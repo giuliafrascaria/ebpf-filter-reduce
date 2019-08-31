@@ -1,8 +1,23 @@
 #include <uapi/linux/bpf.h>
-#include <uapi/linux/if_ether.h>
-#include <uapi/linux/if_packet.h>
-#include <uapi/linux/ip.h>
+#include <linux/version.h>
 #include "bpf_helpers.h"
+
+
+
+SEC("kprobe/sys_write")
+int bpf_prog1()
+{
+
+	char msg[] = "hello world\n";
+
+	bpf_trace_printk(msg, sizeof(msg));
+
+	return 0;
+}
+
+char _license[] SEC("license") = "GPL";
+__u32 _version SEC("version") = LINUX_VERSION_CODE;
+/*
 
 struct bpf_map_def SEC("maps") my_map = {
 	.type = BPF_MAP_TYPE_ARRAY,
@@ -10,17 +25,4 @@ struct bpf_map_def SEC("maps") my_map = {
 	.value_size = sizeof(long),
 	.max_entries = 256,
 };
-
-SEC("socket1")
-int bpf_prog1(struct __sk_buff *skb)
-{
-
-	char msg[] = "hello world\n";
-	char store[] = "fieldfield";
-
-	bpf_trace_printk(msg, sizeof(msg), store);
-
-
-	return 0;
-}
-char _license[] SEC("license") = "GPL";
+*/

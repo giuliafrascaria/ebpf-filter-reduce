@@ -35,7 +35,9 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	printf("loaded module\n");
 
+
+	printf("loaded module\n");
+	sleep(1000);
 	return 0;
 }
