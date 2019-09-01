@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 
   //read data from map
 	for (int i = 0; i < 5; i++) {
-		long long tcp_cnt, udp_cnt;
+		long long tcp_cnt, udp_cnt, icmp_cnt;
 		int key;
 
 		key = IPPROTO_TCP;
@@ -91,11 +91,11 @@ int main(int argc, char **argv)
 		key = IPPROTO_UDP;
 		assert(bpf_map_lookup_elem(map_fd, &key, &udp_cnt) == 0);
 
-		//key = IPPROTO_ICMP;
-		//assert(bpf_map_lookup_elem(map_fd, &key, &icmp_cnt) == 0);
+		key = IPPROTO_ICMP;
+		assert(bpf_map_lookup_elem(map_fd, &key, &icmp_cnt) == 0);
 
-		printf("TCP %lld UDP %lld\n",
-		       tcp_cnt, udp_cnt);
+		printf("TCP %lld UDP %lld ICMP %lld\n",
+		       tcp_cnt, udp_cnt, icmp_cnt);
 		sleep(1);
 	}
 
