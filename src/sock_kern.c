@@ -46,28 +46,13 @@ int bpf_prog1(struct __sk_buff * skb)
   if (count)
   {
     //it should exist because I initialized all values in the line before
-    long newcount = (*count) + 1;
-    bpf_map_update_elem(&my_map, &proto, &newcount, BPF_EXIST);
+
+    //long newcount = (*count) + 1;
+    //bpf_map_update_elem(&my_map, &proto, &newcount, BPF_EXIST);
+
+    //as per the kernel sample
+    __sync_fetch_and_add(count, 1);
   }
-
-
-  /*
-  switch (proto)
-  {
-    case IPPROTO_TCP:
-      count = bpf_map_lookup_elem(&my_map, &proto);
-      *count = *count + 1;
-      bpf_map_update_elem(&my_map, &proto, &count, BPF_EXIST);
-    case IPPROTO_UDP:
-      count = bpf_map_lookup_elem(&my_map, &proto);
-      *count = *count + 1;
-      bpf_map_update_elem(&my_map, &proto, &count, BPF_EXIST);
-    	//__sync_fetch_and_add(count, 1);
-    default:
-      break;
-  }*/
-
-
 
 	return 0;
 }
