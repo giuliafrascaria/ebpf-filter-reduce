@@ -31,17 +31,34 @@ int bpf_prog1(struct __sk_buff * skb)
 {
   //load the right offset in the file
   int proto = load_byte(skb, ETH_HLEN + offsetof(struct iphdr, protocol));
-  long initval = 1;
+  long initval = 0;
   long * count;
 
   //discard the packet if not outgoing
-  //if (skb->pkt_type != PACKET_OUTGOING)
-    //return 0;
-  bpf_map_update_elem(&my_map, &proto, &initval, BPF_ANY);
+  if (skb->pkt_type != PACKET_OUTGOING)
+    return 0;
 
-  /*switch (proto)
+
+  bpf_map_update_elem(&my_map, &proto, &initval, BPF_NOEXIST);
+
+  count = bpf_map_lookup_elem(&my_map, &proto);
+
+  if (count)
+  {
+    //it should exist because I initialized all values in the line before
+    long newcount = (*count) + 1;
+    bpf_map_update_elem(&my_map, &proto, &newcount, BPF_EXIST);
+  }
+
+
+  /*
+  switch (proto)
   {
     case IPPROTO_TCP:
+      count = bpf_map_lookup_elem(&my_map, &proto);
+      *count = *count + 1;
+      bpf_map_update_elem(&my_map, &proto, &count, BPF_EXIST);
+    case IPPROTO_UDP:
       count = bpf_map_lookup_elem(&my_map, &proto);
       *count = *count + 1;
       bpf_map_update_elem(&my_map, &proto, &count, BPF_EXIST);
