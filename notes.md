@@ -67,7 +67,8 @@ struct bpf_context;
 
 ```
 answer: in the man page
-```By picking prog_type program author  selects  a  set  of  helper
+```
+By picking prog_type program author  selects  a  set  of  helper
               functions callable from eBPF program and corresponding format of
               struct bpf_context (which is  the  data  blob  passed  into  the
               program  as  the  first  argument).   For  example, the programs
