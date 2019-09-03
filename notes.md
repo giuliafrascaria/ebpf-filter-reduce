@@ -55,3 +55,46 @@ kprobe_open_kern.c:13:45: error: no member named 'di' in 'struct pt_regs'
 
 ```
 I need struct from bpf_context, that should have it
+
+- in the linux kernel, bpf.h I found this: but where is it defined then?
+
+```
+/* bpf_context is intentionally undefined structure. Pointer to bpf_context is
+ * the first argument to eBPF programs.
+ * For socket filters: 'struct bpf_context *' == 'struct sk_buff *'
+ */
+struct bpf_context;
+
+```
+answer: in the man page
+```By picking prog_type program author  selects  a  set  of  helper
+              functions callable from eBPF program and corresponding format of
+              struct bpf_context (which is  the  data  blob  passed  into  the
+              program  as  the  first  argument).   For  example, the programs
+              loaded with  prog_type  =  TYPE_TRACING  may  call  bpf_printk()
+              helper,  whereas  TYPE_SOCKET  programs  may  not.   The  set of
+              functions  available  to  the  programs  under  given  type  may
+              increase in the future.
+
+              Currently the set of functions for TYPE_TRACING is:
+              bpf_map_lookup_elem(map_fd, void *key)              // lookup key in a map_fd
+              bpf_map_update_elem(map_fd, void *key, void *value) // update key/value
+              bpf_map_delete_elem(map_fd, void *key)              // delete key in a map_fd
+              bpf_ktime_get_ns(void)                              // returns current ktime
+              bpf_printk(char *fmt, int fmt_size, ...)            // prints into trace buffer
+              bpf_memcmp(void *ptr1, void *ptr2, int size)        // non-faulting memcmp
+              bpf_fetch_ptr(void *ptr)    // non-faulting load pointer from any address
+              bpf_fetch_u8(void *ptr)     // non-faulting 1 byte load
+              bpf_fetch_u16(void *ptr)    // other non-faulting loads
+              bpf_fetch_u32(void *ptr)
+              bpf_fetch_u64(void *ptr)
+
+              and bpf_context is defined as:
+              struct bpf_context {
+                  /* argN fields match one to one to arguments passed to trace events */
+                  u64 arg1, arg2, arg3, arg4, arg5, arg6;
+                  /* return value from kretprobe event or from syscall_exit event */
+                  u64 ret;
+              };
+```
+so I should be finding something that depends on bpf prog type for my case, kprobe?
