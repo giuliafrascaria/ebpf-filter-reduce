@@ -26,3 +26,32 @@ bool is_sk_msg = strncmp(event, "sk_msg", 6) == 0;
 ```
 -I/usr/lib/gcc/x86_64-linux-gnu/7.4.0/include
 ```
+
+- how to use PT_REGS_PARM? They should be the copy of the function arguments, so if the calling conventions are respected it's rdi rsi ...
+
+```
+#define PT_REGS_PARM1(x) ((x)->di)
+#define PT_REGS_PARM2(x) ((x)->si)
+#define PT_REGS_PARM3(x) ((x)->dx)
+#define PT_REGS_PARM4(x) ((x)->cx)
+#define PT_REGS_PARM5(x) ((x)->r8)
+#define PT_REGS_RET(x) ((x)->sp)
+#define PT_REGS_FP(x) ((x)->bp)
+#define PT_REGS_RC(x) ((x)->ax)
+#define PT_REGS_SP(x) ((x)->sp)
+#define PT_REGS_IP(x) ((x)->ip)
+
+```
+
+-problem, I am probably including the wrong struct because when compiling I get
+```
+kprobe_open_kern.c:13:45: error: no member named 'di' in 'struct pt_regs'
+  bpf_probe_read(&buf, sizeof(buf), (void *)PT_REGS_PARM1(ctx));
+                                            ^~~~~~~~~~~~~~~~~~
+../common/bpf_helpers.h:166:32: note: expanded from macro 'PT_REGS_PARM1'
+#define PT_REGS_PARM1(x) ((x)->di)
+                          ~~~  ^
+1 error generated.
+
+```
+I need struct from bpf_context, that should have it
