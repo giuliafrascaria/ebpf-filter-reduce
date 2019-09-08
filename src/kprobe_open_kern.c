@@ -25,6 +25,7 @@ struct bpf_map_def SEC("maps") dnat_map = {
  * This example sits on a syscall, and the syscall ABI is relatively stable
  * of course, across platforms, and over time, the ABI may change.
  */
+ 
 SEC("kprobe/sys_connect")
 int bpf_prog1(struct pt_regs *ctx)
 {
