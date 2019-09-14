@@ -99,3 +99,12 @@ By picking prog_type program author  selects  a  set  of  helper
               };
 ```
 so I should be finding something that depends on bpf prog type for my case, kprobe?
+
+
+
+
+error: 'asm goto' constructs are not supported yet
+        return GEN_UNARY_RMWcc(LOCK_PREFIX "incl", v->counter, e);
+
+found linux patch in the mailing list, try
+https://lkml.org/lkml/2018/4/10/825
