@@ -1,3 +1,3 @@
 # ebpf test project
 
-- kernel version: 5.2
+- kernel version: 4.15.9

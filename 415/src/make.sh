@@ -18,6 +18,7 @@ clang -nostdinc -isystem `clang -print-file-name=include` \
 	-I/usr/src/linux-headers-`uname -r`/include/uapi/ \
 	-I/usr/src/linux-headers-`uname -r`/include/generated/uapi/ \
 	-I/usr/src/linux-headers-`uname -r`/arch/x86/include/ \
+	-I/usr/src/linux-headers-`uname -r`/arch/x86/include/asm/ \
 	-I/usr/src/linux-headers-`uname -r`/arch/x86/include/uapi/ \
 	-I/usr/src/linux-headers-`uname -r`/arch/x86/include/generated/ \
 	-I/usr/src/linux-headers-`uname -r`/arch/x86/include/generated/uapi/ \
@@ -27,7 +28,7 @@ gcc "$USER".c ../common/bpf_load.c ~/ebpf/libbpf/src/libbpf.a -I/home/giogge/ebp
 
 }
 
-targets=( tracex1 hellotrace cpustat)
+targets=( tracex1 hellotrace )
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"
