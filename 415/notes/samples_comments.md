@@ -36,3 +36,7 @@ tracex1_kern has undeclared reference to cr3_addr_mask
 /arch/x86/include/asm/processor.h
 |
 |-------->
+
+#dependency problem
+I think it is not possible to use a single make.sh for everything. There are duplicate dependencies that mess the compilation.
+For example, including /include/ and /arch/x86/include/ there is a duplicate /asm/processor-flag.h that makes the compilation fail because the wrong file is picked up.
