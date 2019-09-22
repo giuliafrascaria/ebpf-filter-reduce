@@ -29,7 +29,7 @@ gcc "$USER".c ../common/bpf_load.c ~/ebpf/libbpf/src/libbpf.a -I/home/giogge/ebp
 
 }
 
-targets=( tracex1 hellotrace )
+targets=( tracex1  )
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"
