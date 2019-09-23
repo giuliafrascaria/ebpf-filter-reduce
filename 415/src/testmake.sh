@@ -15,6 +15,7 @@ clang -nostdinc -isystem `clang -print-file-name=include` \
 	-I../common/ \
 	-include /usr/src/linux-headers-`uname -r`/include/linux/kconfig.h \
 	-I/usr/src/linux-headers-`uname -r`/include/ \
+	-I/usr/include/x86_64-linux-gnu/ \
 	-I/usr/src/linux-headers-`uname -r`/include/uapi/ \
 	-I/usr/src/linux-headers-`uname -r`/include/generated/uapi/ \
 	-I/usr/src/linux-headers-`uname -r`/arch/x86/include/ \
