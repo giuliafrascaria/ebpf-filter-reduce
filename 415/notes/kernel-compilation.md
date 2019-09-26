@@ -28,3 +28,60 @@ GRUB_DEFAULT=saved
 After booting in 4.15.0, I deleted the vmlinuz image of the 4.15.0.64 that was installed by default in the vm, and reset the original grub file to avoid always stopping in the advanced boot menu.
 
 ### the end (for now...)
+
+Nope
+
+### updates
+
+As it turned out, the problem persisted and in 4.15.0 I still had the asm directory in the headers. Instead of building the headers with fakeroot, I manually copied the folders to the /usr/src/4.15.0 headers directory to get the compilation working.
+I still have a /asm/linkage.h missing dependency which should be in the asm directory that was giving me problems in the previous steps.
+However, good news is that it is finally possible to compile bpf samples from the kernel sources. I will check their header dependencies to fix my local build.
+
+make headers_install in the linux git directory created these local headers in /usr/include/ (local to the repository, not in the kernel source path)
+
+```
+make headers_install
+  CHK     include/generated/uapi/linux/version.h
+  HOSTCC  scripts/unifdef
+  INSTALL usr/include/asm-generic/ (37 files)
+  INSTALL usr/include/drm/ (25 files)
+  INSTALL usr/include/linux/ (488 files)
+  INSTALL usr/include/linux/android/ (1 file)
+  INSTALL usr/include/linux/byteorder/ (2 files)
+  INSTALL usr/include/linux/caif/ (2 files)
+  INSTALL usr/include/linux/can/ (6 files)
+  INSTALL usr/include/linux/cifs/ (1 file)
+  INSTALL usr/include/linux/dvb/ (8 files)
+  INSTALL usr/include/linux/genwqe/ (1 file)
+  INSTALL usr/include/linux/hdlc/ (1 file)
+  INSTALL usr/include/linux/hsi/ (2 files)
+  INSTALL usr/include/linux/iio/ (2 files)
+  INSTALL usr/include/linux/isdn/ (1 file)
+  INSTALL usr/include/linux/mmc/ (1 file)
+  INSTALL usr/include/linux/netfilter/ (87 files)
+  INSTALL usr/include/linux/netfilter/ipset/ (4 files)
+  INSTALL usr/include/linux/netfilter_arp/ (2 files)
+  INSTALL usr/include/linux/netfilter_bridge/ (17 files)
+  INSTALL usr/include/linux/netfilter_ipv4/ (9 files)
+  INSTALL usr/include/linux/netfilter_ipv6/ (12 files)
+  INSTALL usr/include/linux/nfsd/ (5 files)
+  INSTALL usr/include/linux/raid/ (2 files)
+  INSTALL usr/include/linux/sched/ (1 file)
+  INSTALL usr/include/linux/spi/ (1 file)
+  INSTALL usr/include/linux/sunrpc/ (1 file)
+  INSTALL usr/include/linux/tc_act/ (15 files)
+  INSTALL usr/include/linux/tc_ematch/ (4 files)
+  INSTALL usr/include/linux/usb/ (12 files)
+  INSTALL usr/include/linux/wimax/ (1 file)
+  INSTALL usr/include/misc/ (1 file)
+  INSTALL usr/include/mtd/ (5 files)
+  INSTALL usr/include/rdma/ (20 files)
+  INSTALL usr/include/rdma/hfi/ (2 files)
+  INSTALL usr/include/scsi/ (4 files)
+  INSTALL usr/include/scsi/fc/ (4 files)
+  INSTALL usr/include/sound/ (15 files)
+  INSTALL usr/include/video/ (3 files)
+  INSTALL usr/include/xen/ (4 files)
+  INSTALL usr/include/asm/ (63 files)
+
+```
