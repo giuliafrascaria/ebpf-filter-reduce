@@ -4,4 +4,4 @@
 
 # blog
 
-you can find notes for the project [HERE]{https://giuliafrascaria.github.io/ebpf-experiments/}
+you can find notes for the project [HERE](https://giuliafrascaria.github.io/ebpf-experiments/)
