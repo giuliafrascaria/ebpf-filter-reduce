@@ -5,6 +5,8 @@ what happens underneath a read syscall? I need to understand all the layers of t
 
 ## Linux I/O path, high level
 
+```
+
 -----------------------
 
        userland
@@ -18,6 +20,7 @@ what happens underneath a read syscall? I need to understand all the layers of t
 
       device driver
 -----------------------
+```
 
 
 
@@ -32,7 +35,7 @@ the following object types are part of the common file model:
 - dentry object: information about the linking of a directory entry
 
 
-`
+```
 P1------------> File object-----------> dentry object(can be shared)
 							|
 P2------------> File object-----------> dentry object   |
@@ -49,8 +52,8 @@ P2------------> File object-----------> dentry object   |
 						|
 						v
 					    Disk file
+```
 
-`
 
 The most frequently used dentry objects are kept in a dentry cache (in RAM) by the VFS, in order to improve performance
 
@@ -61,10 +64,11 @@ file objects are process-file specific, and they contain a f-op field with all s
 
 once upon a time in the userland, someone triggered an open and read syscall
 
-`
+```
 int open(pathname, flags)
 int read(int fd, void buf, sizet count)
-`
+```
+
 
 read is a syscall, so at this point we trap in the kernel to trigger the syscall
 - http://man7.org/linux/man-pages/man2/intro.2.html
