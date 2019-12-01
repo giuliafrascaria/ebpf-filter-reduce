@@ -32,8 +32,8 @@ the following object types are part of the common file model:
 - dentry object: information about the linking of a directory entry
 
 
-
-P1------------> File object-----------> dentry object(can be shared) 
+`
+P1------------> File object-----------> dentry object(can be shared)
 							|
 P2------------> File object-----------> dentry object   |
 						|	|
@@ -50,6 +50,7 @@ P2------------> File object-----------> dentry object   |
 						v
 					    Disk file
 
+`
 
 The most frequently used dentry objects are kept in a dentry cache (in RAM) by the VFS, in order to improve performance
 
@@ -103,7 +104,7 @@ now it is possible to perform read/write operations on the file, let's have a lo
 - invoke file-> fop -> read if it is defined, or or the file-> fop -> aio read
 - return the number of bytes transfered
 
-`
+
 - read call -> 
 - sys_read service handler ->
 - the file abstraction in the kernel contains a pointer f_op to the FS-specific functions
@@ -111,8 +112,4 @@ now it is possible to perform read/write operations on the file, let's have a lo
 
 ## the device driver
 
-
-`
-vfs_read()
-`
 
