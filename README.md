@@ -2,4 +2,6 @@
 
 - kernel version: 4.15.9
 
-# create google doc
+# blog
+
+you can find notes for the project [HERE]{https://giuliafrascaria.github.io/ebpf-experiments/}
