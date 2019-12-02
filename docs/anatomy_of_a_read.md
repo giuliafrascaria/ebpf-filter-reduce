@@ -114,6 +114,12 @@ now it is possible to perform read/write operations on the file, let's have a lo
 - the file abstraction in the kernel contains a pointer f_op to the FS-specific functions
 - read becomes file->f_op->read() underneath
 
-## the device driver
+## the real kernel calls
 
+```
+read()		userland program
+sys_read()      kernel handler 
+
+
+```
 
