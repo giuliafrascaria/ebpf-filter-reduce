@@ -44,13 +44,23 @@ A good direction to follow would be the biosnoop tool by brendan gregg. At this 
 ![from Brendsn Gregg's book, BPF tools](images/bpf-disk.png)
 ![from Brendsn Gregg's book, BPF tools](images/fstools.png)
 
+An alternative implementation in the scenario we're looking at is the sendfile call. If we can hook the copy between kernel buffers from the I/O buffer to the socket buffer, only returning the result, that would be great. But this is only valid if data needs to be returned to the client side. If the computation is server-side manipulation of data, then this is not applicable.
 
-considerations:
+[zero-copy](https://www.linuxjournal.com/article/6345)
+
+```
+blk_account_io_completion(struct request *req, unsigned int bytes) //https://elixir.bootlin.com/linux/v4.9/source/block/blk-core.c#L2235
+
+bool blk_update_request(struct request *req, int error, unsigned int nr_bytes)
+
+```
+
+## considerations
 - I can identify the PID but what if the same PID issues multiple requests? I need to instrument based on the file that is accessed, so I need to investigate if requests are batched or if I can assume that a request corresponds to a single file transfer.
 - instrumenting at the read() level makes this easier to achieve, but we are not able to avoid the copy from kernel to user buffer
 - the read() syscall is probably less subject to future changes than the kernel level interfaces with disk (verify how it was in the past though), so this might make the bpf hooks less future-proof if something changes in the block device interface (and the survey suggests that there is research happening in that direction). so the question is, what is the sweet spot between a STABLE anchor point and an EFFICIENT one?
 - How to deal with potentially cached data? Should I assume that the data is always on disk and that an IO request will be issued? Because if data is in the file system cache, that's not the case and I will miss out on some data if I instrument on the block IO level, while I'd be able to catch it in a read() instrumentation -> (check vfsstat)
-- the gain for the blocl IO is actually relevant only if I can avoid copying the data to userland, so it should affect the buffer size being copied, or consume the buffer in kernel memory and return results on a bpf map -> is that even possible? 
+- the gain for the blocl IO is actually relevant only if I can avoid copying the data to userland, so it should affect the buffer size being copied, or consume the buffer in kernel memory and return results on a bpf map -> is that even possible?
 
 
 ![from Brendsn Gregg's book, I/O stack](images/fscaches.png)
