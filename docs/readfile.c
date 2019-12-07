@@ -22,6 +22,8 @@ int main(void)
 		char * buf = malloc(10);
 		ssize_t readbytes = read(fd, buf, 1);
 		close(fd);
+
+		printf("%s\n", buf);
 		free(buf);
 
 	//}
