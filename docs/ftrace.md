@@ -1,0 +1,9 @@
+https://lwn.net/Articles/365835/
+https://lwn.net/Articles/366796/
+https://lwn.net/Articles/370423/
+https://lwn.net/Articles/410200/
+https://lwn.net/Articles/608497/
+https://www.kernel.org/doc/Documentation/trace/ftrace.txt
+https://elinux.org/Ftrace
+https://blog.selectel.com/kernel-tracing-ftrace/
+https://jvns.ca/blog/2017/03/19/getting-started-with-ftrace/
