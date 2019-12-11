@@ -1,4 +1,4 @@
-## The thesis chronicles
+## The BPF chronicles
 With my M.Sc. thesis project I want to investigate the potential for eBPF to be used for pushing computation closer to the storage. 
 
 I will report my struggles here, hoping to help someone else overcome the problems that I faced.
