@@ -640,6 +640,11 @@ I think this is a good point to hook the bpf code. On the entry point addr holds
 
 One question is: is addr the addewss to the raw bytes to transfer, or is there kernel metadata I need to ignore?
 
+The problem with hooking at this point is that 
+- left track of filename looong ago, as well as file descriptor and all that. 
+- I went through the file system, so in order to keep track of what is what I have to transport information across a specific file system layer?
+- we wanted to have some notion of the data type in the file, is it even present at this level
+
 
 
 https://elixir.bootlin.com/linux/v4.15/source/lib/iov_iter.c#L558
