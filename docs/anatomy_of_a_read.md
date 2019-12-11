@@ -899,5 +899,4 @@ https://elixir.bootlin.com/linux/v4.15/source/arch/x86/include/asm/alternative.h
 		: [old] "i" (oldfunc), [new1] "i" (newfunc1),		      \
 		  [new2] "i" (newfunc2), ## input);			      \
 }
-
 ```
