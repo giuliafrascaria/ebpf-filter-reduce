@@ -666,6 +666,35 @@ EXPORT_SYMBOL(_copy_to_iter);
 
 ```
 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+From this point on, this is just going deeper in the rabbit hole
+
+
+### copyout
+
+https://elixir.bootlin.com/linux/v4.15/source/lib/iov_iter.c#L133
+
+I think this might be a good point, on entry point of the function I can modify the from buffer and the size, and only copy the answer to userland.
+
+-> NO actually better to go one level up, because copyout gets called repeatedy until there is more to read, might be hard for consistency and seek point.
+go one level up
+
+```c
+static int copyout(void __user *to, const void *from, size_t n)
+{
+	if (access_ok(VERIFY_WRITE, to, n)) {
+		kasan_check_read(from, n);
+		n = raw_copy_to_user(to, from, n);
+	}
+	return n;
+}
+
+```
 
 ### iovec
 let's first go down the rabbit hole with the iovec option. copyout is called to fill th euser-level buffer buf
@@ -760,26 +789,7 @@ done:
 }
 ```
 
-### copyout
 
-https://elixir.bootlin.com/linux/v4.15/source/lib/iov_iter.c#L133
-
-I think this might be a good point, on entry point of the function I can modify the from buffer and the size, and only copy the answer to userland.
-
--> NO actually better to go one level up, because copyout gets called repeatedy until there is more to read, might be hard for consistency and seek point.
-go one level up
-
-```c
-static int copyout(void __user *to, const void *from, size_t n)
-{
-	if (access_ok(VERIFY_WRITE, to, n)) {
-		kasan_check_read(from, n);
-		n = raw_copy_to_user(to, from, n);
-	}
-	return n;
-}
-
-```
 
 ### raw_copy_to_user
 this is unfortunately architecture-dependent, so I picked the x86 64 bit version
