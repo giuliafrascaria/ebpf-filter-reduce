@@ -27,7 +27,7 @@ gcc "$USER".c ../common/bpf_load.c ~/thesis/libbpf/src/libbpf.a -I/home/giogge/t
 
 }
 
-targets=( tracex1 cpustat)
+targets=( tracex1 cpustat passfd)
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"
