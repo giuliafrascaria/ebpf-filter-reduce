@@ -1,0 +1,481 @@
+  CHK     include/config/kernel.release
+  UPD     include/config/kernel.release
+  CHK     include/generated/uapi/linux/version.h
+  CHK     include/generated/utsrelease.h
+  CHK     include/generated/timeconst.h
+  CHK     include/generated/bounds.h
+  CHK     include/generated/asm-offsets.h
+  CALL    scripts/checksyscalls.sh
+  DESCEND  objtool
+  CHK     scripts/mod/devicetable-offsets.h
+  HOSTCC  samples/bpf/test_lru_dist.o
+  HOSTCC  samples/bpf/../../tools/lib/bpf/bpf.o
+  HOSTLD  samples/bpf/test_lru_dist
+  HOSTCC  samples/bpf/sock_example.o
+  HOSTLD  samples/bpf/sock_example
+  HOSTCC  samples/bpf/bpf_load.o
+  HOSTCC  samples/bpf/fds_example.o
+  HOSTLD  samples/bpf/fds_example
+  HOSTCC  samples/bpf/sockex1_user.o
+  HOSTLD  samples/bpf/sockex1
+  HOSTCC  samples/bpf/sockex2_user.o
+  HOSTLD  samples/bpf/sockex2
+  HOSTCC  samples/bpf/sockex3_user.o
+  HOSTLD  samples/bpf/sockex3
+  HOSTCC  samples/bpf/tracex1_user.o
+  HOSTLD  samples/bpf/tracex1
+  HOSTCC  samples/bpf/tracex2_user.o
+  HOSTLD  samples/bpf/tracex2
+  HOSTCC  samples/bpf/tracex3_user.o
+  HOSTLD  samples/bpf/tracex3
+  HOSTCC  samples/bpf/tracex4_user.o
+  HOSTLD  samples/bpf/tracex4
+  HOSTCC  samples/bpf/tracex5_user.o
+  HOSTLD  samples/bpf/tracex5
+  HOSTCC  samples/bpf/tracex6_user.o
+  HOSTLD  samples/bpf/tracex6
+  HOSTCC  samples/bpf/test_probe_write_user_user.o
+  HOSTLD  samples/bpf/test_probe_write_user
+  HOSTCC  samples/bpf/trace_output_user.o
+  HOSTLD  samples/bpf/trace_output
+  HOSTCC  samples/bpf/lathist_user.o
+  HOSTLD  samples/bpf/lathist
+  HOSTCC  samples/bpf/offwaketime_user.o
+  HOSTLD  samples/bpf/offwaketime
+  HOSTCC  samples/bpf/spintest_user.o
+  HOSTLD  samples/bpf/spintest
+  HOSTCC  samples/bpf/map_perf_test_user.o
+  HOSTLD  samples/bpf/map_perf_test
+  HOSTCC  samples/bpf/test_overhead_user.o
+samples/bpf/test_overhead_user.c: In function ‘test_task_rename’:
+samples/bpf/test_overhead_user.c:48:3: warning: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Wunused-result]
+   write(fd, buf, sizeof(buf));
+   ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+samples/bpf/test_overhead_user.c: In function ‘test_urandom_read’:
+samples/bpf/test_overhead_user.c:67:3: warning: ignoring return value of ‘read’, declared with attribute warn_unused_result [-Wunused-result]
+   read(fd, buf, sizeof(buf));
+   ^~~~~~~~~~~~~~~~~~~~~~~~~~
+  HOSTLD  samples/bpf/test_overhead
+  HOSTCC  samples/bpf/test_cgrp2_array_pin.o
+  HOSTLD  samples/bpf/test_cgrp2_array_pin
+  HOSTCC  samples/bpf/test_cgrp2_attach.o
+  HOSTLD  samples/bpf/test_cgrp2_attach
+  HOSTCC  samples/bpf/test_cgrp2_attach2.o
+  HOSTCC  samples/bpf/../../tools/testing/selftests/bpf/cgroup_helpers.o
+  HOSTLD  samples/bpf/test_cgrp2_attach2
+  HOSTCC  samples/bpf/test_cgrp2_sock.o
+  HOSTLD  samples/bpf/test_cgrp2_sock
+  HOSTCC  samples/bpf/test_cgrp2_sock2.o
+  HOSTLD  samples/bpf/test_cgrp2_sock2
+  HOSTCC  samples/bpf/xdp1_user.o
+  HOSTLD  samples/bpf/xdp1
+  HOSTLD  samples/bpf/xdp2
+  HOSTCC  samples/bpf/xdp_router_ipv4_user.o
+  HOSTLD  samples/bpf/xdp_router_ipv4
+  HOSTCC  samples/bpf/test_current_task_under_cgroup_user.o
+  HOSTLD  samples/bpf/test_current_task_under_cgroup
+  HOSTCC  samples/bpf/trace_event_user.o
+samples/bpf/trace_event_user.c: In function ‘test_perf_event_all_cpu’:
+samples/bpf/trace_event_user.c:144:2: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+  system("dd if=/dev/zero of=/dev/null count=5000k status=none");
+  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+samples/bpf/trace_event_user.c: In function ‘test_perf_event_task’:
+samples/bpf/trace_event_user.c:173:2: warning: ignoring return value of ‘system’, declared with attribute warn_unused_result [-Wunused-result]
+  system("dd if=/dev/zero of=/dev/null count=5000k status=none");
+  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  HOSTLD  samples/bpf/trace_event
+  HOSTCC  samples/bpf/sampleip_user.o
+  HOSTLD  samples/bpf/sampleip
+  HOSTCC  samples/bpf/tc_l2_redirect_user.o
+  HOSTLD  samples/bpf/tc_l2_redirect
+  HOSTCC  samples/bpf/lwt_len_hist_user.o
+  HOSTLD  samples/bpf/lwt_len_hist
+  HOSTCC  samples/bpf/xdp_tx_iptunnel_user.o
+  HOSTLD  samples/bpf/xdp_tx_iptunnel
+  HOSTCC  samples/bpf/test_map_in_map_user.o
+  HOSTLD  samples/bpf/test_map_in_map
+  HOSTCC  samples/bpf/cookie_uid_helper_example.o
+  HOSTLD  samples/bpf/per_socket_stats_example
+  HOSTCC  samples/bpf/load_sock_ops.o
+  HOSTLD  samples/bpf/load_sock_ops
+  HOSTCC  samples/bpf/xdp_redirect_user.o
+  HOSTLD  samples/bpf/xdp_redirect
+  HOSTCC  samples/bpf/xdp_redirect_map_user.o
+  HOSTLD  samples/bpf/xdp_redirect_map
+  HOSTCC  samples/bpf/xdp_redirect_cpu_user.o
+  HOSTLD  samples/bpf/xdp_redirect_cpu
+  HOSTCC  samples/bpf/xdp_monitor_user.o
+  HOSTLD  samples/bpf/xdp_monitor
+  HOSTCC  samples/bpf/syscall_tp_user.o
+  HOSTLD  samples/bpf/syscall_tp
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/sockex1_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/sockex1_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/sockex2_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/sockex2_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/sockex3_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/sockex3_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tracex1_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tracex1_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tracex2_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tracex2_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tracex3_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tracex3_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tracex4_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tracex4_kern.o
+  CC      samples/bpf/syscall_nrs.s
+  CHK     samples/bpf/syscall_nrs.h
+  UPD     samples/bpf/syscall_nrs.h
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tracex5_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tracex5_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tracex6_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tracex6_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/sock_flags_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/sock_flags_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/test_probe_write_user_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/test_probe_write_user_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/trace_output_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/trace_output_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tcbpf1_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tcbpf1_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tcbpf2_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tcbpf2_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tc_l2_redirect_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tc_l2_redirect_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/lathist_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/lathist_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/offwaketime_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/offwaketime_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/spintest_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/spintest_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/map_perf_test_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/map_perf_test_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/test_overhead_tp_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/test_overhead_tp_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/test_overhead_kprobe_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/test_overhead_kprobe_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/parse_varlen.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/parse_varlen.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/parse_simple.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/parse_simple.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/parse_ldabs.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/parse_ldabs.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/test_cgrp2_tc_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/test_cgrp2_tc_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/xdp1_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/xdp1_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/xdp2_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/xdp2_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/xdp_router_ipv4_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/xdp_router_ipv4_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/test_current_task_under_cgroup_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/test_current_task_under_cgroup_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/trace_event_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/trace_event_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/sampleip_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/sampleip_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/lwt_len_hist_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/lwt_len_hist_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/xdp_tx_iptunnel_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/xdp_tx_iptunnel_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/test_map_in_map_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/test_map_in_map_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tcp_synrto_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tcp_synrto_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tcp_rwnd_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tcp_rwnd_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tcp_bufs_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tcp_bufs_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tcp_cong_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tcp_cong_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tcp_iw_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tcp_iw_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tcp_clamp_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tcp_clamp_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/tcp_basertt_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/tcp_basertt_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/xdp_redirect_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/xdp_redirect_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/xdp_redirect_map_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/xdp_redirect_map_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/xdp_redirect_cpu_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/xdp_redirect_cpu_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/xdp_monitor_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/xdp_monitor_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-O2 -emit-llvm -c samples/bpf/syscall_tp_kern.c -o -| llc -march=bpf -filetype=obj -o samples/bpf/syscall_tp_kern.o
