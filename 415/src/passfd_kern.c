@@ -50,20 +50,34 @@ struct bpf_map_def SEC("maps") my_read_map =
 
 
 // bpf instrumentation for the read syscall (entry point)
-SEC("/tracepoint/syscalls/sys_enter_read")
+
+SEC("tracepoint/syscalls/sys_enter_read")
 int attach_open(struct syscalls_enter_read_args *ctx) {
 	
 	long key = 0;
- 	long * val = bpf_map_lookup_elem(&my_map, &key);
-
- 	if (*val == ctx->fd){
+ 	long * val;
+       	val = bpf_map_lookup_elem(&my_map, &key);
+	
+	if(!val)
+	{
+		return 0;
+	}
+ 	
+	if (*val == ctx->fd)
+	{
  		//success, I successfully read the filename from the map
-		//update fd_map, will be used by the read bpf instumentation
-		
+		//update fd_map, will be used by the read bpf instumentation	
 		bpf_map_update_elem(&my_read_map, &key, val, BPF_ANY);  
  	}
 	return 0;
 }
+/*
+SEC("tracepoint/syscalls/sys_enter_read")
+int attach_read(struct syscalls_enter_read_args *ctx) {
+	char s[] = "tracepoint hooked\n";
+	bpf_trace_printk(s, sizeof(s)); 
+	return 0;
+}*/
 
 
 char _license[] SEC("license") = "GPL";

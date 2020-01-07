@@ -44,6 +44,7 @@ int main(int argc, char **argv)
 
 	__u32 key = 0;
 	int val = open(argv[1], O_RDONLY);
+	if (val == -1)
 	{
                 fprintf(stderr, "open failed: %s\n", strerror(errno));
                 return 1;
