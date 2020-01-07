@@ -68,3 +68,71 @@ struggles:
 
 I have written a program tha passes a file descriptor from userspace to bpf module, and then viceversa. 
 I am currently stuck at the execution, the bpf prog load fails with errno 0 so there is something wrong in the kernel module
+
+## 7/6/2020
+- trying to debug my bpf code, strace shows that maps are created while the program fails loading. figured out, the problem was a typo in the definition of the SEC(), I was writing \tracepoint and I don't need the slash
+- continuing to look into bpf examples
+- the execution of the kernel module is now triggered but fails for invalid mem access first, then for wrong value after I added an error check
+
+```
+welcome
+loading bpf extension ./passfd_kern.o
+bpf_load_program() err=13
+0: (bf) r6 = r1
+1: (b7) r1 = 0
+2: (7b) *(u64 *)(r10 -8) = r1
+3: (bf) r2 = r10
+4: (07) r2 += -8
+5: (18) r1 = 0xffff9addc0f18300
+7: (85) call bpf_map_lookup_elem#1
+8: (79) r1 = *(u64 *)(r0 +0)
+R0 invalid mem access 'map_value_or_null'
+ERROR: loading BPF program (errno 13):
+0: (bf) r6 = r1
+1: (b7) r1 = 0
+2: (7b) *(u64 *)(r10 -8) = r1
+3: (bf) r2 = r10
+4: (07) r2 += -8
+5: (18) r1 = 0xffff9addc0f18300
+7: (85) call bpf_map_lookup_elem#1
+8: (79) r1 = *(u64 *)(r0 +0)
+R0 invalid mem access 'map_value_or_null'
+
+-----------------------------------------
+
+welcome
+loading bpf extension ./passfd_kern.o
+bpf_load_program() err=13
+0: (bf) r6 = r1
+1: (b7) r1 = 0
+2: (7b) *(u64 *)(r10 -8) = r1
+3: (bf) r2 = r10
+4: (07) r2 += -8
+5: (18) r1 = 0xffff9addc4f82200
+7: (85) call bpf_map_lookup_elem#1
+8: (15) if r0 == 0x0 goto pc+10
+ R0=map_value(id=0,off=0,ks=4,vs=4,imm=0) R6=ctx(id=0,off=0,imm=0) R10=fp0
+9: (79) r1 = *(u64 *)(r6 +16)
+10: (79) r2 = *(u64 *)(r0 +0)
+ R0=map_value(id=0,off=0,ks=4,vs=4,imm=0) R1=inv(id=0) R6=ctx(id=0,off=0,imm=0) R10=fp0
+invalid access to map value, value_size=4 off=0 size=8
+R0 min value is outside of the array range
+ERROR: loading BPF program (errno 13):
+0: (bf) r6 = r1
+1: (b7) r1 = 0
+2: (7b) *(u64 *)(r10 -8) = r1
+3: (bf) r2 = r10
+4: (07) r2 += -8
+5: (18) r1 = 0xffff9addc4f82200
+7: (85) call bpf_map_lookup_elem#1
+8: (15) if r0 == 0x0 goto pc+10
+ R0=map_value(id=0,off=0,ks=4,vs=4,imm=0) R6=ctx(id=0,off=0,imm=0) R10=fp0
+9: (79) r1 = *(u64 *)(r6 +16)
+10: (79) r2 = *(u64 *)(r0 +0)
+ R0=map_value(id=0,off=0,ks=4,vs=4,imm=0) R1=inv(id=0) R6=ctx(id=0,off=0,imm=0) R10=fp0
+invalid access to map value, value_size=4 off=0 size=8
+R0 min value is outside of the array range
+
+
+```
+
