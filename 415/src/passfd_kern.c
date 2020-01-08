@@ -55,7 +55,7 @@ SEC("tracepoint/syscalls/sys_enter_read")
 int attach_read(struct sys_enter_read_args *ctx) {
 	
 	long key = 0;
- 	long * val;
+ 	__u32 * val;
        	val = bpf_map_lookup_elem(&my_map, &key);
 	
 	if(!val)
@@ -72,7 +72,7 @@ int attach_read(struct sys_enter_read_args *ctx) {
 	//{
  		//success, I successfully read the filename from the map
 		//update fd_map, will be used by the read bpf instumentation	
-	__u32 fd = 1;
+	__u32 fd = *val;
 	bpf_map_update_elem(&my_read_map, &key, &fd, BPF_ANY);  
  	//}
 	return 0;
