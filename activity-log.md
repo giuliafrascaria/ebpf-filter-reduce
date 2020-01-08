@@ -132,7 +132,13 @@ ERROR: loading BPF program (errno 13):
  R0=map_value(id=0,off=0,ks=4,vs=4,imm=0) R1=inv(id=0) R6=ctx(id=0,off=0,imm=0) R10=fp0
 invalid access to map value, value_size=4 off=0 size=8
 R0 min value is outside of the array range
-
-
 ```
 
+### 8/8/2020
+- debugging the read tracepoint hook. I have an issue with the value being read from the second map, so from kernel to user
+- in order to understand what is going on there, I am trying to play with two tracepoint examples that are in the kernel tree (syscall_tp, ibumad, cpustat)
+- todo: create external helper function 
+- insider paper
+- test boundaries of bpf (modify, stop, )
+- alternate path on map, returning the sum of the integers on map
+- databricks
