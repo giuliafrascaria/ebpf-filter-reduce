@@ -35,6 +35,20 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+
+	int fd = open("f", O_RDONLY);
+	if (fd == -1)
+	{
+		printf("error open file\n");
+		exit(EXIT_FAILURE);
+	}
+
+ 	char * buf = malloc(10);
+	ssize_t readbytes = read(fd, buf, 1);
+	printf("%s\n", buf);
+	close(fd);
+	free(buf);
+
 	printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");
 
 	return 0;
