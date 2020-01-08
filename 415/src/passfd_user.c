@@ -65,11 +65,11 @@ int main(int argc, char **argv)
 	//int map_fd1 = bpf_object__find_map_fd_by_name(obj, "my_read_map");
 
 
-	unsigned long value1;
+	long value1;
 	bpf_map_lookup_elem(map_fd[1], &key, &value1);
 
 
-	printf("file descriptor map: %lu\n", value1);
+	printf("file descriptor map: %ld\n", value1);
 	// ath this point the map should be populated with the 
 
 	return 0;

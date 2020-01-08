@@ -22,7 +22,7 @@ format:
 print fmt: "fd: 0x%08lx, buf: 0x%08lx, count: 0x%08lx", ((unsigned long)(REC->fd)), ((unsigned long)(REC->buf)), ((unsigned long)(REC->count))
 */
 
-struct syscalls_enter_read_args 
+struct sys_enter_read_args 
 {
 	unsigned long long unused;
 	long syscall_nr;
@@ -52,7 +52,7 @@ struct bpf_map_def SEC("maps") my_read_map =
 // bpf instrumentation for the read syscall (entry point)
 
 SEC("tracepoint/syscalls/sys_enter_read")
-int attach_open(struct syscalls_enter_read_args *ctx) {
+int attach_read(struct sys_enter_read_args *ctx) {
 	
 	long key = 0;
  	long * val;
@@ -60,20 +60,26 @@ int attach_open(struct syscalls_enter_read_args *ctx) {
 	
 	if(!val)
 	{
+		char s[] = "error reading value from map\n";
+        	bpf_trace_printk(s, sizeof(s)); 
 		return 0;
 	}
+	char s[] = "read value from map\n";
+        bpf_trace_printk(s, sizeof(s));
+
  	
-	if (*val == ctx->fd)
-	{
+	//if (*val == ctx->fd)
+	//{
  		//success, I successfully read the filename from the map
 		//update fd_map, will be used by the read bpf instumentation	
-		bpf_map_update_elem(&my_read_map, &key, val, BPF_ANY);  
- 	}
+	__u32 fd = 1;
+	bpf_map_update_elem(&my_read_map, &key, &fd, BPF_ANY);  
+ 	//}
 	return 0;
 }
 /*
 SEC("tracepoint/syscalls/sys_enter_read")
-int attach_read(struct syscalls_enter_read_args *ctx) {
+int attach_read(struct sys_enter_read_args *ctx) {
 	char s[] = "tracepoint hooked\n";
 	bpf_trace_printk(s, sizeof(s)); 
 	return 0;
