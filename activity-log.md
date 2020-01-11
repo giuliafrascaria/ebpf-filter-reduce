@@ -1,10 +1,10 @@
 ## activity log
 
-### 5/6/2020
+### 5/1/2020
 - fixed the setup on the more powerful laptop (new vm and thesis setup)
 - recompiled the kernel to have parallel read path, now I should be able to hook to read from file only
 
-### 6/6/2020
+### 6/1/2020
 - fixed the headers for 4.15.0+, now there are my functions in the headers that bpf includes
 - experimenting with bpf maps
 
@@ -69,7 +69,7 @@ struggles:
 I have written a program tha passes a file descriptor from userspace to bpf module, and then viceversa. 
 I am currently stuck at the execution, the bpf prog load fails with errno 0 so there is something wrong in the kernel module
 
-## 7/6/2020
+## 7/1/2020
 - trying to debug my bpf code, strace shows that maps are created while the program fails loading. figured out, the problem was a typo in the definition of the SEC(), I was writing \tracepoint and I don't need the slash
 - continuing to look into bpf examples
 - the execution of the kernel module is now triggered but fails for invalid mem access first, then for wrong value after I added an error check
@@ -134,7 +134,7 @@ invalid access to map value, value_size=4 off=0 size=8
 R0 min value is outside of the array range
 ```
 
-### 8/8/2020
+### 8/1/2020
 - debugging the read tracepoint hook. I have an issue with the value being read from the second map, so from kernel to user
 - in order to understand what is going on there, I am trying to play with two tracepoint examples that are in the kernel tree (syscall_tp, ibumad, cpustat)
 - todo: create external helper function 
@@ -142,3 +142,25 @@ R0 min value is outside of the array range
 - test boundaries of bpf (modify, stop, )
 - alternate path on map, returning the sum of the integers on map
 - databricks
+
+### 11/1/2020
+- working on bpf samples, trying to read buffer content and copy to shared map (or checksum or whatever)
+- the problems I encountered today are with buffer and buffer content. I don't seem to always 
+- todo: add the PID to the map and filter with that, try to change the hook point (did the buffer copy already happen?) try with kprobe
+```
+welcome
+loading bpf extension ./readbuff_kern.o
+loaded bpf kernel module
+file descriptor user: 3
+buffer on user side = 0x55a546957270, file value 31
+read buffer from map: 0x7fe39d34a000, map value 0
+
+
+giogge@ubuntu18:~/thesis/ebpf-experiments/415/src/compiled$ sudo ./readbuff f
+welcome
+loading bpf extension ./readbuff_kern.o
+loaded bpf kernel module
+file descriptor user: 3
+buffer on user side = 0x559f59142270, file value 31
+read buffer from map: 0x559f59142270, map value 70
+```
