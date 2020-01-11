@@ -21,13 +21,13 @@ clang -nostdinc -isystem `clang -print-file-name=include` \
 	-I/usr/src/linux-headers-`uname -r`/arch/x86/include/uapi/ \
 	-I/usr/src/linux-headers-`uname -r`/arch/x86/include/generated/ \
 	-I/usr/src/linux-headers-`uname -r`/arch/x86/include/generated/uapi/ \
-	-O2 -emit-llvm -c "$KERN".c -o -| llc -march=bpf -filetype=obj -o "$KERN".o
+	-O2 -emit-llvm -c "$KERN".c -o -| llc -march=bpf -filetype=obj -o "compiled/$KERN".o
 
-gcc "$USER".c ../common/bpf_load.c ~/thesis/libbpf/src/libbpf.a -I/home/giogge/thesis/libbpf/include/uapi/ -I/home/giogge/thesis/libbpf/src/ -I../common/ -lelf -o $DEFAULT
+gcc "$USER".c ../common/bpf_load.c ~/thesis/libbpf/src/libbpf.a -I/home/giogge/thesis/libbpf/include/uapi/ -I/home/giogge/thesis/libbpf/src/ -I../common/ -lelf -o compiled/$DEFAULT
 
 }
 
-targets=( hellotrace tracex1 cpustat open_tp passfd)
+targets=( hellotrace tracex1 cpustat open_tp passfd readbuff)
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"

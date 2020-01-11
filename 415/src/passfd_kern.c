@@ -67,14 +67,13 @@ int attach_read(struct sys_enter_read_args *ctx) {
 	char s[] = "read value from map\n";
         bpf_trace_printk(s, sizeof(s));
 
- 	
-	//if (*val == ctx->fd)
-	//{
- 		//success, I successfully read the filename from the map
-		//update fd_map, will be used by the read bpf instumentation	
+ 	//success, I successfully read the filename from the map
+	//update fd_map, will be used by the read bpf instumentation	
+	
 	__u32 fd = *val;
 	bpf_map_update_elem(&my_read_map, &key, &fd, BPF_ANY);  
- 	//}
+ 	
+
 	return 0;
 }
 /*
