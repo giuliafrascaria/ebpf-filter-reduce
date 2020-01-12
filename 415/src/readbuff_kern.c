@@ -60,7 +60,7 @@ struct bpf_map_def SEC("maps") my_map =
         .type = BPF_MAP_TYPE_ARRAY,
         .key_size = sizeof(u32),
         .value_size = sizeof(u32),
-        .max_entries = 1,
+        .max_entries = 1	// holding userland info, like pid and file descriptor
 };
 
 struct bpf_map_def SEC("maps") my_read_map =
@@ -68,7 +68,15 @@ struct bpf_map_def SEC("maps") my_read_map =
         .type = BPF_MAP_TYPE_ARRAY,
         .key_size = sizeof(u32),
         .value_size = sizeof(u64),
-        .max_entries = 2,
+        .max_entries = 1,	//used upon entry to read call, used to pass the buffer address to the return point
+};
+
+struct bpf_map_def SEC("maps") my_char_map =
+{
+        .type = BPF_MAP_TYPE_ARRAY,
+        .key_size = sizeof(u32),
+        .value_size = sizeof(char),
+        .max_entries = 1,	//return 1 char to userland through the map, as read from the buffer upon return from the read syscall
 };
 
 
@@ -77,19 +85,38 @@ struct bpf_map_def SEC("maps") my_read_map =
 SEC("tracepoint/syscalls/sys_enter_read")
 int attach_read(struct sys_enter_read_args *ctx) {
 	
-	long key = 0;
+	__u32 key = 0;
  	__u32 * val;
        	val = bpf_map_lookup_elem(&my_map, &key);
 	
 	if(!val)
 	{
-		char s[] = "error reading value from map\n";
+		char s[] = "error reading fd value from map\n";
         	bpf_trace_printk(s, sizeof(s)); 
 		return 0;
 	}
+
+	// get pid frdom map and compare to current pid
+	/*__u32 pid_key = 1;
+        __u32 * pid;
+        pid = bpf_map_lookup_elem(&my_map, &pid_key);
+
+        if(!pid)
+        {
+                char s[] = "error reading pid value from map\n";
+                bpf_trace_printk(s, sizeof(s));
+                return 0;
+        }*/
+
+	//char str[] = "pid on map %ld\n";
+	//bpf_trace_printk(str, sizeof(str), *pid);
+
+	char str1[] = "fd on params %d\n";
+        bpf_trace_printk(str1, sizeof(str1), ctx->fd);
+
 	if (*val == ctx->fd)
 	{
-		char s[] = "matching targeted file descriptor\n";
+		char s[] = "matching targeted file descriptor and pid on read entry\n";
         	bpf_trace_printk(s, sizeof(s));
 
  		//success, I successfully read the filename from the map
@@ -107,29 +134,44 @@ int attach_read(struct sys_enter_read_args *ctx) {
 SEC("tracepoint/syscalls/sys_exit_read")
 int attach_exit_read(struct sys_exit_read_args *ctx) {
 	
-	long key = 0;
- 	char * buf;
-       	buf = bpf_map_lookup_elem(&my_read_map, &key); //if all goes well, at this point I should be having the full read buffer, I'll try to read it on exit and save a char on map
-	
-	if(!buf)
-	{
-		char s[] = "error reading value from map\n";
-        	bpf_trace_printk(s, sizeof(s)); 
-		return 0;
-	}
-	else 
-	{		
-		char s[] = "read value from map, should look for buffer %x\n";
-        	bpf_trace_printk(s, sizeof(s), buf);
- 		//success, I successfully read the buf from the map
-		//update read_map to save a char of the buffer on map	
-	
-		long charkey = 1;
-		char single_char = *buf;
-		bpf_map_update_elem(&my_read_map, &charkey, &single_char, BPF_ANY);  
- 
-	}
+	// get pid frdom map and compare to current pid
+        /*__u32 pid_key = 1;
+        __u32 * pid;
+        pid = bpf_map_lookup_elem(&my_map, &pid_key);
 
+        if(!pid)
+        {
+                char s[] = "error reading pid value from map\n";
+                bpf_trace_printk(s, sizeof(s));
+                return 0;
+        }*/
+	//if(*pid == ctx->pid)
+	//else
+	//{
+		//targeting the right buffer, can look up on read map
+				
+		long key = 0;
+		char * buf;
+		buf = bpf_map_lookup_elem(&my_read_map, &key); //at this point I should be having the full read buffer, I'll try to read it on exit and save a char on map
+	
+		if(!buf)
+		{
+			char s[] = "error reading buffer value from map\n";
+			bpf_trace_printk(s, sizeof(s)); 
+			return 0;
+		}
+		else 
+		{		
+			char s[] = "read value from map, should look for buffer %x, value %c\n";
+			bpf_trace_printk(s, sizeof(s), buf, (char) *buf);
+			//success, I successfully read the buf from the map
+			//update read_map to save a char of the buffer on map	
+		
+			long charkey = 0;
+			char single_char = *buf;
+			bpf_map_update_elem(&my_char_map, &charkey, &single_char, BPF_ANY);  
+		}	
+	//}
 
 	return 0;
 }

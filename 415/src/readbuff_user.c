@@ -58,22 +58,34 @@ int main(int argc, char **argv)
       		  return 1;
         }
 
+	/*pid_t pid = getpid();
+	__u32 pid_key = 1;
+
+	printf("user pid %ld\n", pid);
+
+	if (bpf_map_update_elem(map_fd[0], &pid_key, &pid, BPF_ANY) != 0)
+        {
+                  fprintf(stderr, "map_update failed: %s\n", strerror(errno));
+                  return 1;
+        }*/
+	
+
 	// now read from file, the bpf code on kernel side is instrumented to put a 1 in a bpf map if the instrumentation was on the passed file descriptor
 	char * buf = malloc(10*sizeof(char));
 	ssize_t readbytes = read(val, buf, 1);
-	printf("buffer on user side = %p, read value %c\n", buf, *buf);	
+	printf("buffer on user side = %p, file value %x\n", buf, *buf);	
 	//int map_fd1 = bpf_object__find_map_fd_by_name(obj, "my_read_map");
 
 
 	char * buffaddr;
 	bpf_map_lookup_elem(map_fd[1], &key, &buffaddr);
 
-	long charkey = 1;
+	__u32 charkey = 0;
 	char charval;
-	bpf_map_lookup_elem(map_fd[1], &charkey, &charval);
+	bpf_map_lookup_elem(map_fd[2], &charkey, &charval);
 
 
-	printf("read buffer from map: %p, with char value %c\n", buffaddr, charval);
+	printf("read buffer from map: %p, map value %x\n", buffaddr, charval);
 	// ath this point the map should be populated with the 
 
 	return 0;
