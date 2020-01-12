@@ -164,3 +164,11 @@ file descriptor user: 3
 buffer on user side = 0x559f59142270, file value 31
 read buffer from map: 0x559f59142270, map value 70
 ```
+
+### 12/1/2020
+- trying to make it more targeted, added the pid to the params but it only reads to 0 so it doesn't help
+
+```
+cat-2033  [001] ....  5027.061718: 0x00000001: pid on map 2153
+cat-2033  [001] ....  5027.061718: 0x00000001: pid on map 0
+```
