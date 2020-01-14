@@ -1,10 +1,12 @@
 ## activity log
 
 ### 5/1/2020
+
 - fixed the setup on the more powerful laptop (new vm and thesis setup)
 - recompiled the kernel to have parallel read path, now I should be able to hook to read from file only
 
 ### 6/1/2020
+
 - fixed the headers for 4.15.0+, now there are my functions in the headers that bpf includes
 - experimenting with bpf maps
 
@@ -70,6 +72,7 @@ I have written a program tha passes a file descriptor from userspace to bpf modu
 I am currently stuck at the execution, the bpf prog load fails with errno 0 so there is something wrong in the kernel module
 
 ## 7/1/2020
+
 - trying to debug my bpf code, strace shows that maps are created while the program fails loading. figured out, the problem was a typo in the definition of the SEC(), I was writing \tracepoint and I don't need the slash
 - continuing to look into bpf examples
 - the execution of the kernel module is now triggered but fails for invalid mem access first, then for wrong value after I added an error check
@@ -135,6 +138,7 @@ R0 min value is outside of the array range
 ```
 
 ### 8/1/2020
+
 - debugging the read tracepoint hook. I have an issue with the value being read from the second map, so from kernel to user
 - in order to understand what is going on there, I am trying to play with two tracepoint examples that are in the kernel tree (syscall_tp, ibumad, cpustat)
 - todo: create external helper function 
@@ -144,6 +148,7 @@ R0 min value is outside of the array range
 - databricks
 
 ### 11/1/2020
+
 - working on bpf samples, trying to read buffer content and copy to shared map (or checksum or whatever)
 - the problems I encountered today are with buffer and buffer content. I don't seem to always 
 - todo: add the PID to the map and filter with that, try to change the hook point (did the buffer copy already happen?) try with kprobe
@@ -166,9 +171,40 @@ read buffer from map: 0x559f59142270, map value 70
 ```
 
 ### 12/1/2020
+
 - trying to make it more targeted, added the pid to the params but it only reads to 0 so it doesn't help
+- trying to figure out why the char does not read correctly, I suspect it might be an alignment issue with map values or type issue with signed unsigned stuff
 
 ```
 cat-2033  [001] ....  5027.061718: 0x00000001: pid on map 2153
 cat-2033  [001] ....  5027.061718: 0x00000001: pid on map 0
 ```
+
+### 13/1/2020
+
+- read source code to find out how helper functions are used in the bpf infrastructure
+- tested the code again, there is an issue with the file descriptor (and I think it's strange that it is consistently file descriptor 3 hmm)
+- the buffer address is also unstable, not always the same
+- Are the parameters being consumed in some way? is another process writing the parameters cause the identification is not unique? Who knows
+
+```
+buffer on user side = 0x56482deca3e0, file value 31
+read buffer from map: 0x7f7efc861000, map value 0
+
+buffer on user side = 0x55cbd9f9d3e0, file value 31
+read buffer from map: 0x55cbd9f9d3e0, map value ffffffe0
+
+------------------------------------------------------
+
+readbuff-2061  [000] ....  4076.401405: 0x00000001: fd on params 10
+sshd-2029  [003] ....  4076.401434: 0x00000001: fd on params 11
+sshd-2029  [003] ....  4076.401657: 0x00000001: fd on params 11
+readbuff-2061  [000] ....  4076.401696: 0x00000001: fd on params 3
+readbuff-2061  [000] ....  4076.401697: 0x00000001: matching targeted file descriptor and pid on read entry
+sshd-1870  [003] ....  4076.401712: 0x00000001: fd on params 11
+cat-2059  [003] ....  4076.401766: 0x00000001: fd on params 3
+```
+
+### 14/1/2020
+
+- 
