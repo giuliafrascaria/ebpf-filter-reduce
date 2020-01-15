@@ -81,40 +81,47 @@ struct bpf_map_def SEC("maps") my_char_map =
 
 
 // bpf instrumentation for the read syscall (entry point)
-/*
+
 SEC("tracepoint/syscalls/sys_enter_read")
 int attach_read(struct sys_enter_read_args *ctx) {
 	
 	__u32 key = 0;
- 	__u32 * val;
-       	val = bpf_map_lookup_elem(&my_map, &key);
+ 	char * val;
+       	val = bpf_map_lookup_elem(&my_read_map, &key);
 	
 	if(!val)
 	{
-		char s[] = "error reading fd value from map\n";
+		char s[] = "error reading buffer value from map, read entry\n";
         	bpf_trace_printk(s, sizeof(s)); 
 		return 0;
 	}
 
-	char str1[] = "fd on params %d\n";
-        bpf_trace_printk(str1, sizeof(str1), ctx->fd);
+	char str1[] = "buffer on params %p, buffer on map %p\n";
+        bpf_trace_printk(str1, sizeof(str1), (char *) ctx->buf, (char *) val);
 
-	if (*val == ctx->fd)
+	if (*val == ctx->buf)
 	{
-		char s[] = "matching targeted file descriptor and pid on read entry\n";
+		char s[] = "matching targeted buffer with param buffer on read entry\n";
         	bpf_trace_printk(s, sizeof(s));
 
  		//success, I successfully read the filename from the map
 		//update read_map, will be used by the read bpf instumentation	
 	
-		char * buf = (char *) ctx->buf;
-		bpf_map_update_elem(&my_read_map, &key, &buf, BPF_ANY);  
+		//char * buf = (char *) ctx->buf;
+		//bpf_map_update_elem(&my_read_map, &key, &buf, BPF_ANY);  
  	
-		return 0;
+		//return 0;
+	}
+	else
+	{
+		char s[] = "buffer value mismatch on read entry\n";
+                bpf_trace_printk(s, sizeof(s));
+                //return 0;
+	
 	}
 	return 0;
 }
-*/
+
 
 SEC("tracepoint/syscalls/sys_exit_read")
 int attach_exit_read(struct sys_exit_read_args *ctx) {
@@ -122,10 +129,9 @@ int attach_exit_read(struct sys_exit_read_args *ctx) {
 	//targeting the right buffer, can look up on read map
 			
 	__u32 key = 0;
-	char * buf;
-	int res = bpf_map_lookup_elem(&my_read_map, &key, &buf); //at this point I should be having the full read buffer, I'll try to read it on exit and save a char on map
+	char * buf = bpf_map_lookup_elem(&my_read_map, &key); //at this point I should be having the full read buffer, I'll try to read it on exit and save a char on map
 	
-	if(res != 0)
+	if(!buf)
 	{
 		char s[] = "error reading buffer value from map\n";
 		bpf_trace_printk(s, sizeof(s)); 
