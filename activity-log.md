@@ -207,4 +207,36 @@ cat-2059  [003] ....  4076.401766: 0x00000001: fd on params 3
 
 ### 14/1/2020
 
-- 
+- I am rewriting a new example where userland passes the buffer instead of the file descriptor. This seems reasonable but I am still reading wrong values
+- I think that my include of bpf-helpers is not the right one. In the 4.15 source code the bpf-helpers.h is not in the /samples/bpf folder so it comes from somewhere else. there is one in tools, and it is not the same version that I am including right now
+
+```
+cat-2176  [002] ....  5934.275479: 0x00000001: read buffer from map 000000005278ca75
+cat-2176  [002] ....  5934.275484: 0x00000001: read buffer from map 000000005278ca75
+cat-2176  [002] ....  5934.275491: 0x00000001: read buffer from map 000000005278ca75
+```
+
+### 15/1/2020
+
+- judging from the makefile in the kernel source for the bpf samples, the include path for the headers includes this one https://elixir.bootlin.com/linux/v4.15/source/tools/testing/selftests/bpf/bpf_helpers.h#L12
+- so I think that this is the version of bpf helpers that I should be using, so it seems correct
+- https://elixir.bootlin.com/linux/v4.15/source/tools/lib/bpf/bpf.h#L61
+- even the entry on read reads the wrong value from the buffer, need to debug it so that at least that works like is does in readbuff
+
+
+```
+sudo cat /sys/kernel/debug/tracing/trace_pipe | grep buffermap
+       buffermap-3142  [002] .... 24707.068272: 0x00000001: buffer on params 000000003b586c71, buffer on map 0000000069c09fff
+       buffermap-3142  [002] .N.. 24707.068280: 0x00000001: buffer value mismatch on read entry
+       buffermap-3142  [000] .... 24707.069222: 0x00000001: buffer on params 000000001991f4a0, buffer on map 0000000069c09fff
+       buffermap-3142  [000] .... 24707.069236: 0x00000001: buffer value mismatch on read entry
+       buffermap-3142  [000] .... 24707.069238: 0x00000001: read buffer from map 0000000069c09fff
+
+
+welcome
+loading bpf extension ./buffermap_kern.o
+loaded bpf kernel module
+file descriptor user: 3
+buffer on user side = 0x5561a6778460, file value 31
+read map value 60
+```
