@@ -244,4 +244,22 @@ read map value 60
 
 ### 16/1/2020
 
-- 
+- trying to understand the difference between the two bpf instrumentations
+
+sudo ./buffermap f
+welcome
+loading bpf extension ./buffermap_kern.o
+loaded bpf kernel module
+file descriptor user: 3
+buffer on user side = 0x559d5718d450, file value 31
+read map value 50
+
+
+giogge@ubuntu18:~/thesis/ebpf-experiments/415/src/compiled$ sudo ./readbuff f
+welcome
+loading bpf extension ./readbuff_kern.o
+loaded bpf kernel module
+file descriptor user: 3
+buffer on user side = 0x556bd56843e0, file value 31
+read buffer from map: 0x556bd56843e0, map value ffffffe0
+giogge@ubuntu18:~/thesis/ebpf-experiments/415/src/compiled$ 
