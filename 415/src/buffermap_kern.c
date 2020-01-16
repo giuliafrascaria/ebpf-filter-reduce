@@ -67,7 +67,7 @@ struct bpf_map_def SEC("maps") my_read_map =
 {
         .type = BPF_MAP_TYPE_ARRAY,
         .key_size = sizeof(u32),
-        .value_size = sizeof(long),
+        .value_size = sizeof(u64),
         .max_entries = 1,	//used upon entry to read call, used to pass the buffer address to the return point
 };
 
@@ -86,7 +86,7 @@ SEC("tracepoint/syscalls/sys_enter_read")
 int attach_read(struct sys_enter_read_args *ctx) {
 	
 	__u32 key = 0;
- 	char * val;
+ 	__u64 * val;
        	val = bpf_map_lookup_elem(&my_read_map, &key);
 	
 	if(!val)
@@ -129,7 +129,8 @@ int attach_exit_read(struct sys_exit_read_args *ctx) {
 	//targeting the right buffer, can look up on read map
 			
 	__u32 key = 0;
-	char * buf = bpf_map_lookup_elem(&my_read_map, &key); //at this point I should be having the full read buffer, I'll try to read it on exit and save a char on map
+	char * buf;
+	buf = bpf_map_lookup_elem(&my_read_map, &key); //at this point I should be having the full read buffer, I'll try to read it on exit and save a char on map
 	
 	if(!buf)
 	{

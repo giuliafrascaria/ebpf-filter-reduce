@@ -222,6 +222,7 @@ cat-2176  [002] ....  5934.275491: 0x00000001: read buffer from map 000000005278
 - so I think that this is the version of bpf helpers that I should be using, so it seems correct
 - https://elixir.bootlin.com/linux/v4.15/source/tools/lib/bpf/bpf.h#L61
 - even the entry on read reads the wrong value from the buffer, need to debug it so that at least that works like is does in readbuff
+- watched videos (and mailing list discussion) about the google security extension using ebpf. I think it can be useful to look at because if I understood correctly they hook files, need to see how they identified then
 
 
 ```
@@ -240,3 +241,7 @@ file descriptor user: 3
 buffer on user side = 0x5561a6778460, file value 31
 read map value 60
 ```
+
+### 16/1/2020
+
+- 
