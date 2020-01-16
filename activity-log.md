@@ -244,7 +244,9 @@ read map value 60
 
 ### 16/1/2020
 
-- trying to understand the difference between the two bpf instrumentations
+- trying to understand the difference between the two bpf instrumentations readbuff and buffread
+- check if the pointer needs to be turned in double pointer to correctly retrieve the buffer address (solve the verifier error)
+- now the buffer on map and param match on read entry, good sign, but only the least significant bytes are printed
 
 sudo ./buffermap f
 welcome
