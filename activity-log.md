@@ -283,4 +283,4 @@ read map value ffffffb0
 
 ```
 
-- unfortunate finding: the verifier issue happens when I try to access the char in the user buffer, giving invalid memory access. I probably need to recompile with a bpf helper function that returns the read chars
+- unfortunate finding: the verifier issue happens when I try to access the char in the user buffer, giving invalid memory access. I probably need to recompile with a bpf helper function that returns the read chars if the current helper function bpf_probe_read doesn't work. will test that tomorrow
