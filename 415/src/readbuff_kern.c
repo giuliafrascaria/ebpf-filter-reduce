@@ -87,7 +87,7 @@ int attach_read(struct sys_enter_read_args *ctx) {
 	
 	__u32 key = 0;
  	__u32 * val;
-       	val = bpf_map_lookup_elem(&my_map, &key);
+    val = bpf_map_lookup_elem(&my_map, &key);
 	
 	if(!val)
 	{
@@ -112,12 +112,12 @@ int attach_read(struct sys_enter_read_args *ctx) {
 	//bpf_trace_printk(str, sizeof(str), *pid);
 
 	char str1[] = "fd on params %d\n";
-        bpf_trace_printk(str1, sizeof(str1), ctx->fd);
+    bpf_trace_printk(str1, sizeof(str1), ctx->fd);
 
 	if (*val == ctx->fd)
 	{
 		char s[] = "matching targeted file descriptor and pid on read entry\n";
-        	bpf_trace_printk(s, sizeof(s));
+        bpf_trace_printk(s, sizeof(s));
 
  		//success, I successfully read the filename from the map
 		//update read_map, will be used by the read bpf instumentation	

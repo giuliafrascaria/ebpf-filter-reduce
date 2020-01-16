@@ -141,11 +141,7 @@ R0 min value is outside of the array range
 
 - debugging the read tracepoint hook. I have an issue with the value being read from the second map, so from kernel to user
 - in order to understand what is going on there, I am trying to play with two tracepoint examples that are in the kernel tree (syscall_tp, ibumad, cpustat)
-- todo: create external helper function 
-- insider paper
-- test boundaries of bpf (modify, stop, )
-- alternate path on map, returning the sum of the integers on map
-- databricks
+
 
 ### 11/1/2020
 
@@ -248,6 +244,8 @@ read map value 60
 - check if the pointer needs to be turned in double pointer to correctly retrieve the buffer address (solve the verifier error)
 - now the buffer on map and param match on read entry, good sign, but only the least significant bytes are printed
 
+
+```
 sudo ./buffermap f
 welcome
 loading bpf extension ./buffermap_kern.o
@@ -265,3 +263,24 @@ file descriptor user: 3
 buffer on user side = 0x556bd56843e0, file value 31
 read buffer from map: 0x556bd56843e0, map value ffffffe0
 giogge@ubuntu18:~/thesis/ebpf-experiments/415/src/compiled$ 
+
+----------------------------------------------------------------
+
+buffermap-5963  [001] .... 19121.687272: 0x00000001: buffer on params 219e54b0, buffer on map 219e54b0
+buffermap-5963  [001] .... 19121.687274: 0x00000001: matching targeted buffer with param buffer on read entry
+buffermap-5963  [001] .... 19121.687282: 0x00000001: read buffer from map 392ffa90
+
+
+sudo ./buffermap f
+welcome
+loading bpf extension ./buffermap_kern.o
+loaded bpf kernel module
+file descriptor user: 3
+buffer on user side = 0x5620219e54b0
+buffer on user side = 0x5620219e54b0, file value 31
+read map value ffffffb0
+
+
+```
+
+- unfortunate finding: the verifier issue happens when I try to access the char in the user buffer, giving invalid memory access. I probably need to recompile with a bpf helper function that returns the read chars

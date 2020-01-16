@@ -56,15 +56,15 @@ int main(int argc, char **argv)
 	// allocate a buffer for the read and pass the address to the bpf map
 	char * buf = malloc(10*sizeof(char));
 
-	printf("buffer on user side = %p\n", buf);	
+	printf("buffer on user side = %lu\n", (unsigned long) buf);	
 	if (bpf_map_update_elem(map_fd[0], &key, &buf, BPF_ANY) != 0) 
 	{
-                  fprintf(stderr, "map_update failed: %s\n", strerror(errno));
-      		  return 1;
-        }
+            fprintf(stderr, "map_update failed: %s\n", strerror(errno));
+      		return 1;
+    }
 	
 	ssize_t readbytes = read(val, buf, 1);
-	printf("buffer on user side = %p, file value %x\n", buf, *buf);	
+	//printf("buffer on user side = %p, file value %x\n", buf, *buf);	
 	//int map_fd1 = bpf_object__find_map_fd_by_name(obj, "my_read_map");
 
 	__u32 charkey = 0;
@@ -73,10 +73,10 @@ int main(int argc, char **argv)
 	char charval;
 
 	//bpf_map_lookup_elem(map_fd[1], &key, &buffaddr);
-	bpf_map_lookup_elem(map_fd[2], &charkey, &charval);
+	//bpf_map_lookup_elem(map_fd[2], &charkey, &charval);
 
 	//printf("read map value %x in buffer %x\n", charval, buffaddr);
-	printf("read map value %x\n", charval);
+	//printf("read map value %x\n", charval);
 	// ath this point the map should be populated with the 
 
 	return 0;
