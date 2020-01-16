@@ -284,3 +284,10 @@ read map value ffffffb0
 ```
 
 - unfortunate finding: the verifier issue happens when I try to access the char in the user buffer, giving invalid memory access. I probably need to recompile with a bpf helper function that returns the read chars if the current helper function bpf_probe_read doesn't work. will test that tomorrow
+- trying to use the bpf_probe_read but the print doesn't show hmm
+
+```
+buffermap-8921  [001] .... 29777.210644: 0x00000001: buffer on params 93941785740880, buffer on map 93941785740880
+buffermap-8921  [001] .... 29777.210646: 0x00000001: matching targeted buffer with param buffer on read entry
+buffermap-8921  [001] .... 29777.210659: 0x00000001: read buffer from map on read exit 93941785740880
+```

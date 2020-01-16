@@ -153,12 +153,22 @@ int attach_exit_read(struct sys_exit_read_args *ctx) {
 		//success, I successfully read the buf from the map
 		//update read_map to save a char of the buffer on map	
 		
-		bpf_map_delete_elem(&my_read_map, &key);
+		//bpf_map_delete_elem(&my_read_map, &key);
 
 
 		long charkey = 0;
 		//u32 bufkey = 0;
-		char single_char = **buf;
+		char single_char;
+
+		//	if (bpf_probe_read(&orig_addr, sizeof(orig_addr), sockaddr_arg) != 0)
+		//return 0;
+
+		if (bpf_probe_read(&single_char, sizeof(single_char), (void *) *buf) != 0) 
+		{
+			char serr[] = "error reading char from user buff\n";
+			bpf_trace_printk(serr, sizeof(serr));
+			return 0;
+		}
 		char s1[] = "read char from user buffer %c\n";
 		bpf_trace_printk(s1, sizeof(s1), single_char);
 		//char * userbuf = buf;
