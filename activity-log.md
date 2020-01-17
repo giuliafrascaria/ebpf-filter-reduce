@@ -291,3 +291,21 @@ buffermap-8921  [001] .... 29777.210644: 0x00000001: buffer on params 9394178574
 buffermap-8921  [001] .... 29777.210646: 0x00000001: matching targeted buffer with param buffer on read entry
 buffermap-8921  [001] .... 29777.210659: 0x00000001: read buffer from map on read exit 93941785740880
 ```
+
+### 17/1/2020
+
+- I looked up online and in the bpf helpers, turns out that I can identify the PID with the helper funtion bpf_get_current_pid_tgid >> 32
+- in 4.15 this is not available, but in following kernel versions (looking at 5.4 now) there is bpf_get_current_task that returns the whole task struct
+- the problem now is that I can identify the right PID and only execute for that, but the bpf_probe_read does not work, it doesn't print anything in either way (success or fail)
+- https://github.com/iovisor/bcc/issues/799
+- https://github.com/iovisor/bcc/issues/1329
+
+```
+buffermap-4261  [002] .... 33911.045475: 0x00000001: pid on map 4261
+buffermap-4261  [002] .... 33911.045476: 0x00000001: tgid 4261
+buffermap-4261  [002] .... 33911.045479: 0x00000001: buffer on params 94605633736128, buffer on map 94605633736128
+buffermap-4261  [002] .... 33911.045481: 0x00000001: matching targeted buffer with param buffer on read entry
+buffermap-4261  [002] .... 33911.045488: 0x00000001: pid on map 4261
+buffermap-4261  [002] .... 33911.045489: 0x00000001: tgid 4261
+buffermap-4261  [002] .... 33911.045491: 0x00000001: read buffer from map on read exit 94605633736128
+```
