@@ -27,7 +27,7 @@ gcc "$USER".c ../common/bpf_load.c ~/thesis/libbpf/src/libbpf.a -I/home/giogge/t
 
 }
 
-targets=( hellotrace tracex1 cpustat open_tp passfd readbuff buffermap)
+targets=( hellotrace tracex1 cpustat open_tp passfd readbuff buffermap readiter)
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"

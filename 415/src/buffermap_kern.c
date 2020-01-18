@@ -215,6 +215,8 @@ int attach_exit_read(struct sys_exit_read_args *ctx) {
 			//u32 bufkey = 0;
 			char single_char;
 
+			//single_char = **buf;
+
 			//	if (bpf_probe_read(&orig_addr, sizeof(orig_addr), sockaddr_arg) != 0)
 			//return 0;
 

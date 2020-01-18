@@ -309,3 +309,18 @@ buffermap-4261  [002] .... 33911.045488: 0x00000001: pid on map 4261
 buffermap-4261  [002] .... 33911.045489: 0x00000001: tgid 4261
 buffermap-4261  [002] .... 33911.045491: 0x00000001: read buffer from map on read exit 94605633736128
 ```
+
+### 18/1/2020
+- trying to debug the bpf_probe_read issue, to understand why it is not responsive
+- In the examples, I can see that the probe read is always used in context fields. On read exit for this function I do not have the buffer in the context so I will try to instrument a lower-level function where the buffer is a user paramenter -> probably will have to switch to kprobe
+- definitely, the direct access does not work (will check if it works when buff is a parameter)
+- I am switching to the lower level functions to hook,  I need a kprobe on functions where I have kernel and user buffer as params. I created the readiter files for playing with kprobes, but I was expecting to hook on the _copy_to_iter_giulia. That is not triggered, iovec is triggered so now I have to recompile the kernel to have that parallel read path as well
+- good news is that the copyout function totally looks like what I want to hook
+
+```
+        readiter-4731  [001] d... 18410.507377: 0x00000001: copy_page_to_iter
+        readiter-4731  [001] d... 18410.507389: 0x00000001: copy_page_to_iter_iovec
+        readiter-4731  [001] d... 18410.507391: 0x00000001: copyout
+
+
+```
