@@ -15,7 +15,7 @@ int bpf_prog1()
 
 
 
-SEC("kprobe/copy_page_to_iter_iovec")
+SEC("kprobe/copy_page_to_iter_iovec_giulia")
 int bpf_prog2()
 {
 	char s[] = "copy_page_to_iter_iovec\n";
@@ -43,6 +43,14 @@ SEC("kprobe/copyout")
 int bpf_prog5()
 {
 	char s[] = "copyout\n";
+	bpf_trace_printk(s, sizeof(s));
+	return 0;
+}
+
+SEC("kprobe/raw_copy_to_user")
+int bpf_prog6()
+{
+	char s[] = "copy to user\n";
 	bpf_trace_printk(s, sizeof(s));
 	return 0;
 }

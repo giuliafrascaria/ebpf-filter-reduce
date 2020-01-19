@@ -321,6 +321,33 @@ buffermap-4261  [002] .... 33911.045491: 0x00000001: read buffer from map on rea
         readiter-4731  [001] d... 18410.507377: 0x00000001: copy_page_to_iter
         readiter-4731  [001] d... 18410.507389: 0x00000001: copy_page_to_iter_iovec
         readiter-4731  [001] d... 18410.507391: 0x00000001: copyout
+```
 
+### 19/1/2020
+- I am trying to kprobe the new kernel functions that I instrumented. It works with copy_page_to_iter_iov but the problem is that in that page I still don't have the kernel address as a param, so I cannot probe read the chars. I need a function where kaddr has already been called -> copyout or raw_copy_to_user.
+- the kprobe on these two functions doesn't seem to work, and in fact I cannot find them in kernel symbols. I probably have to recompile the kernel including the functions in a way that they are not inlined (found these sources online for that)
+- https://lwn.net/Articles/598217/
+- https://events.static.linuxfound.org/sites/events/files/slides/Handling%20the%20Massive%20Multiple%20Kprobes%20v2_1.pdf
+- https://stackoverflow.com/questions/48221631/kprobe-handler-not-getting-triggered-for-specific-function?rq=1
+- https://stackoverflow.com/questions/49480167/kprobe-not-working-for-some-functions
+- https://stackoverflow.com/questions/43987036/why-cant-kprobe-probe-some-functions-in-the-kernel
+- https://lore.kernel.org/patchwork/patch/648777/
+
+```
+cat /proc/kallsyms | grep copyout
+          (null) T nanosleep_copyout
+          (null) t copyout
+          (null) t raw_cmd_copyout.isra.9	[floppy]
+giogge@ubuntu18:~/linux/lib$ cat /proc/kallsyms | grep giulia
+          (null) t copy_page_to_iter_iovec_giulia
+          (null) t copy_page_to_iter_giulia.part.13
+          (null) T copy_page_to_iter_giulia
+          (null) T _copy_to_iter_giulia
+          (null) r __ksymtab__copy_to_iter_giulia
+          (null) r __ksymtab_copy_page_to_iter_giulia
+          (null) r __kstrtab_copy_page_to_iter_giulia
+          (null) r __kstrtab__copy_to_iter_giulia
+giogge@ubuntu18:~/linux/lib$ cat /proc/kallsyms | grep raw_copy
+          (null) t qxl_draw_copyarea	[qxl]
 
 ```
