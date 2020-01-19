@@ -332,6 +332,7 @@ buffermap-4261  [002] .... 33911.045491: 0x00000001: read buffer from map on rea
 - https://stackoverflow.com/questions/49480167/kprobe-not-working-for-some-functions
 - https://stackoverflow.com/questions/43987036/why-cant-kprobe-probe-some-functions-in-the-kernel
 - https://lore.kernel.org/patchwork/patch/648777/
+- I am recompiling the kernel with export symbol on copyout, hopefully I can kprobe on that
 
 ```
 cat /proc/kallsyms | grep copyout
@@ -350,4 +351,16 @@ giogge@ubuntu18:~/linux/lib$ cat /proc/kallsyms | grep giulia
 giogge@ubuntu18:~/linux/lib$ cat /proc/kallsyms | grep raw_copy
           (null) t qxl_draw_copyarea	[qxl]
 
+
+-------------------------------------
+YEEES I have the kernel symbol for copyout giulia
+
+cat /proc/kallsyms | grep copyout
+(null) T nanosleep_copyout
+(null) t copyout
+(null) t copyout_giulia
+(null) r __ksymtab_copyout_giulia
+(null) r __kstrtab_copyout_giulia
+(null) t raw_cmd_copyout.isra.9
 ```
+

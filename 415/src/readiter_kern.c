@@ -39,18 +39,10 @@ int bpf_prog4()
 	return 0;
 }
 
-SEC("kprobe/copyout")
+SEC("kprobe/copyout_giulia")
 int bpf_prog5()
 {
 	char s[] = "copyout\n";
-	bpf_trace_printk(s, sizeof(s));
-	return 0;
-}
-
-SEC("kprobe/raw_copy_to_user")
-int bpf_prog6()
-{
-	char s[] = "copy to user\n";
 	bpf_trace_printk(s, sizeof(s));
 	return 0;
 }
