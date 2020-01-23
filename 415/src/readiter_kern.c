@@ -1,6 +1,7 @@
-#include <uapi/linux/bpf.h>
+#include <linux/ptrace.h>
 #include <linux/version.h>
-
+#include <uapi/linux/bpf.h>
+#include <uapi/linux/in6.h>
 #include "bpf_helpers.h"
 
 
@@ -8,7 +9,7 @@
 SEC("kprobe/copy_page_to_iter_giulia")
 int bpf_prog1()
 {
-	char s[] = "NOT A NOOB\n";
+	char s[] = "copy_page_to_iter\n";
 	bpf_trace_printk(s, sizeof(s));
 	return 0;
 }
@@ -40,10 +41,31 @@ int bpf_prog4()
 }
 
 SEC("kprobe/copyout_giulia")
-int bpf_prog5()
+int bpf_prog5(struct pt_regs *ctx)
 {
-	char s[] = "copyout\n";
-	bpf_trace_printk(s, sizeof(s));
+
+	char s1[] = "entering copyout\n";
+	bpf_trace_printk(s1, sizeof(s1));
+
+	void __user *to;
+	const void *from;
+	to = PT_REGS_PARM1(ctx);
+	from = PT_REGS_PARM2(ctx);
+
+	char s2[] = "copyout to 0x%p from 0x%p\n";
+	bpf_trace_printk(s2, sizeof(s2), to, from);
+
+	char singlechar;
+
+	if (bpf_probe_read(&singlechar, sizeof(singlechar), (void *) from) != 0) 
+	{
+		char serr[] = "error reading char from kernel buff\n";
+		bpf_trace_printk(serr, sizeof(serr));
+		return 0;
+	}
+
+	char s[] = "copyout to 0x%p from 0x%p char %c\n";
+	bpf_trace_printk(s, sizeof(s), to, from, singlechar);
 	return 0;
 }
 

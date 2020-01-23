@@ -364,3 +364,32 @@ cat /proc/kallsyms | grep copyout
 (null) t raw_cmd_copyout.isra.9
 ```
 
+### 22/1/2020
+- explored the kprobe of copyout now that I hook the desired point. found a way to access the register parameters
+- PROBLEM! unfortunately the verifier does not allow direct derefenrence of the pointer
+- bpf probe read does not respond, keeps behaving like before not even entering the error print
+
+```
+direct access:
+eBPF file to be loaded is : ./readiter_kern.o 
+bpf_load_program() err=13
+0: (79) r3 = *(u64 *)(r1 +112)
+1: (79) r4 = *(u64 *)(r1 +104)
+2: (71) r5 = *(u8 *)(r4 +0)
+R4 invalid mem access 'inv'
+0: (79) r3 = *(u64 *)(r1 +112)
+1: (79) r4 = *(u64 *)(r1 +104)
+2: (71) r5 = *(u8 *)(r4 +0)
+R4 invalid mem access 'inv'
+```
+
+```
+with bpf_probe_read:
+
+        readiter-4338  [001] ....  8840.649057: 0x00000001: copy_page_to_iter
+        readiter-4338  [001] .N..  8840.649089: 0x00000001: copy_page_to_iter_iovec
+        readiter-4338  [001] d...  8840.649196: 0x00000001: entering copyout
+        readiter-4338  [001] d...  8840.649206: 0x00000001: copyout to 0x00000000716fa52a from 0x00000000d352ce1e
+
+???
+```
