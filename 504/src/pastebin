@@ -1,0 +1,31 @@
+clang -nostdinc -isystem `clang -print-file-name=include` \
+	-D__KERNEL__ -D__ASM_SYSREG_H -D__TARGET_ARCH_x86 \
+	$C_FLAGS \
+	-I../common/ \
+	-include /usr/src/linux-headers-`uname -r`/include/linux/kconfig.h \
+	-I/usr/src/linux-headers-`uname -r`/include/ \
+	-I/usr/src/linux-headers-`uname -r`/include/uapi/ \
+	-I/usr/src/linux-headers-`uname -r`/include/generated/uapi/ \
+	-I/usr/src/linux-headers-`uname -r`/arch/x86/include \
+	-I/usr/src/linux-headers-`uname -r`/arch/x86/include/uapi/ \
+	-I/usr/src/linux-headers-`uname -r`/arch/x86/include/generated/ \
+	-I/usr/src/linux-headers-`uname -r`/arch/x86/include/generated/uapi/ \
+    -I/usr/src/linux-headers-`uname -r`/tools/lib/ \
+    -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c "$KERN".c -o -| llc -march=bpf -filetype=obj -o "compiled/$KERN".o
+
+
+
+
+clang -nostdinc -isystem `clang -print-file-name=include` \
+	-D__KERNEL__ -D__ASM_SYSREG_H -D__TARGET_ARCH_x86 \
+	$C_FLAGS \
+	-I../common/ \
+	-include /usr/src/linux-headers-`uname -r`/include/linux/kconfig.h \
+	-I/usr/src/linux-headers-`uname -r`/tools/lib/bpf/ \
+	-I/usr/src/linux-headers-`uname -r`/tools/testing/selftests/bpf/ \
+	-I/usr/src/linux-headers-`uname -r`/tools/lib/ \
+	-I/usr/src/linux-headers-`uname -r`/tools/include \
+	-I/usr/src/linux-headers-`uname -r`/tools/perf \
+    -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c "$KERN".c -o -| llc -march=bpf -filetype=obj -o "compiled/$KERN".o

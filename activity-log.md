@@ -393,3 +393,31 @@ with bpf_probe_read:
 
 ???
 ```
+
+### 24/1/2020
+- recompiled kernel for 5.4 and tried to get bpf to work
+
+### 25/1/2020
+- continuing to work on kernel 5.4. the samples in kernel need to be built differently 
+- https://www.spinics.net/lists/xdp-newbies/msg01391.html
+- don't understand if llvm supports bpf now, compiling the llvm infrastructure from source to see if it works
+- https://github.com/torvalds/linux/tree/v5.4/samples/bpf
+- I believe that the asm_volatile issue that I had in kernel 5.3 has been solved in 5.4 by the asm_goto_workaround.h that I can see in the samples/bpf/ so I might need to include that in the compilation of my own samples
+- bpf_probe_read only works for tracing programs(defined in kernel/trace/bpf_trace.c)
+
+### 26/1/2020
+- collected the trace for the read on 5.4 kernel, so I can recompile the parallel read path appropriately
+- recompiled the read path on kernel 5.4
+
+### 27/1/2020
+- I am trying to port everything to 5.4 cause I think it's better that way
+- the issue with asm is resolved, the kernel modules are working, the problem now is in the user side
+- includes are missing, need to find the headers that are necessary to link those binaries
+
+```
+making ...buffermap
+/tmp/ccFd33g3.o: In function `sys_perf_event_open':
+bpf_load.c:(.text+0x48): undefined reference to `test_attr__enabled'
+bpf_load.c:(.text+0x72): undefined reference to `test_attr__open'
+collect2: error: ld returned 1 exit status
+```
