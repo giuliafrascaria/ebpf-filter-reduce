@@ -421,3 +421,7 @@ bpf_load.c:(.text+0x48): undefined reference to `test_attr__enabled'
 bpf_load.c:(.text+0x72): undefined reference to `test_attr__open'
 collect2: error: ld returned 1 exit status
 ```
+
+### 28/1/2020
+-basically just trying to compile the samples. following this link as reference for out of tree headers that need to be included 
+-https://github.com/netoptimizer/prototype-kernel
