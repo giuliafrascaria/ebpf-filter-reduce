@@ -25,11 +25,13 @@ clang -nostdinc -isystem `clang -print-file-name=include` \
     -include asm_goto_workaround.h \
 	-O2 -emit-llvm -c "$KERN".c -o -| llc -march=bpf -filetype=obj -o "compiled/$KERN".o
 
-gcc "$USER".c common/bpf_load.c ~/thesis/libbpf/src/libbpf.a -I/home/giogge/thesis/libbpf/src/ -Icommon/ -Ikernel-usr-include/ -Itools/ -Itools/lib/ -Itools/include/ -Itools/perf/ -Itools/perf/util/ -lelf -o compiled/$DEFAULT
+gcc "$USER".c bpf_load.c ~/thesis/libbpf/src/libbpf.a -iquote -I/home/giogge/thesis/libbpf/src/ \
+ -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ \
+-I./tools/include -I./tools/perf -I./tools/perf/util -I./tools/perf/tests -lelf --verbose -o compiled/$DEFAULT
 
 }
 
-targets=( hellotrace tracex1 cpustat open_tp passfd readbuff buffermap readiter)
+targets=( tracex1 )
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"

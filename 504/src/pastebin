@@ -29,3 +29,25 @@ clang -nostdinc -isystem `clang -print-file-name=include` \
 	-I/usr/src/linux-headers-`uname -r`/tools/perf \
     -include asm_goto_workaround.h \
 	-O2 -emit-llvm -c "$KERN".c -o -| llc -march=bpf -filetype=obj -o "compiled/$KERN".o
+
+	-I../tools/ -I../tools/perf/ -I../tools/include/
+
+
+
+
+set -e;  echo '  HOSTCC  samples/bpf//tracex1_user.o'; 
+
+	gcc -Wp,-MD,samples/bpf//.tracex1_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 
+	-fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf 
+	-DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex1_user.o samples/bpf//tracex1_user.c; scripts/basic/fixdep samples/bpf//.tracex1_user.o.d samples/bpf//tracex1_user.o 
+
+	'gcc -Wp,-MD,samples/bpf//.tracex1_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   
+	-I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     
+	-c -o samples/bpf//tracex1_user.o samples/bpf//tracex1_user.c' 
+
+	> samples/bpf//.tracex1_user.o.cmd; rm -f samples/bpf//.tracex1_user.o.d
+
+set -e;  echo '  HOSTLD  samples/bpf//tracex1'; gcc   -o samples/bpf//tracex1 samples/bpf//bpf_load.o samples/bpf//tracex1_user.o   
+	/home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//tracex1 := gcc   
+	-o samples/bpf//tracex1 samples/bpf//bpf_load.o samples/bpf//tracex1_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' 
+	> samples/bpf//.tracex1.cmd

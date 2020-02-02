@@ -1,0 +1,778 @@
+make M=samples/bpf/ -n
+make -f ./scripts/Makefile.build obj=samples/bpf/ single-build= need-builtin=1 need-modorder=1
+readelf: Error: Missing knowledge of 32-bit reloc types used in DWARF sections of machine number 247
+readelf: Warning: unable to apply unsupported reloc type 10 to section .debug_info
+readelf: Warning: unable to apply unsupported reloc type 1 to section .debug_info
+readelf: Warning: unable to apply unsupported reloc type 10 to section .debug_info
+:
+:
+set -e;  echo '  AR      samples/bpf//built-in.a'; rm -f samples/bpf//built-in.a; ar cDPrST samples/bpf//built-in.a ; printf '%s\n' 'cmd_samples/bpf//built-in.a := rm -f samples/bpf//built-in.a; ar cDPrST samples/bpf//built-in.a ' > samples/bpf//.built-in.a.cmd
+{  :; } \
+| awk '!x[$0]++' - > samples/bpf//modules.order
+for TOOL in clang llc ; do \
+	if ! (which -- "${TOOL}" > /dev/null 2>&1); then \
+		echo "*** ERROR: Cannot find LLVM tool ${TOOL}" ;\
+		exit 1; \
+	else true; fi; \
+done
+if ! (llc -march=bpf -mattr=help > /dev/null 2>&1); then \
+	echo "*** ERROR: LLVM (llc) does not support 'bpf' target" ;\
+	echo "   NOTICE: LLVM version >= 3.7.1 required" ;\
+	exit 2; \
+else true; fi
+make -C /home/giogge/linux/samples/bpf/../../tools/lib/bpf/ RM='rm -rf' LDFLAGS= srctree=/home/giogge/linux/samples/bpf/../../ O=
+make -C /home/giogge/linux/samples/bpf/../..//tools/build CFLAGS= LDFLAGS= fixdep
+make -f /home/giogge/linux/samples/bpf/../..//tools/build/Makefile.build dir=. obj=fixdep
+set -e;  echo '  HOSTLD   fixdep-in.o';  ld -r -o fixdep-in.o  fixdep.o; printf '%s\n' 'cmd_fixdep-in.o :=  ld -r -o fixdep-in.o  fixdep.o' > ./.fixdep-in.o.cmd
+:
+make all_cmd
+if [ "1" != "1" ]; then echo "No libelf found"; exit 1 ; fi
+if [ "1" != "1" ]; then echo "BPF API too old"; exit 1 ; fi
+make -f /home/giogge/linux/tools/build/Makefile.build dir=. obj=libbpf OUTPUT=staticobjs/
+set -e;  echo '  LD       staticobjs/libbpf-in.o';  ld -r -o staticobjs/libbpf-in.o  staticobjs/libbpf.o staticobjs/bpf.o staticobjs/nlattr.o staticobjs/btf.o staticobjs/libbpf_errno.o staticobjs/str_error.o staticobjs/netlink.o staticobjs/bpf_prog_linfo.o staticobjs/libbpf_probes.o staticobjs/xsk.o staticobjs/hashmap.o staticobjs/btf_dump.o; printf '%s\n' 'cmd_staticobjs/libbpf-in.o :=  ld -r -o staticobjs/libbpf-in.o  staticobjs/libbpf.o staticobjs/bpf.o staticobjs/nlattr.o staticobjs/btf.o staticobjs/libbpf_errno.o staticobjs/str_error.o staticobjs/netlink.o staticobjs/bpf_prog_linfo.o staticobjs/libbpf_probes.o staticobjs/xsk.o staticobjs/hashmap.o staticobjs/btf_dump.o' > staticobjs/.libbpf-in.o.cmd
+:
+(test -f ../../include/uapi/linux/bpf.h -a -f ../../../include/uapi/linux/bpf.h && ( \
+(diff -B ../../include/uapi/linux/bpf.h ../../../include/uapi/linux/bpf.h >/dev/null) || \
+echo "Warning: Kernel ABI header at 'tools/include/uapi/linux/bpf.h' differs from latest version at 'include/uapi/linux/bpf.h'" >&2 )) || true
+(test -f ../../include/uapi/linux/bpf_common.h -a -f ../../../include/uapi/linux/bpf_common.h && ( \
+(diff -B ../../include/uapi/linux/bpf_common.h ../../../include/uapi/linux/bpf_common.h >/dev/null) || \
+echo "Warning: Kernel ABI header at 'tools/include/uapi/linux/bpf_common.h' differs from latest version at 'include/uapi/linux/bpf_common.h'" >&2 )) || true
+(test -f ../../include/uapi/linux/netlink.h -a -f ../../../include/uapi/linux/netlink.h && ( \
+(diff -B ../../include/uapi/linux/netlink.h ../../../include/uapi/linux/netlink.h >/dev/null) || \
+echo "Warning: Kernel ABI header at 'tools/include/uapi/linux/netlink.h' differs from latest version at 'include/uapi/linux/netlink.h'" >&2 )) || true
+(test -f ../../include/uapi/linux/if_link.h -a -f ../../../include/uapi/linux/if_link.h && ( \
+(diff -B ../../include/uapi/linux/if_link.h ../../../include/uapi/linux/if_link.h >/dev/null) || \
+echo "Warning: Kernel ABI header at 'tools/include/uapi/linux/if_link.h' differs from latest version at 'include/uapi/linux/if_link.h'" >&2 )) || true
+(test -f ../../include/uapi/linux/if_xdp.h -a -f ../../../include/uapi/linux/if_xdp.h && ( \
+(diff -B ../../include/uapi/linux/if_xdp.h ../../../include/uapi/linux/if_xdp.h >/dev/null) || \
+echo "Warning: Kernel ABI header at 'tools/include/uapi/linux/if_xdp.h' differs from latest version at 'include/uapi/linux/if_xdp.h'" >&2 )) || true
+make -f /home/giogge/linux/tools/build/Makefile.build dir=. obj=libbpf OUTPUT=sharedobjs/ CFLAGS="-g -Wall -DHAVE_LIBELF_MMAP_SUPPORT -Wbad-function-cast -Wdeclaration-after-statement -Wformat-security -Wformat-y2k -Winit-self -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-system-headers -Wold-style-definition -Wpacked -Wredundant-decls -Wstrict-prototypes -Wswitch-default -Wswitch-enum -Wundef -Wwrite-strings -Wformat -Wstrict-aliasing=3 -Wshadow -Werror -Wall -fPIC -I. -I/home/giogge/linux/tools/include -I/home/giogge/linux/tools/arch/x86/include/uapi -I/home/giogge/linux/tools/include/uapi -fvisibility=hidden -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -DSHARED"
+set -e;  echo '  LD       sharedobjs/libbpf-in.o';  ld -r -o sharedobjs/libbpf-in.o  sharedobjs/libbpf.o sharedobjs/bpf.o sharedobjs/nlattr.o sharedobjs/btf.o sharedobjs/libbpf_errno.o sharedobjs/str_error.o sharedobjs/netlink.o sharedobjs/bpf_prog_linfo.o sharedobjs/libbpf_probes.o sharedobjs/xsk.o sharedobjs/hashmap.o sharedobjs/btf_dump.o; printf '%s\n' 'cmd_sharedobjs/libbpf-in.o :=  ld -r -o sharedobjs/libbpf-in.o  sharedobjs/libbpf.o sharedobjs/bpf.o sharedobjs/nlattr.o sharedobjs/btf.o sharedobjs/libbpf_errno.o sharedobjs/str_error.o sharedobjs/netlink.o sharedobjs/bpf_prog_linfo.o sharedobjs/libbpf_probes.o sharedobjs/xsk.o sharedobjs/hashmap.o sharedobjs/btf_dump.o' > sharedobjs/.libbpf-in.o.cmd
+:
+echo '  LINK     'libbpf.so.0.0.5;gcc --shared -Wl,-soname,libbpf.so.0 \
+			    -Wl,--version-script=libbpf.map sharedobjs/libbpf-in.o -lelf -o libbpf.so.0.0.5
+ln -sf libbpf.so.0.0.5 libbpf.so
+ln -sf libbpf.so.0.0.5 libbpf.so.0
+if [ "170" != "170" ]; then	 \
+	echo "Warning: Num of global symbols in sharedobjs/libbpf-in.o"	 \
+	     "(170) does NOT match with num of"	 \
+	     "versioned symbols in libbpf.so (170)." \
+	     "Please make sure all LIBBPF_API symbols are"	 \
+	     "versioned in libbpf.map." >&2;		 \
+	readelf -s --wide libbpf-in.o |		 \
+	    cut -d "@" -f1 | sed 's/_v[0-9]_[0-9]_[0-9].*//' |	 \
+	    awk '/GLOBAL/ && /DEFAULT/ && !/UND/ {print $8}'|   \
+	    sort -u > libbpf_global_syms.tmp;		 \
+	readelf -s --wide libbpf.so |			 \
+	    grep -Eo '[^ ]+@LIBBPF_' | cut -d@ -f1 |		 \
+	    sort -u > libbpf_versioned_syms.tmp; 	 \
+	diff -u libbpf_global_syms.tmp			 \
+	     libbpf_versioned_syms.tmp;		 \
+	rm libbpf_global_syms.tmp			 \
+	   libbpf_versioned_syms.tmp;			 \
+	exit 1;							 \
+fi
+set -e;  echo '  HOSTCC  samples/bpf//test_lru_dist'; gcc -Wp,-MD,samples/bpf//.test_lru_dist.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0       -o samples/bpf//test_lru_dist samples/bpf//test_lru_dist.c   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; scripts/basic/fixdep samples/bpf//.test_lru_dist.d samples/bpf//test_lru_dist 'gcc -Wp,-MD,samples/bpf//.test_lru_dist.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0       -o samples/bpf//test_lru_dist samples/bpf//test_lru_dist.c   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.test_lru_dist.cmd; rm -f samples/bpf//.test_lru_dist.d
+set -e;  echo '  HOSTCC  samples/bpf//sock_example'; gcc -Wp,-MD,samples/bpf//.sock_example.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0       -o samples/bpf//sock_example samples/bpf//sock_example.c   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; scripts/basic/fixdep samples/bpf//.sock_example.d samples/bpf//sock_example 'gcc -Wp,-MD,samples/bpf//.sock_example.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0       -o samples/bpf//sock_example samples/bpf//sock_example.c   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.sock_example.cmd; rm -f samples/bpf//.sock_example.d
+set -e;  echo '  HOSTCC  samples/bpf//fds_example.o'; gcc -Wp,-MD,samples/bpf//.fds_example.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//fds_example.o samples/bpf//fds_example.c; scripts/basic/fixdep samples/bpf//.fds_example.o.d samples/bpf//fds_example.o 'gcc -Wp,-MD,samples/bpf//.fds_example.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//fds_example.o samples/bpf//fds_example.c' > samples/bpf//.fds_example.o.cmd; rm -f samples/bpf//.fds_example.o.d
+set -e;  echo '  HOSTLD  samples/bpf//fds_example'; gcc   -o samples/bpf//fds_example samples/bpf//fds_example.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//fds_example := gcc   -o samples/bpf//fds_example samples/bpf//fds_example.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.fds_example.cmd
+set -e;  echo '  HOSTCC  samples/bpf//sockex1_user.o'; gcc -Wp,-MD,samples/bpf//.sockex1_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//sockex1_user.o samples/bpf//sockex1_user.c; scripts/basic/fixdep samples/bpf//.sockex1_user.o.d samples/bpf//sockex1_user.o 'gcc -Wp,-MD,samples/bpf//.sockex1_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//sockex1_user.o samples/bpf//sockex1_user.c' > samples/bpf//.sockex1_user.o.cmd; rm -f samples/bpf//.sockex1_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//sockex1'; gcc   -o samples/bpf//sockex1 samples/bpf//sockex1_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//sockex1 := gcc   -o samples/bpf//sockex1 samples/bpf//sockex1_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.sockex1.cmd
+set -e;  echo '  HOSTCC  samples/bpf//sockex2_user.o'; gcc -Wp,-MD,samples/bpf//.sockex2_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//sockex2_user.o samples/bpf//sockex2_user.c; scripts/basic/fixdep samples/bpf//.sockex2_user.o.d samples/bpf//sockex2_user.o 'gcc -Wp,-MD,samples/bpf//.sockex2_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//sockex2_user.o samples/bpf//sockex2_user.c' > samples/bpf//.sockex2_user.o.cmd; rm -f samples/bpf//.sockex2_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//sockex2'; gcc   -o samples/bpf//sockex2 samples/bpf//sockex2_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//sockex2 := gcc   -o samples/bpf//sockex2 samples/bpf//sockex2_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.sockex2.cmd
+set -e;  echo '  HOSTCC  samples/bpf//bpf_load.o'; gcc -Wp,-MD,samples/bpf//.bpf_load.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0    -I./usr/include -Wno-unused-variable -c -o samples/bpf//bpf_load.o samples/bpf//bpf_load.c; scripts/basic/fixdep samples/bpf//.bpf_load.o.d samples/bpf//bpf_load.o 'gcc -Wp,-MD,samples/bpf//.bpf_load.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0    -I./usr/include -Wno-unused-variable -c -o samples/bpf//bpf_load.o samples/bpf//bpf_load.c' > samples/bpf//.bpf_load.o.cmd; rm -f samples/bpf//.bpf_load.o.d
+set -e;  echo '  HOSTCC  samples/bpf//sockex3_user.o'; gcc -Wp,-MD,samples/bpf//.sockex3_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//sockex3_user.o samples/bpf//sockex3_user.c; scripts/basic/fixdep samples/bpf//.sockex3_user.o.d samples/bpf//sockex3_user.o 'gcc -Wp,-MD,samples/bpf//.sockex3_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//sockex3_user.o samples/bpf//sockex3_user.c' > samples/bpf//.sockex3_user.o.cmd; rm -f samples/bpf//.sockex3_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//sockex3'; gcc   -o samples/bpf//sockex3 samples/bpf//bpf_load.o samples/bpf//sockex3_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//sockex3 := gcc   -o samples/bpf//sockex3 samples/bpf//bpf_load.o samples/bpf//sockex3_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.sockex3.cmd
+set -e;  echo '  HOSTCC  samples/bpf//tracex1_user.o'; gcc -Wp,-MD,samples/bpf//.tracex1_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex1_user.o samples/bpf//tracex1_user.c; scripts/basic/fixdep samples/bpf//.tracex1_user.o.d samples/bpf//tracex1_user.o 'gcc -Wp,-MD,samples/bpf//.tracex1_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex1_user.o samples/bpf//tracex1_user.c' > samples/bpf//.tracex1_user.o.cmd; rm -f samples/bpf//.tracex1_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//tracex1'; gcc   -o samples/bpf//tracex1 samples/bpf//bpf_load.o samples/bpf//tracex1_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//tracex1 := gcc   -o samples/bpf//tracex1 samples/bpf//bpf_load.o samples/bpf//tracex1_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.tracex1.cmd
+set -e;  echo '  HOSTCC  samples/bpf//tracex2_user.o'; gcc -Wp,-MD,samples/bpf//.tracex2_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex2_user.o samples/bpf//tracex2_user.c; scripts/basic/fixdep samples/bpf//.tracex2_user.o.d samples/bpf//tracex2_user.o 'gcc -Wp,-MD,samples/bpf//.tracex2_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex2_user.o samples/bpf//tracex2_user.c' > samples/bpf//.tracex2_user.o.cmd; rm -f samples/bpf//.tracex2_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//tracex2'; gcc   -o samples/bpf//tracex2 samples/bpf//bpf_load.o samples/bpf//tracex2_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//tracex2 := gcc   -o samples/bpf//tracex2 samples/bpf//bpf_load.o samples/bpf//tracex2_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.tracex2.cmd
+set -e;  echo '  HOSTCC  samples/bpf//tracex3_user.o'; gcc -Wp,-MD,samples/bpf//.tracex3_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex3_user.o samples/bpf//tracex3_user.c; scripts/basic/fixdep samples/bpf//.tracex3_user.o.d samples/bpf//tracex3_user.o 'gcc -Wp,-MD,samples/bpf//.tracex3_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex3_user.o samples/bpf//tracex3_user.c' > samples/bpf//.tracex3_user.o.cmd; rm -f samples/bpf//.tracex3_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//tracex3'; gcc   -o samples/bpf//tracex3 samples/bpf//bpf_load.o samples/bpf//tracex3_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//tracex3 := gcc   -o samples/bpf//tracex3 samples/bpf//bpf_load.o samples/bpf//tracex3_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.tracex3.cmd
+set -e;  echo '  HOSTCC  samples/bpf//tracex4_user.o'; gcc -Wp,-MD,samples/bpf//.tracex4_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex4_user.o samples/bpf//tracex4_user.c; scripts/basic/fixdep samples/bpf//.tracex4_user.o.d samples/bpf//tracex4_user.o 'gcc -Wp,-MD,samples/bpf//.tracex4_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex4_user.o samples/bpf//tracex4_user.c' > samples/bpf//.tracex4_user.o.cmd; rm -f samples/bpf//.tracex4_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//tracex4'; gcc   -o samples/bpf//tracex4 samples/bpf//bpf_load.o samples/bpf//tracex4_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf -lrt; printf '%s\n' 'cmd_samples/bpf//tracex4 := gcc   -o samples/bpf//tracex4 samples/bpf//bpf_load.o samples/bpf//tracex4_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf -lrt' > samples/bpf//.tracex4.cmd
+set -e;  echo '  HOSTCC  samples/bpf//tracex5_user.o'; gcc -Wp,-MD,samples/bpf//.tracex5_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex5_user.o samples/bpf//tracex5_user.c; scripts/basic/fixdep samples/bpf//.tracex5_user.o.d samples/bpf//tracex5_user.o 'gcc -Wp,-MD,samples/bpf//.tracex5_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex5_user.o samples/bpf//tracex5_user.c' > samples/bpf//.tracex5_user.o.cmd; rm -f samples/bpf//.tracex5_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//tracex5'; gcc   -o samples/bpf//tracex5 samples/bpf//bpf_load.o samples/bpf//tracex5_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//tracex5 := gcc   -o samples/bpf//tracex5 samples/bpf//bpf_load.o samples/bpf//tracex5_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.tracex5.cmd
+set -e;  echo '  HOSTCC  samples/bpf//tracex6_user.o'; gcc -Wp,-MD,samples/bpf//.tracex6_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex6_user.o samples/bpf//tracex6_user.c; scripts/basic/fixdep samples/bpf//.tracex6_user.o.d samples/bpf//tracex6_user.o 'gcc -Wp,-MD,samples/bpf//.tracex6_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex6_user.o samples/bpf//tracex6_user.c' > samples/bpf//.tracex6_user.o.cmd; rm -f samples/bpf//.tracex6_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//tracex6'; gcc   -o samples/bpf//tracex6 samples/bpf//bpf_load.o samples/bpf//tracex6_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//tracex6 := gcc   -o samples/bpf//tracex6 samples/bpf//bpf_load.o samples/bpf//tracex6_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.tracex6.cmd
+set -e;  echo '  HOSTCC  samples/bpf//tracex7_user.o'; gcc -Wp,-MD,samples/bpf//.tracex7_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex7_user.o samples/bpf//tracex7_user.c; scripts/basic/fixdep samples/bpf//.tracex7_user.o.d samples/bpf//tracex7_user.o 'gcc -Wp,-MD,samples/bpf//.tracex7_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex7_user.o samples/bpf//tracex7_user.c' > samples/bpf//.tracex7_user.o.cmd; rm -f samples/bpf//.tracex7_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//tracex7'; gcc   -o samples/bpf//tracex7 samples/bpf//bpf_load.o samples/bpf//tracex7_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//tracex7 := gcc   -o samples/bpf//tracex7 samples/bpf//bpf_load.o samples/bpf//tracex7_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.tracex7.cmd
+set -e;  echo '  HOSTCC  samples/bpf//test_probe_write_user_user.o'; gcc -Wp,-MD,samples/bpf//.test_probe_write_user_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_probe_write_user_user.o samples/bpf//test_probe_write_user_user.c; scripts/basic/fixdep samples/bpf//.test_probe_write_user_user.o.d samples/bpf//test_probe_write_user_user.o 'gcc -Wp,-MD,samples/bpf//.test_probe_write_user_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_probe_write_user_user.o samples/bpf//test_probe_write_user_user.c' > samples/bpf//.test_probe_write_user_user.o.cmd; rm -f samples/bpf//.test_probe_write_user_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//test_probe_write_user'; gcc   -o samples/bpf//test_probe_write_user samples/bpf//bpf_load.o samples/bpf//test_probe_write_user_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//test_probe_write_user := gcc   -o samples/bpf//test_probe_write_user samples/bpf//bpf_load.o samples/bpf//test_probe_write_user_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.test_probe_write_user.cmd
+set -e;  echo '  HOSTCC  samples/bpf//trace_output_user.o'; gcc -Wp,-MD,samples/bpf//.trace_output_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//trace_output_user.o samples/bpf//trace_output_user.c; scripts/basic/fixdep samples/bpf//.trace_output_user.o.d samples/bpf//trace_output_user.o 'gcc -Wp,-MD,samples/bpf//.trace_output_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//trace_output_user.o samples/bpf//trace_output_user.c' > samples/bpf//.trace_output_user.o.cmd; rm -f samples/bpf//.trace_output_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//trace_output'; gcc   -o samples/bpf//trace_output samples/bpf//bpf_load.o samples/bpf//trace_output_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf -lrt; printf '%s\n' 'cmd_samples/bpf//trace_output := gcc   -o samples/bpf//trace_output samples/bpf//bpf_load.o samples/bpf//trace_output_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf -lrt' > samples/bpf//.trace_output.cmd
+set -e;  echo '  HOSTCC  samples/bpf//lathist_user.o'; gcc -Wp,-MD,samples/bpf//.lathist_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//lathist_user.o samples/bpf//lathist_user.c; scripts/basic/fixdep samples/bpf//.lathist_user.o.d samples/bpf//lathist_user.o 'gcc -Wp,-MD,samples/bpf//.lathist_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//lathist_user.o samples/bpf//lathist_user.c' > samples/bpf//.lathist_user.o.cmd; rm -f samples/bpf//.lathist_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//lathist'; gcc   -o samples/bpf//lathist samples/bpf//bpf_load.o samples/bpf//lathist_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//lathist := gcc   -o samples/bpf//lathist samples/bpf//bpf_load.o samples/bpf//lathist_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.lathist.cmd
+set -e;  echo '  HOSTCC  samples/bpf//offwaketime_user.o'; gcc -Wp,-MD,samples/bpf//.offwaketime_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//offwaketime_user.o samples/bpf//offwaketime_user.c; scripts/basic/fixdep samples/bpf//.offwaketime_user.o.d samples/bpf//offwaketime_user.o 'gcc -Wp,-MD,samples/bpf//.offwaketime_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//offwaketime_user.o samples/bpf//offwaketime_user.c' > samples/bpf//.offwaketime_user.o.cmd; rm -f samples/bpf//.offwaketime_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//offwaketime'; gcc   -o samples/bpf//offwaketime samples/bpf//bpf_load.o samples/bpf//offwaketime_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//offwaketime := gcc   -o samples/bpf//offwaketime samples/bpf//bpf_load.o samples/bpf//offwaketime_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.offwaketime.cmd
+set -e;  echo '  HOSTCC  samples/bpf//spintest_user.o'; gcc -Wp,-MD,samples/bpf//.spintest_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//spintest_user.o samples/bpf//spintest_user.c; scripts/basic/fixdep samples/bpf//.spintest_user.o.d samples/bpf//spintest_user.o 'gcc -Wp,-MD,samples/bpf//.spintest_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//spintest_user.o samples/bpf//spintest_user.c' > samples/bpf//.spintest_user.o.cmd; rm -f samples/bpf//.spintest_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//spintest'; gcc   -o samples/bpf//spintest samples/bpf//bpf_load.o samples/bpf//spintest_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//spintest := gcc   -o samples/bpf//spintest samples/bpf//bpf_load.o samples/bpf//spintest_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.spintest.cmd
+set -e;  echo '  HOSTCC  samples/bpf//map_perf_test_user.o'; gcc -Wp,-MD,samples/bpf//.map_perf_test_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//map_perf_test_user.o samples/bpf//map_perf_test_user.c; scripts/basic/fixdep samples/bpf//.map_perf_test_user.o.d samples/bpf//map_perf_test_user.o 'gcc -Wp,-MD,samples/bpf//.map_perf_test_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//map_perf_test_user.o samples/bpf//map_perf_test_user.c' > samples/bpf//.map_perf_test_user.o.cmd; rm -f samples/bpf//.map_perf_test_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//map_perf_test'; gcc   -o samples/bpf//map_perf_test samples/bpf//bpf_load.o samples/bpf//map_perf_test_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf -lrt; printf '%s\n' 'cmd_samples/bpf//map_perf_test := gcc   -o samples/bpf//map_perf_test samples/bpf//bpf_load.o samples/bpf//map_perf_test_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf -lrt' > samples/bpf//.map_perf_test.cmd
+set -e;  echo '  HOSTCC  samples/bpf//test_overhead_user.o'; gcc -Wp,-MD,samples/bpf//.test_overhead_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_overhead_user.o samples/bpf//test_overhead_user.c; scripts/basic/fixdep samples/bpf//.test_overhead_user.o.d samples/bpf//test_overhead_user.o 'gcc -Wp,-MD,samples/bpf//.test_overhead_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_overhead_user.o samples/bpf//test_overhead_user.c' > samples/bpf//.test_overhead_user.o.cmd; rm -f samples/bpf//.test_overhead_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//test_overhead'; gcc   -o samples/bpf//test_overhead samples/bpf//bpf_load.o samples/bpf//test_overhead_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf -lrt; printf '%s\n' 'cmd_samples/bpf//test_overhead := gcc   -o samples/bpf//test_overhead samples/bpf//bpf_load.o samples/bpf//test_overhead_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf -lrt' > samples/bpf//.test_overhead.cmd
+set -e;  echo '  HOSTCC  samples/bpf//test_cgrp2_array_pin.o'; gcc -Wp,-MD,samples/bpf//.test_cgrp2_array_pin.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_cgrp2_array_pin.o samples/bpf//test_cgrp2_array_pin.c; scripts/basic/fixdep samples/bpf//.test_cgrp2_array_pin.o.d samples/bpf//test_cgrp2_array_pin.o 'gcc -Wp,-MD,samples/bpf//.test_cgrp2_array_pin.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_cgrp2_array_pin.o samples/bpf//test_cgrp2_array_pin.c' > samples/bpf//.test_cgrp2_array_pin.o.cmd; rm -f samples/bpf//.test_cgrp2_array_pin.o.d
+set -e;  echo '  HOSTLD  samples/bpf//test_cgrp2_array_pin'; gcc   -o samples/bpf//test_cgrp2_array_pin samples/bpf//test_cgrp2_array_pin.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//test_cgrp2_array_pin := gcc   -o samples/bpf//test_cgrp2_array_pin samples/bpf//test_cgrp2_array_pin.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.test_cgrp2_array_pin.cmd
+set -e;  echo '  HOSTCC  samples/bpf//test_cgrp2_attach.o'; gcc -Wp,-MD,samples/bpf//.test_cgrp2_attach.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_cgrp2_attach.o samples/bpf//test_cgrp2_attach.c; scripts/basic/fixdep samples/bpf//.test_cgrp2_attach.o.d samples/bpf//test_cgrp2_attach.o 'gcc -Wp,-MD,samples/bpf//.test_cgrp2_attach.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_cgrp2_attach.o samples/bpf//test_cgrp2_attach.c' > samples/bpf//.test_cgrp2_attach.o.cmd; rm -f samples/bpf//.test_cgrp2_attach.o.d
+set -e;  echo '  HOSTLD  samples/bpf//test_cgrp2_attach'; gcc   -o samples/bpf//test_cgrp2_attach samples/bpf//test_cgrp2_attach.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//test_cgrp2_attach := gcc   -o samples/bpf//test_cgrp2_attach samples/bpf//test_cgrp2_attach.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.test_cgrp2_attach.cmd
+set -e;  echo '  HOSTCC  samples/bpf//test_cgrp2_sock.o'; gcc -Wp,-MD,samples/bpf//.test_cgrp2_sock.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_cgrp2_sock.o samples/bpf//test_cgrp2_sock.c; scripts/basic/fixdep samples/bpf//.test_cgrp2_sock.o.d samples/bpf//test_cgrp2_sock.o 'gcc -Wp,-MD,samples/bpf//.test_cgrp2_sock.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_cgrp2_sock.o samples/bpf//test_cgrp2_sock.c' > samples/bpf//.test_cgrp2_sock.o.cmd; rm -f samples/bpf//.test_cgrp2_sock.o.d
+set -e;  echo '  HOSTLD  samples/bpf//test_cgrp2_sock'; gcc   -o samples/bpf//test_cgrp2_sock samples/bpf//test_cgrp2_sock.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//test_cgrp2_sock := gcc   -o samples/bpf//test_cgrp2_sock samples/bpf//test_cgrp2_sock.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.test_cgrp2_sock.cmd
+set -e;  echo '  HOSTCC  samples/bpf//test_cgrp2_sock2.o'; gcc -Wp,-MD,samples/bpf//.test_cgrp2_sock2.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_cgrp2_sock2.o samples/bpf//test_cgrp2_sock2.c; scripts/basic/fixdep samples/bpf//.test_cgrp2_sock2.o.d samples/bpf//test_cgrp2_sock2.o 'gcc -Wp,-MD,samples/bpf//.test_cgrp2_sock2.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_cgrp2_sock2.o samples/bpf//test_cgrp2_sock2.c' > samples/bpf//.test_cgrp2_sock2.o.cmd; rm -f samples/bpf//.test_cgrp2_sock2.o.d
+set -e;  echo '  HOSTLD  samples/bpf//test_cgrp2_sock2'; gcc   -o samples/bpf//test_cgrp2_sock2 samples/bpf//bpf_load.o samples/bpf//test_cgrp2_sock2.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//test_cgrp2_sock2 := gcc   -o samples/bpf//test_cgrp2_sock2 samples/bpf//bpf_load.o samples/bpf//test_cgrp2_sock2.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.test_cgrp2_sock2.cmd
+set -e;  echo '  HOSTCC  samples/bpf//xdp1_user.o'; gcc -Wp,-MD,samples/bpf//.xdp1_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp1_user.o samples/bpf//xdp1_user.c; scripts/basic/fixdep samples/bpf//.xdp1_user.o.d samples/bpf//xdp1_user.o 'gcc -Wp,-MD,samples/bpf//.xdp1_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp1_user.o samples/bpf//xdp1_user.c' > samples/bpf//.xdp1_user.o.cmd; rm -f samples/bpf//.xdp1_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//xdp1'; gcc   -o samples/bpf//xdp1 samples/bpf//xdp1_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//xdp1 := gcc   -o samples/bpf//xdp1 samples/bpf//xdp1_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.xdp1.cmd
+set -e;  echo '  HOSTLD  samples/bpf//xdp2'; gcc   -o samples/bpf//xdp2 samples/bpf//xdp1_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//xdp2 := gcc   -o samples/bpf//xdp2 samples/bpf//xdp1_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.xdp2.cmd
+set -e;  echo '  HOSTCC  samples/bpf//xdp_router_ipv4_user.o'; gcc -Wp,-MD,samples/bpf//.xdp_router_ipv4_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_router_ipv4_user.o samples/bpf//xdp_router_ipv4_user.c; scripts/basic/fixdep samples/bpf//.xdp_router_ipv4_user.o.d samples/bpf//xdp_router_ipv4_user.o 'gcc -Wp,-MD,samples/bpf//.xdp_router_ipv4_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_router_ipv4_user.o samples/bpf//xdp_router_ipv4_user.c' > samples/bpf//.xdp_router_ipv4_user.o.cmd; rm -f samples/bpf//.xdp_router_ipv4_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//xdp_router_ipv4'; gcc   -o samples/bpf//xdp_router_ipv4 samples/bpf//xdp_router_ipv4_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//xdp_router_ipv4 := gcc   -o samples/bpf//xdp_router_ipv4 samples/bpf//xdp_router_ipv4_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.xdp_router_ipv4.cmd
+set -e;  echo '  HOSTCC  samples/bpf//test_current_task_under_cgroup_user.o'; gcc -Wp,-MD,samples/bpf//.test_current_task_under_cgroup_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_current_task_under_cgroup_user.o samples/bpf//test_current_task_under_cgroup_user.c; scripts/basic/fixdep samples/bpf//.test_current_task_under_cgroup_user.o.d samples/bpf//test_current_task_under_cgroup_user.o 'gcc -Wp,-MD,samples/bpf//.test_current_task_under_cgroup_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_current_task_under_cgroup_user.o samples/bpf//test_current_task_under_cgroup_user.c' > samples/bpf//.test_current_task_under_cgroup_user.o.cmd; rm -f samples/bpf//.test_current_task_under_cgroup_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//test_current_task_under_cgroup'; gcc   -o samples/bpf//test_current_task_under_cgroup samples/bpf//bpf_load.o samples/bpf//../../tools/testing/selftests/bpf/cgroup_helpers.o samples/bpf//test_current_task_under_cgroup_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//test_current_task_under_cgroup := gcc   -o samples/bpf//test_current_task_under_cgroup samples/bpf//bpf_load.o samples/bpf//../../tools/testing/selftests/bpf/cgroup_helpers.o samples/bpf//test_current_task_under_cgroup_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.test_current_task_under_cgroup.cmd
+set -e;  echo '  HOSTCC  samples/bpf//trace_event_user.o'; gcc -Wp,-MD,samples/bpf//.trace_event_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//trace_event_user.o samples/bpf//trace_event_user.c; scripts/basic/fixdep samples/bpf//.trace_event_user.o.d samples/bpf//trace_event_user.o 'gcc -Wp,-MD,samples/bpf//.trace_event_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//trace_event_user.o samples/bpf//trace_event_user.c' > samples/bpf//.trace_event_user.o.cmd; rm -f samples/bpf//.trace_event_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//trace_event'; gcc   -o samples/bpf//trace_event samples/bpf//bpf_load.o samples/bpf//trace_event_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//trace_event := gcc   -o samples/bpf//trace_event samples/bpf//bpf_load.o samples/bpf//trace_event_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.trace_event.cmd
+set -e;  echo '  HOSTCC  samples/bpf//sampleip_user.o'; gcc -Wp,-MD,samples/bpf//.sampleip_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//sampleip_user.o samples/bpf//sampleip_user.c; scripts/basic/fixdep samples/bpf//.sampleip_user.o.d samples/bpf//sampleip_user.o 'gcc -Wp,-MD,samples/bpf//.sampleip_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//sampleip_user.o samples/bpf//sampleip_user.c' > samples/bpf//.sampleip_user.o.cmd; rm -f samples/bpf//.sampleip_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//sampleip'; gcc   -o samples/bpf//sampleip samples/bpf//bpf_load.o samples/bpf//sampleip_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//sampleip := gcc   -o samples/bpf//sampleip samples/bpf//bpf_load.o samples/bpf//sampleip_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.sampleip.cmd
+set -e;  echo '  HOSTCC  samples/bpf//tc_l2_redirect_user.o'; gcc -Wp,-MD,samples/bpf//.tc_l2_redirect_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tc_l2_redirect_user.o samples/bpf//tc_l2_redirect_user.c; scripts/basic/fixdep samples/bpf//.tc_l2_redirect_user.o.d samples/bpf//tc_l2_redirect_user.o 'gcc -Wp,-MD,samples/bpf//.tc_l2_redirect_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//tc_l2_redirect_user.o samples/bpf//tc_l2_redirect_user.c' > samples/bpf//.tc_l2_redirect_user.o.cmd; rm -f samples/bpf//.tc_l2_redirect_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//tc_l2_redirect'; gcc   -o samples/bpf//tc_l2_redirect samples/bpf//bpf_load.o samples/bpf//tc_l2_redirect_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//tc_l2_redirect := gcc   -o samples/bpf//tc_l2_redirect samples/bpf//bpf_load.o samples/bpf//tc_l2_redirect_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.tc_l2_redirect.cmd
+set -e;  echo '  HOSTCC  samples/bpf//lwt_len_hist_user.o'; gcc -Wp,-MD,samples/bpf//.lwt_len_hist_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//lwt_len_hist_user.o samples/bpf//lwt_len_hist_user.c; scripts/basic/fixdep samples/bpf//.lwt_len_hist_user.o.d samples/bpf//lwt_len_hist_user.o 'gcc -Wp,-MD,samples/bpf//.lwt_len_hist_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//lwt_len_hist_user.o samples/bpf//lwt_len_hist_user.c' > samples/bpf//.lwt_len_hist_user.o.cmd; rm -f samples/bpf//.lwt_len_hist_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//lwt_len_hist'; gcc   -o samples/bpf//lwt_len_hist samples/bpf//bpf_load.o samples/bpf//lwt_len_hist_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//lwt_len_hist := gcc   -o samples/bpf//lwt_len_hist samples/bpf//bpf_load.o samples/bpf//lwt_len_hist_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.lwt_len_hist.cmd
+set -e;  echo '  HOSTCC  samples/bpf//xdp_tx_iptunnel_user.o'; gcc -Wp,-MD,samples/bpf//.xdp_tx_iptunnel_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_tx_iptunnel_user.o samples/bpf//xdp_tx_iptunnel_user.c; scripts/basic/fixdep samples/bpf//.xdp_tx_iptunnel_user.o.d samples/bpf//xdp_tx_iptunnel_user.o 'gcc -Wp,-MD,samples/bpf//.xdp_tx_iptunnel_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_tx_iptunnel_user.o samples/bpf//xdp_tx_iptunnel_user.c' > samples/bpf//.xdp_tx_iptunnel_user.o.cmd; rm -f samples/bpf//.xdp_tx_iptunnel_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//xdp_tx_iptunnel'; gcc   -o samples/bpf//xdp_tx_iptunnel samples/bpf//xdp_tx_iptunnel_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//xdp_tx_iptunnel := gcc   -o samples/bpf//xdp_tx_iptunnel samples/bpf//xdp_tx_iptunnel_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.xdp_tx_iptunnel.cmd
+set -e;  echo '  HOSTCC  samples/bpf//test_map_in_map_user.o'; gcc -Wp,-MD,samples/bpf//.test_map_in_map_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_map_in_map_user.o samples/bpf//test_map_in_map_user.c; scripts/basic/fixdep samples/bpf//.test_map_in_map_user.o.d samples/bpf//test_map_in_map_user.o 'gcc -Wp,-MD,samples/bpf//.test_map_in_map_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//test_map_in_map_user.o samples/bpf//test_map_in_map_user.c' > samples/bpf//.test_map_in_map_user.o.cmd; rm -f samples/bpf//.test_map_in_map_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//test_map_in_map'; gcc   -o samples/bpf//test_map_in_map samples/bpf//bpf_load.o samples/bpf//test_map_in_map_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//test_map_in_map := gcc   -o samples/bpf//test_map_in_map samples/bpf//bpf_load.o samples/bpf//test_map_in_map_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.test_map_in_map.cmd
+set -e;  echo '  HOSTCC  samples/bpf//cookie_uid_helper_example.o'; gcc -Wp,-MD,samples/bpf//.cookie_uid_helper_example.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//cookie_uid_helper_example.o samples/bpf//cookie_uid_helper_example.c; scripts/basic/fixdep samples/bpf//.cookie_uid_helper_example.o.d samples/bpf//cookie_uid_helper_example.o 'gcc -Wp,-MD,samples/bpf//.cookie_uid_helper_example.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//cookie_uid_helper_example.o samples/bpf//cookie_uid_helper_example.c' > samples/bpf//.cookie_uid_helper_example.o.cmd; rm -f samples/bpf//.cookie_uid_helper_example.o.d
+set -e;  echo '  HOSTLD  samples/bpf//per_socket_stats_example'; gcc   -o samples/bpf//per_socket_stats_example samples/bpf//cookie_uid_helper_example.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//per_socket_stats_example := gcc   -o samples/bpf//per_socket_stats_example samples/bpf//cookie_uid_helper_example.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.per_socket_stats_example.cmd
+set -e;  echo '  HOSTCC  samples/bpf//xdp_redirect_user.o'; gcc -Wp,-MD,samples/bpf//.xdp_redirect_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_redirect_user.o samples/bpf//xdp_redirect_user.c; scripts/basic/fixdep samples/bpf//.xdp_redirect_user.o.d samples/bpf//xdp_redirect_user.o 'gcc -Wp,-MD,samples/bpf//.xdp_redirect_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_redirect_user.o samples/bpf//xdp_redirect_user.c' > samples/bpf//.xdp_redirect_user.o.cmd; rm -f samples/bpf//.xdp_redirect_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//xdp_redirect'; gcc   -o samples/bpf//xdp_redirect samples/bpf//xdp_redirect_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//xdp_redirect := gcc   -o samples/bpf//xdp_redirect samples/bpf//xdp_redirect_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.xdp_redirect.cmd
+set -e;  echo '  HOSTCC  samples/bpf//xdp_redirect_map_user.o'; gcc -Wp,-MD,samples/bpf//.xdp_redirect_map_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_redirect_map_user.o samples/bpf//xdp_redirect_map_user.c; scripts/basic/fixdep samples/bpf//.xdp_redirect_map_user.o.d samples/bpf//xdp_redirect_map_user.o 'gcc -Wp,-MD,samples/bpf//.xdp_redirect_map_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_redirect_map_user.o samples/bpf//xdp_redirect_map_user.c' > samples/bpf//.xdp_redirect_map_user.o.cmd; rm -f samples/bpf//.xdp_redirect_map_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//xdp_redirect_map'; gcc   -o samples/bpf//xdp_redirect_map samples/bpf//xdp_redirect_map_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//xdp_redirect_map := gcc   -o samples/bpf//xdp_redirect_map samples/bpf//xdp_redirect_map_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.xdp_redirect_map.cmd
+set -e;  echo '  HOSTCC  samples/bpf//xdp_redirect_cpu_user.o'; gcc -Wp,-MD,samples/bpf//.xdp_redirect_cpu_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_redirect_cpu_user.o samples/bpf//xdp_redirect_cpu_user.c; scripts/basic/fixdep samples/bpf//.xdp_redirect_cpu_user.o.d samples/bpf//xdp_redirect_cpu_user.o 'gcc -Wp,-MD,samples/bpf//.xdp_redirect_cpu_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_redirect_cpu_user.o samples/bpf//xdp_redirect_cpu_user.c' > samples/bpf//.xdp_redirect_cpu_user.o.cmd; rm -f samples/bpf//.xdp_redirect_cpu_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//xdp_redirect_cpu'; gcc   -o samples/bpf//xdp_redirect_cpu samples/bpf//bpf_load.o samples/bpf//xdp_redirect_cpu_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//xdp_redirect_cpu := gcc   -o samples/bpf//xdp_redirect_cpu samples/bpf//bpf_load.o samples/bpf//xdp_redirect_cpu_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.xdp_redirect_cpu.cmd
+set -e;  echo '  HOSTCC  samples/bpf//xdp_monitor_user.o'; gcc -Wp,-MD,samples/bpf//.xdp_monitor_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_monitor_user.o samples/bpf//xdp_monitor_user.c; scripts/basic/fixdep samples/bpf//.xdp_monitor_user.o.d samples/bpf//xdp_monitor_user.o 'gcc -Wp,-MD,samples/bpf//.xdp_monitor_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_monitor_user.o samples/bpf//xdp_monitor_user.c' > samples/bpf//.xdp_monitor_user.o.cmd; rm -f samples/bpf//.xdp_monitor_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//xdp_monitor'; gcc   -o samples/bpf//xdp_monitor samples/bpf//bpf_load.o samples/bpf//xdp_monitor_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//xdp_monitor := gcc   -o samples/bpf//xdp_monitor samples/bpf//bpf_load.o samples/bpf//xdp_monitor_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.xdp_monitor.cmd
+set -e;  echo '  HOSTCC  samples/bpf//xdp_rxq_info_user.o'; gcc -Wp,-MD,samples/bpf//.xdp_rxq_info_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_rxq_info_user.o samples/bpf//xdp_rxq_info_user.c; scripts/basic/fixdep samples/bpf//.xdp_rxq_info_user.o.d samples/bpf//xdp_rxq_info_user.o 'gcc -Wp,-MD,samples/bpf//.xdp_rxq_info_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_rxq_info_user.o samples/bpf//xdp_rxq_info_user.c' > samples/bpf//.xdp_rxq_info_user.o.cmd; rm -f samples/bpf//.xdp_rxq_info_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//xdp_rxq_info'; gcc   -o samples/bpf//xdp_rxq_info samples/bpf//xdp_rxq_info_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//xdp_rxq_info := gcc   -o samples/bpf//xdp_rxq_info samples/bpf//xdp_rxq_info_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.xdp_rxq_info.cmd
+set -e;  echo '  HOSTCC  samples/bpf//syscall_tp_user.o'; gcc -Wp,-MD,samples/bpf//.syscall_tp_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//syscall_tp_user.o samples/bpf//syscall_tp_user.c; scripts/basic/fixdep samples/bpf//.syscall_tp_user.o.d samples/bpf//syscall_tp_user.o 'gcc -Wp,-MD,samples/bpf//.syscall_tp_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//syscall_tp_user.o samples/bpf//syscall_tp_user.c' > samples/bpf//.syscall_tp_user.o.cmd; rm -f samples/bpf//.syscall_tp_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//syscall_tp'; gcc   -o samples/bpf//syscall_tp samples/bpf//bpf_load.o samples/bpf//syscall_tp_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//syscall_tp := gcc   -o samples/bpf//syscall_tp samples/bpf//bpf_load.o samples/bpf//syscall_tp_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.syscall_tp.cmd
+set -e;  echo '  HOSTCC  samples/bpf//cpustat_user.o'; gcc -Wp,-MD,samples/bpf//.cpustat_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//cpustat_user.o samples/bpf//cpustat_user.c; scripts/basic/fixdep samples/bpf//.cpustat_user.o.d samples/bpf//cpustat_user.o 'gcc -Wp,-MD,samples/bpf//.cpustat_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//cpustat_user.o samples/bpf//cpustat_user.c' > samples/bpf//.cpustat_user.o.cmd; rm -f samples/bpf//.cpustat_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//cpustat'; gcc   -o samples/bpf//cpustat samples/bpf//bpf_load.o samples/bpf//cpustat_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//cpustat := gcc   -o samples/bpf//cpustat samples/bpf//bpf_load.o samples/bpf//cpustat_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.cpustat.cmd
+set -e;  echo '  HOSTCC  samples/bpf//xdp_adjust_tail_user.o'; gcc -Wp,-MD,samples/bpf//.xdp_adjust_tail_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_adjust_tail_user.o samples/bpf//xdp_adjust_tail_user.c; scripts/basic/fixdep samples/bpf//.xdp_adjust_tail_user.o.d samples/bpf//xdp_adjust_tail_user.o 'gcc -Wp,-MD,samples/bpf//.xdp_adjust_tail_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_adjust_tail_user.o samples/bpf//xdp_adjust_tail_user.c' > samples/bpf//.xdp_adjust_tail_user.o.cmd; rm -f samples/bpf//.xdp_adjust_tail_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//xdp_adjust_tail'; gcc   -o samples/bpf//xdp_adjust_tail samples/bpf//xdp_adjust_tail_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//xdp_adjust_tail := gcc   -o samples/bpf//xdp_adjust_tail samples/bpf//xdp_adjust_tail_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.xdp_adjust_tail.cmd
+set -e;  echo '  HOSTCC  samples/bpf//xdpsock_user.o'; gcc -Wp,-MD,samples/bpf//.xdpsock_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdpsock_user.o samples/bpf//xdpsock_user.c; scripts/basic/fixdep samples/bpf//.xdpsock_user.o.d samples/bpf//xdpsock_user.o 'gcc -Wp,-MD,samples/bpf//.xdpsock_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdpsock_user.o samples/bpf//xdpsock_user.c' > samples/bpf//.xdpsock_user.o.cmd; rm -f samples/bpf//.xdpsock_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//xdpsock'; gcc   -o samples/bpf//xdpsock samples/bpf//xdpsock_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf -pthread; printf '%s\n' 'cmd_samples/bpf//xdpsock := gcc   -o samples/bpf//xdpsock samples/bpf//xdpsock_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf -pthread' > samples/bpf//.xdpsock.cmd
+set -e;  echo '  HOSTCC  samples/bpf//xdp_fwd_user.o'; gcc -Wp,-MD,samples/bpf//.xdp_fwd_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_fwd_user.o samples/bpf//xdp_fwd_user.c; scripts/basic/fixdep samples/bpf//.xdp_fwd_user.o.d samples/bpf//xdp_fwd_user.o 'gcc -Wp,-MD,samples/bpf//.xdp_fwd_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_fwd_user.o samples/bpf//xdp_fwd_user.c' > samples/bpf//.xdp_fwd_user.o.cmd; rm -f samples/bpf//.xdp_fwd_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//xdp_fwd'; gcc   -o samples/bpf//xdp_fwd samples/bpf//xdp_fwd_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//xdp_fwd := gcc   -o samples/bpf//xdp_fwd samples/bpf//xdp_fwd_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.xdp_fwd.cmd
+set -e;  echo '  HOSTCC  samples/bpf//task_fd_query_user.o'; gcc -Wp,-MD,samples/bpf//.task_fd_query_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//task_fd_query_user.o samples/bpf//task_fd_query_user.c; scripts/basic/fixdep samples/bpf//.task_fd_query_user.o.d samples/bpf//task_fd_query_user.o 'gcc -Wp,-MD,samples/bpf//.task_fd_query_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//task_fd_query_user.o samples/bpf//task_fd_query_user.c' > samples/bpf//.task_fd_query_user.o.cmd; rm -f samples/bpf//.task_fd_query_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//task_fd_query'; gcc   -o samples/bpf//task_fd_query samples/bpf//bpf_load.o samples/bpf//task_fd_query_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//task_fd_query := gcc   -o samples/bpf//task_fd_query samples/bpf//bpf_load.o samples/bpf//task_fd_query_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.task_fd_query.cmd
+set -e;  echo '  HOSTCC  samples/bpf//xdp_sample_pkts_user.o'; gcc -Wp,-MD,samples/bpf//.xdp_sample_pkts_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_sample_pkts_user.o samples/bpf//xdp_sample_pkts_user.c; scripts/basic/fixdep samples/bpf//.xdp_sample_pkts_user.o.d samples/bpf//xdp_sample_pkts_user.o 'gcc -Wp,-MD,samples/bpf//.xdp_sample_pkts_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//xdp_sample_pkts_user.o samples/bpf//xdp_sample_pkts_user.c' > samples/bpf//.xdp_sample_pkts_user.o.cmd; rm -f samples/bpf//.xdp_sample_pkts_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//xdp_sample_pkts'; gcc   -o samples/bpf//xdp_sample_pkts samples/bpf//xdp_sample_pkts_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//xdp_sample_pkts := gcc   -o samples/bpf//xdp_sample_pkts samples/bpf//xdp_sample_pkts_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.xdp_sample_pkts.cmd
+set -e;  echo '  HOSTCC  samples/bpf//ibumad_user.o'; gcc -Wp,-MD,samples/bpf//.ibumad_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//ibumad_user.o samples/bpf//ibumad_user.c; scripts/basic/fixdep samples/bpf//.ibumad_user.o.d samples/bpf//ibumad_user.o 'gcc -Wp,-MD,samples/bpf//.ibumad_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//ibumad_user.o samples/bpf//ibumad_user.c' > samples/bpf//.ibumad_user.o.cmd; rm -f samples/bpf//.ibumad_user.o.d
+set -e;  echo '  HOSTLD  samples/bpf//ibumad'; gcc   -o samples/bpf//ibumad samples/bpf//bpf_load.o samples/bpf//ibumad_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//ibumad := gcc   -o samples/bpf//ibumad samples/bpf//bpf_load.o samples/bpf//ibumad_user.o samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.ibumad.cmd
+set -e;  echo '  HOSTCC  samples/bpf//hbm.o'; gcc -Wp,-MD,samples/bpf//.hbm.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//hbm.o samples/bpf//hbm.c; scripts/basic/fixdep samples/bpf//.hbm.o.d samples/bpf//hbm.o 'gcc -Wp,-MD,samples/bpf//.hbm.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     -c -o samples/bpf//hbm.o samples/bpf//hbm.c' > samples/bpf//.hbm.o.cmd; rm -f samples/bpf//.hbm.o.d
+set -e;  echo '  HOSTLD  samples/bpf//hbm'; gcc   -o samples/bpf//hbm samples/bpf//bpf_load.o samples/bpf//hbm.o samples/bpf//../../tools/testing/selftests/bpf/cgroup_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//hbm := gcc   -o samples/bpf//hbm samples/bpf//bpf_load.o samples/bpf//hbm.o samples/bpf//../../tools/testing/selftests/bpf/cgroup_helpers.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' > samples/bpf//.hbm.cmd
+echo "  CLANG-bpf " samples/bpf//sockex1_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//sockex1_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//sockex1_kern.o
+echo "  CLANG-bpf " samples/bpf//sockex2_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//sockex2_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//sockex2_kern.o
+echo "  CLANG-bpf " samples/bpf//sockex3_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//sockex3_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//sockex3_kern.o
+echo "  CLANG-bpf " samples/bpf//tracex1_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tracex1_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tracex1_kern.o
+echo "  CLANG-bpf " samples/bpf//tracex2_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tracex2_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tracex2_kern.o
+echo "  CLANG-bpf " samples/bpf//tracex3_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tracex3_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tracex3_kern.o
+echo "  CLANG-bpf " samples/bpf//tracex4_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tracex4_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tracex4_kern.o
+set -e;  echo '  CC      samples/bpf//syscall_nrs.s'; gcc -Wp,-MD,samples/bpf//.syscall_nrs.s.d -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h -include ./include/linux/compiler_types.h -D__KERNEL__ -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE -Werror=implicit-function-declaration -Werror=implicit-int -Wno-format-security -std=gnu89 -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -m64 -falign-jumps=1 -falign-loops=1 -mno-80387 -mno-fp-ret-in-387 -mpreferred-stack-boundary=3 -mskip-rax-setup -mtune=generic -mno-red-zone -mcmodel=kernel -DCONFIG_X86_X32_ABI -DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1 -DCONFIG_AS_CFI_SECTIONS=1 -DCONFIG_AS_SSSE3=1 -DCONFIG_AS_AVX=1 -DCONFIG_AS_AVX2=1 -DCONFIG_AS_AVX512=1 -DCONFIG_AS_SHA1_NI=1 -DCONFIG_AS_SHA256_NI=1 -Wno-sign-compare -fno-asynchronous-unwind-tables -mindirect-branch=thunk-extern -mindirect-branch-register -fno-jump-tables -fno-delete-null-pointer-checks -Wno-frame-address -Wno-format-truncation -Wno-format-overflow -O2 --param=allow-store-data-races=0 -Wframe-larger-than=1024 -fstack-protector-strong -Wno-unused-but-set-variable -Wimplicit-fallthrough -Wno-unused-const-variable -fno-omit-frame-pointer -fno-optimize-sibling-calls -pg -mrecord-mcount -mfentry -DCC_USING_FENTRY -Wdeclaration-after-statement -Wvla -Wno-pointer-sign -fno-strict-overflow -fno-merge-all-constants -fmerge-constants -fno-stack-check -fconserve-stack -Werror=date-time -Werror=incompatible-pointer-types -Werror=designated-init -DKBUILD_BASENAME='"syscall_nrs"' -DKBUILD_MODNAME='"syscall_nrs"'  -fverbose-asm -S -o samples/bpf//syscall_nrs.s samples/bpf//syscall_nrs.c; scripts/basic/fixdep samples/bpf//.syscall_nrs.s.d samples/bpf//syscall_nrs.s 'gcc -Wp,-MD,samples/bpf//.syscall_nrs.s.d -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h -include ./include/linux/compiler_types.h -D__KERNEL__ -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE -Werror=implicit-function-declaration -Werror=implicit-int -Wno-format-security -std=gnu89 -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -m64 -falign-jumps=1 -falign-loops=1 -mno-80387 -mno-fp-ret-in-387 -mpreferred-stack-boundary=3 -mskip-rax-setup -mtune=generic -mno-red-zone -mcmodel=kernel -DCONFIG_X86_X32_ABI -DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1 -DCONFIG_AS_CFI_SECTIONS=1 -DCONFIG_AS_SSSE3=1 -DCONFIG_AS_AVX=1 -DCONFIG_AS_AVX2=1 -DCONFIG_AS_AVX512=1 -DCONFIG_AS_SHA1_NI=1 -DCONFIG_AS_SHA256_NI=1 -Wno-sign-compare -fno-asynchronous-unwind-tables -mindirect-branch=thunk-extern -mindirect-branch-register -fno-jump-tables -fno-delete-null-pointer-checks -Wno-frame-address -Wno-format-truncation -Wno-format-overflow -O2 --param=allow-store-data-races=0 -Wframe-larger-than=1024 -fstack-protector-strong -Wno-unused-but-set-variable -Wimplicit-fallthrough -Wno-unused-const-variable -fno-omit-frame-pointer -fno-optimize-sibling-calls -pg -mrecord-mcount -mfentry -DCC_USING_FENTRY -Wdeclaration-after-statement -Wvla -Wno-pointer-sign -fno-strict-overflow -fno-merge-all-constants -fmerge-constants -fno-stack-check -fconserve-stack -Werror=date-time -Werror=incompatible-pointer-types -Werror=designated-init -DKBUILD_BASENAME='\''"syscall_nrs"'\'' -DKBUILD_MODNAME='\''"syscall_nrs"'\''  -fverbose-asm -S -o samples/bpf//syscall_nrs.s samples/bpf//syscall_nrs.c' > samples/bpf//.syscall_nrs.s.cmd; rm -f samples/bpf//.syscall_nrs.s.d
+set -e; mkdir -p samples/bpf//; { 	 echo "#ifndef __SYSCALL_NRS_H__"; echo "#define __SYSCALL_NRS_H__"; echo "/*"; echo " * DO NOT MODIFY."; echo " *"; echo " * This file was generated by Kbuild"; echo " */"; echo ""; sed -ne 	's:^[[:space:]]*\.ascii[[:space:]]*"\(.*\)".*:\1:; /^->/{s:->#\(.*\):/* \1 */:; s:^->\([^ ]*\) [\$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; s:->::; p;}' < samples/bpf//syscall_nrs.s; echo ""; echo "#endif"; } > samples/bpf//syscall_nrs.h.tmp; if [ -r samples/bpf//syscall_nrs.h ] && cmp -s samples/bpf//syscall_nrs.h samples/bpf//syscall_nrs.h.tmp; then rm -f samples/bpf//syscall_nrs.h.tmp; else echo '  UPD     samples/bpf//syscall_nrs.h'; mv -f samples/bpf//syscall_nrs.h.tmp samples/bpf//syscall_nrs.h; fi
+echo "  CLANG-bpf " samples/bpf//tracex5_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tracex5_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tracex5_kern.o
+echo "  CLANG-bpf " samples/bpf//tracex6_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tracex6_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tracex6_kern.o
+echo "  CLANG-bpf " samples/bpf//tracex7_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tracex7_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tracex7_kern.o
+echo "  CLANG-bpf " samples/bpf//sock_flags_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//sock_flags_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//sock_flags_kern.o
+echo "  CLANG-bpf " samples/bpf//test_probe_write_user_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//test_probe_write_user_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//test_probe_write_user_kern.o
+echo "  CLANG-bpf " samples/bpf//trace_output_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//trace_output_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//trace_output_kern.o
+echo "  CLANG-bpf " samples/bpf//tcbpf1_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tcbpf1_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tcbpf1_kern.o
+echo "  CLANG-bpf " samples/bpf//tc_l2_redirect_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tc_l2_redirect_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tc_l2_redirect_kern.o
+echo "  CLANG-bpf " samples/bpf//lathist_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//lathist_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//lathist_kern.o
+echo "  CLANG-bpf " samples/bpf//offwaketime_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//offwaketime_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//offwaketime_kern.o
+echo "  CLANG-bpf " samples/bpf//spintest_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//spintest_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//spintest_kern.o
+echo "  CLANG-bpf " samples/bpf//map_perf_test_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//map_perf_test_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//map_perf_test_kern.o
+echo "  CLANG-bpf " samples/bpf//test_overhead_tp_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//test_overhead_tp_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//test_overhead_tp_kern.o
+echo "  CLANG-bpf " samples/bpf//test_overhead_raw_tp_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//test_overhead_raw_tp_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//test_overhead_raw_tp_kern.o
+echo "  CLANG-bpf " samples/bpf//test_overhead_kprobe_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//test_overhead_kprobe_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//test_overhead_kprobe_kern.o
+echo "  CLANG-bpf " samples/bpf//parse_varlen.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//parse_varlen.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//parse_varlen.o
+echo "  CLANG-bpf " samples/bpf//parse_simple.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//parse_simple.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//parse_simple.o
+echo "  CLANG-bpf " samples/bpf//parse_ldabs.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//parse_ldabs.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//parse_ldabs.o
+echo "  CLANG-bpf " samples/bpf//test_cgrp2_tc_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//test_cgrp2_tc_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//test_cgrp2_tc_kern.o
+echo "  CLANG-bpf " samples/bpf//xdp1_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//xdp1_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//xdp1_kern.o
+echo "  CLANG-bpf " samples/bpf//xdp2_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//xdp2_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//xdp2_kern.o
+echo "  CLANG-bpf " samples/bpf//xdp_router_ipv4_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//xdp_router_ipv4_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//xdp_router_ipv4_kern.o
+echo "  CLANG-bpf " samples/bpf//test_current_task_under_cgroup_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//test_current_task_under_cgroup_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//test_current_task_under_cgroup_kern.o
+echo "  CLANG-bpf " samples/bpf//trace_event_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//trace_event_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//trace_event_kern.o
+echo "  CLANG-bpf " samples/bpf//sampleip_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//sampleip_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//sampleip_kern.o
+echo "  CLANG-bpf " samples/bpf//lwt_len_hist_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//lwt_len_hist_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//lwt_len_hist_kern.o
+echo "  CLANG-bpf " samples/bpf//xdp_tx_iptunnel_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//xdp_tx_iptunnel_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//xdp_tx_iptunnel_kern.o
+echo "  CLANG-bpf " samples/bpf//test_map_in_map_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//test_map_in_map_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//test_map_in_map_kern.o
+echo "  CLANG-bpf " samples/bpf//tcp_synrto_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tcp_synrto_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tcp_synrto_kern.o
+echo "  CLANG-bpf " samples/bpf//tcp_rwnd_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tcp_rwnd_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tcp_rwnd_kern.o
+echo "  CLANG-bpf " samples/bpf//tcp_bufs_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tcp_bufs_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tcp_bufs_kern.o
+echo "  CLANG-bpf " samples/bpf//tcp_cong_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tcp_cong_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tcp_cong_kern.o
+echo "  CLANG-bpf " samples/bpf//tcp_iw_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tcp_iw_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tcp_iw_kern.o
+echo "  CLANG-bpf " samples/bpf//tcp_clamp_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tcp_clamp_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tcp_clamp_kern.o
+echo "  CLANG-bpf " samples/bpf//tcp_basertt_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tcp_basertt_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tcp_basertt_kern.o
+echo "  CLANG-bpf " samples/bpf//tcp_tos_reflect_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tcp_tos_reflect_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tcp_tos_reflect_kern.o
+echo "  CLANG-bpf " samples/bpf//tcp_dumpstats_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//tcp_dumpstats_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//tcp_dumpstats_kern.o
+echo "  CLANG-bpf " samples/bpf//xdp_redirect_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//xdp_redirect_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//xdp_redirect_kern.o
+echo "  CLANG-bpf " samples/bpf//xdp_redirect_map_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//xdp_redirect_map_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//xdp_redirect_map_kern.o
+echo "  CLANG-bpf " samples/bpf//xdp_redirect_cpu_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//xdp_redirect_cpu_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//xdp_redirect_cpu_kern.o
+echo "  CLANG-bpf " samples/bpf//xdp_monitor_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//xdp_monitor_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//xdp_monitor_kern.o
+echo "  CLANG-bpf " samples/bpf//xdp_rxq_info_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//xdp_rxq_info_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//xdp_rxq_info_kern.o
+echo "  CLANG-bpf " samples/bpf//xdp2skb_meta_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//xdp2skb_meta_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//xdp2skb_meta_kern.o
+echo "  CLANG-bpf " samples/bpf//syscall_tp_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//syscall_tp_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//syscall_tp_kern.o
+echo "  CLANG-bpf " samples/bpf//cpustat_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//cpustat_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//cpustat_kern.o
+echo "  CLANG-bpf " samples/bpf//xdp_adjust_tail_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//xdp_adjust_tail_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//xdp_adjust_tail_kern.o
+echo "  CLANG-bpf " samples/bpf//xdp_fwd_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//xdp_fwd_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//xdp_fwd_kern.o
+echo "  CLANG-bpf " samples/bpf//task_fd_query_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//task_fd_query_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//task_fd_query_kern.o
+echo "  CLANG-bpf " samples/bpf//xdp_sample_pkts_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//xdp_sample_pkts_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//xdp_sample_pkts_kern.o
+echo "  CLANG-bpf " samples/bpf//ibumad_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//ibumad_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//ibumad_kern.o
+echo "  CLANG-bpf " samples/bpf//hbm_out_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//hbm_out_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//hbm_out_kern.o
+echo "  CLANG-bpf " samples/bpf//hbm_edt_kern.o
+clang  -nostdinc -isystem /usr/lib/gcc/x86_64-linux-gnu/7/include -I./arch/x86/include -I./arch/x86/include/generated  -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h  -Isamples/bpf/ \
+	-I./tools/testing/selftests/bpf/ \
+	-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+	-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+	-Wno-gnu-variable-sized-type-not-at-end \
+	-Wno-address-of-packed-member -Wno-tautological-compare \
+	-Wno-unknown-warning-option  \
+	-I./samples/bpf/ -include asm_goto_workaround.h \
+	-O2 -emit-llvm -c samples/bpf//hbm_edt_kern.c -o -| llc -march=bpf  -filetype=obj -o samples/bpf//hbm_edt_kern.o
+:
+test -e ./Module.symvers || ( \
+echo; \
+echo "  WARNING: Symbol version dump ./Module.symvers"; \
+echo "           is missing; modules will have no dependencies and modversions."; \
+echo )
+make -f ./scripts/Makefile.modpost
+readelf: Error: Missing knowledge of 32-bit reloc types used in DWARF sections of machine number 247
+readelf: Warning: unable to apply unsupported reloc type 10 to section .debug_info
+readelf: Warning: unable to apply unsupported reloc type 1 to section .debug_info
+readelf: Warning: unable to apply unsupported reloc type 10 to section .debug_info
+cat: samples/bpf//modules.order: No such file or directory
+echo '  Building modules, stage 2.'
+set -e;  echo '  MODPOST 0 modules'; sed 's/ko$/o/' samples/bpf//modules.order | scripts/mod/modpost  -a -i ./Module.symvers -I samples/bpf//Module.symvers  -o samples/bpf//Module.symvers     -s -T - vmlinux
+make -f ./scripts/Makefile.modfinal
+cat: samples/bpf//modules.order: No such file or directory

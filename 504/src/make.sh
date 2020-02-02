@@ -25,7 +25,7 @@ clang -nostdinc -isystem `clang -print-file-name=include` \
     -include asm_goto_workaround.h \
 	-O2 -emit-llvm -c "$KERN".c -o -| llc -march=bpf -filetype=obj -o "compiled/$KERN".o
 
-gcc "$USER".c ../common/bpf_load.c ~/thesis/libbpf/src/libbpf.a -I/home/giogge/thesis/libbpf/include/uapi/ -I/home/giogge/thesis/libbpf/src/ -I../common/ -I../tools/include/ -I../tools/perf/ -lelf -o compiled/$DEFAULT
+gcc "$USER".c ../common/bpf_load.c ~/thesis/libbpf/src/libbpf.a -I../tools/include/ -I../tools/perf/ -I../common/ -I/home/giogge/thesis/libbpf/include/uapi/ -I/home/giogge/thesis/libbpf/src/ -lelf -o compiled/$DEFAULT
 
 }
 

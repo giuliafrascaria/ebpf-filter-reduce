@@ -1,5 +1,37 @@
 ## activity log
 
+### 2/2/2020
+- same as yesterday, trying to build 5.4 samples
+- obrained verbose output from kernel make samples and isolated a user function
+- I FIXED IT. I used the includes of the makefile verbose output, and I disabled the test attribute in perf-sys.h 
+
+```
+make M=samples/bpf/ -n
+
+set -e;  echo '  HOSTCC  samples/bpf//tracex1_user.o'; 
+
+	gcc -Wp,-MD,samples/bpf//.tracex1_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 
+	-fomit-frame-pointer -std=gnu89   -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf 
+	-DHAVE_ATTR_TEST=0     -c -o samples/bpf//tracex1_user.o samples/bpf//tracex1_user.c; scripts/basic/fixdep samples/bpf//.tracex1_user.o.d samples/bpf//tracex1_user.o 
+
+	'gcc -Wp,-MD,samples/bpf//.tracex1_user.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   
+	-I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ -I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0     
+	-c -o samples/bpf//tracex1_user.o samples/bpf//tracex1_user.c' 
+
+	> samples/bpf//.tracex1_user.o.cmd; rm -f samples/bpf//.tracex1_user.o.d
+
+set -e;  echo '  HOSTLD  samples/bpf//tracex1'; gcc   -o samples/bpf//tracex1 samples/bpf//bpf_load.o samples/bpf//tracex1_user.o   
+	/home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ; printf '%s\n' 'cmd_samples/bpf//tracex1 := gcc   
+	-o samples/bpf//tracex1 samples/bpf//bpf_load.o samples/bpf//tracex1_user.o   /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf ' 
+	> samples/bpf//.tracex1.cmd
+```
+### 1/2/2020
+- trying to compile with -nostdinc, very complex and honestly think it's not worth it
+- -iquote forces to look in local dir first, even for includes in <> form. Will use it for the makefile
+
+### 30/1/2020
+- meeting
+
 ### 28/1/2020
 -basically just trying to compile the samples. following this link as reference for out of tree headers that need to be included 
 -https://github.com/netoptimizer/prototype-kernel

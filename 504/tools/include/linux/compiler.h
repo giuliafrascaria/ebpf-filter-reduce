@@ -3,7 +3,7 @@
 #define _TOOLS_LINUX_COMPILER_H_
 
 #ifdef __GNUC__
-#include <linux/compiler-gcc.h>
+#include "linux/compiler-gcc.h"
 #endif
 
 #ifndef __compiletime_error
