@@ -27,11 +27,11 @@ clang -nostdinc -isystem `clang -print-file-name=include` \
 
 gcc "$USER".c bpf_load.c ~/thesis/libbpf/src/libbpf.a -iquote -I/home/giogge/thesis/libbpf/src/ \
  -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ \
--I./tools/include -I./tools/perf -I./tools/perf/util -I./tools/perf/tests -lelf --verbose -o compiled/$DEFAULT
+-I./tools/include -I./tools/perf -I./tools/perf/util -I./tools/perf/tests -lelf -o compiled/$DEFAULT
 
 }
 
-targets=( tracex1 )
+targets=( tracex1 readiter hellotrace)
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"

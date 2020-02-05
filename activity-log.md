@@ -1,5 +1,34 @@
 ## activity log
 
+### 5/2/2020
+- now that the compilation is fixed, the problem is getting the kprobe to work again!
+- first I thought it was a problem with linux_version_code because in /usr/include/ the headers were still for 4.15 and there was a version mismatch
+- after fixing that, it in fact turns out from the strace that the kernel version check is passed, and the failure happens when trying to attach a kprobe
+- checking dmesg thanks to a life saving internet post, I found out that the error is that I'm trying to probe a notrace function T_T 
+- apparently that function was turned to notrace with kernel 5.4
+- I think I have to recompile with CONFIG_KPROBE_EVENTS_ON_NOTRACE on the functions I want to hook
+- https://gitlab.freedesktop.org/panfrost/linux/commit/45408c4f92506dbdfef1721f2613e1426de00894
+- https://github.com/iovisor/bcc/issues/2509
+- https://github.com/iovisor/bpftrace/issues/206
+- https://bolinfest.github.io/opensnoop-native/
+
+[ 4631.148994] trace_kprobe: Could not probe notrace function copy_page_to_iter
+[ 4723.077755] trace_kprobe: Could not probe notrace function copy_page_to_iter
+
+sudo strace ./hellotrace 
+pread64(3, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\3\0\3\0"..., 120, 272) = 120
+bpf(BPF_PROG_LOAD, {prog_type=BPF_PROG_TYPE_KPROBE, insn_cnt=15, insns=0x561fad0ee2a0, license="GPL", log_level=0, log_size=0, log_buf=0, kern_version=328704, prog_flags=0}, 120) = 4
+openat(AT_FDCWD, "/sys/kernel/debug/tracing/kprobe_events", O_WRONLY|O_APPEND) = 5
+write(5, "p:__x64_sys_write __x64_sys_writ"..., 33) = 33
+close(5)     
+
+sudo strace ./readiter f
+bpf(BPF_PROG_LOAD, {prog_type=BPF_PROG_TYPE_KPROBE, insn_cnt=11, insns=0x55b5b14462b0, license="GPL", log_level=0, log_size=0, log_buf=0, kern_version=328704, prog_flags=0}, 120) = 4
+openat(AT_FDCWD, "/sys/kernel/debug/tracing/kprobe_events", O_WRONLY|O_APPEND) = 5
+write(5, "p:copy_page_to_iter copy_page_to"..., 37) = -1 EINVAL (Invalid argument)
+close(5)                                = 0
+
+
 ### 2/2/2020
 - same as yesterday, trying to build 5.4 samples
 - obrained verbose output from kernel make samples and isolated a user function
