@@ -43,8 +43,8 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
- 	char * buf = malloc(10);
-	ssize_t readbytes = read(fd, buf, 1);
+ 	char * buf = malloc(20);
+	ssize_t readbytes = read(fd, buf, 16);
 	printf("%s\n", buf);
 	close(fd);
 	free(buf);

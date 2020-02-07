@@ -44,5 +44,13 @@ int bpf_prog1(struct pt_regs *ctx)
 	return 0;
 }
 
+SEC("kprobe/bpf_probe_read")
+int bpf_prog6()
+{
+	char s[] = "bpf_probe_read\n";
+	bpf_trace_printk(s, sizeof(s));
+	return 0;
+}
+
 char _license[] SEC("license") = "GPL";
 u32 _version SEC("version") = LINUX_VERSION_CODE;

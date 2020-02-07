@@ -6,7 +6,7 @@
 
 //SEC("kprobe/sys_write")
 //SEC("kprobe/copy_page_to_iter_giulia")
-SEC("kprobe/sys_write")
+SEC("kprobe/copyout_bpf")
 int bpf_prog1()
 {
 	char s[] = "giulia's function yeee\n";

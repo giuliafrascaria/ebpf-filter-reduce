@@ -1,5 +1,28 @@
 ## activity log
 
+### 7/2/2020
+- tried to make bpf_probe_read work. There is something wrong with the call in copyout because the call in tracex1 seems to work and is identical
+- recompiling the kernel again to export more symbols that I can hoook
+- why is the kernel address always the same 
+
+        readiter-18721 [000] .... 18373.674726: 0: entering copyout
+        readiter-18721 [000] .... 18373.674728: 0: copyout to 0x00000000184b7294 from 0x000000001461c6d7 len 16
+        readiter-18724 [003] .... 18387.905358: 0: copy_page_to_iter
+        readiter-18724 [003] d... 18387.905385: 0: entering copyout
+        readiter-18724 [003] d... 18387.905388: 0: copyout to 0x00000000e68cad05 from 0x000000001461c6d7 len 16
+           <...>-18727 [000] d... 18389.551760: 0: copy_page_to_iter
+           <...>-18727 [000] d... 18389.551787: 0: entering copyout
+           <...>-18727 [000] d... 18389.551789: 0: copyout to 0x000000001e0fe4fd from 0x000000001461c6d7 len 16
+        readiter-18729 [003] d... 18390.777455: 0: copy_page_to_iter
+        readiter-18729 [003] d... 18390.777579: 0: entering copyout
+        readiter-18729 [003] d... 18390.777581: 0: copyout to 0x0000000092e06c4a from 0x000000001461c6d7 len 16
+           <...>-18796 [000] .... 18581.927487: 0: copy_page_to_iter
+           <...>-18796 [000] d... 18581.927497: 0: entering copyout
+           <...>-18796 [000] d... 18581.927499: 0: copyout to 0x000000009f4b80bd from 0x000000001461c6d7 len 16
+           <...>-18798 [000] .... 18582.947198: 0: copy_page_to_iter
+           <...>-18798 [000] d... 18582.947212: 0: entering copyout
+           <...>-18798 [000] d... 18582.947214: 0: copyout to 0x000000005afc398c from 0x000000001461c6d7 len 16
+
 ### 5/2/2020
 - now that the compilation is fixed, the problem is getting the kprobe to work again!
 - first I thought it was a problem with linux_version_code because in /usr/include/ the headers were still for 4.15 and there was a version mismatch
