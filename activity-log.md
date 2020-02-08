@@ -1,10 +1,22 @@
 ## activity log
 
+### 8/2/2020
+- fixed the kernel from yesterday's compilation errors
+- started preparing slides for thursday's presentation
+- added some functions to kprobe, now I can better follow the path 
+```
+readiter-2425  [000] ....  5644.654606: 0: ext4 file read
+readiter-2425  [000] .N..  5644.654636: 0: generic file read
+readiter-2425  [000] ....  5644.654744: 0: copy_page_to_iter
+readiter-2425  [000] .N..  5644.654758: 0: copy_page_to_iter_iovec
+readiter-2425  [000] d...  5644.654793: 0: entering copyout
+readiter-2425  [000] d...  5644.654805: 0: copyout to 0x00000000b0417f58 from 0x000000005f6ccaf9 len 16
+```
 ### 7/2/2020
 - tried to make bpf_probe_read work. There is something wrong with the call in copyout because the call in tracex1 seems to work and is identical
 - recompiling the kernel again to export more symbols that I can hoook
 - why is the kernel address always the same 
-
+```
         readiter-18721 [000] .... 18373.674726: 0: entering copyout
         readiter-18721 [000] .... 18373.674728: 0: copyout to 0x00000000184b7294 from 0x000000001461c6d7 len 16
         readiter-18724 [003] .... 18387.905358: 0: copy_page_to_iter
@@ -22,7 +34,7 @@
            <...>-18798 [000] .... 18582.947198: 0: copy_page_to_iter
            <...>-18798 [000] d... 18582.947212: 0: entering copyout
            <...>-18798 [000] d... 18582.947214: 0: copyout to 0x000000005afc398c from 0x000000001461c6d7 len 16
-
+```
 ### 5/2/2020
 - now that the compilation is fixed, the problem is getting the kprobe to work again!
 - first I thought it was a problem with linux_version_code because in /usr/include/ the headers were still for 4.15 and there was a version mismatch
@@ -34,7 +46,7 @@
 - https://github.com/iovisor/bcc/issues/2509
 - https://github.com/iovisor/bpftrace/issues/206
 - https://bolinfest.github.io/opensnoop-native/
-
+```
 [ 4631.148994] trace_kprobe: Could not probe notrace function copy_page_to_iter
 [ 4723.077755] trace_kprobe: Could not probe notrace function copy_page_to_iter
 
@@ -50,7 +62,7 @@ bpf(BPF_PROG_LOAD, {prog_type=BPF_PROG_TYPE_KPROBE, insn_cnt=11, insns=0x55b5b14
 openat(AT_FDCWD, "/sys/kernel/debug/tracing/kprobe_events", O_WRONLY|O_APPEND) = 5
 write(5, "p:copy_page_to_iter copy_page_to"..., 37) = -1 EINVAL (Invalid argument)
 close(5)                                = 0
-
+```
 
 ### 2/2/2020
 - same as yesterday, trying to build 5.4 samples

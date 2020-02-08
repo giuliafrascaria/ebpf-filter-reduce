@@ -39,6 +39,22 @@ int bpf_prog1()
 	return 0;
 }
 
+SEC("kprobe/ext4_file_read_iter")
+int bpf_prog2()
+{
+	char s[] = "ext4 file read\n";
+	bpf_trace_printk(s, sizeof(s));
+	return 0;
+}
+
+SEC("kprobe/generic_file_read_iter")
+int bpf_prog9()
+{
+	char s[] = "generic file read\n";
+	bpf_trace_printk(s, sizeof(s));
+	return 0;
+}
+
 SEC("kprobe/copy_page_to_iter_pipe")	//not here 
 int bpf_prog3()
 {
@@ -50,19 +66,33 @@ int bpf_prog3()
 SEC("kprobe/_copy_to_iter_bpf")
 int bpf_prog4()
 {
-	char s[] = "Where i'd actually want to be\n";
+	char s[] = "_copy_to_iter_bpf\n";
+	bpf_trace_printk(s, sizeof(s));
+	return 0;
+}
+
+SEC("kprobe/copy_to_iter_bpf")
+int bpf_prog5()
+{
+	char s[] = "copy_to_iter_bpf\n";
+	bpf_trace_printk(s, sizeof(s));
+	return 0;
+}
+
+SEC("kprobe/copy_page_to_iter_iovec_bpf")
+int bpf_prog6()
+{
+	char s[] = "copy_page_to_iter_iovec\n";
 	bpf_trace_printk(s, sizeof(s));
 	return 0;
 }
 
 SEC("kprobe/copyout_bpf")
-int bpf_prog5(struct pt_regs *ctx)
+int bpf_prog7(struct pt_regs *ctx)
 {
 
 	char s1[] = "entering copyout\n";
 	bpf_trace_printk(s1, sizeof(s1));
-
-	
 
 	void __user *to;
 	void *from;
@@ -91,12 +121,28 @@ int bpf_prog5(struct pt_regs *ctx)
 }
 
 SEC("kprobe/bpf_probe_read")
-int bpf_prog6()
+int bpf_prog8()
 {
 	char s[] = "bpf_probe_read\n";
 	bpf_trace_printk(s, sizeof(s));
 	return 0;
 }
+
+/*SEC("kprobe/vfs_read")
+int bpf_prog10()
+{
+	char s[] = "vfs_read\n";
+	bpf_trace_printk(s, sizeof(s));
+	return 0;
+}
+
+SEC("kprobe/__vfs_read")
+int bpf_prog11()
+{
+	char s[] = "__vfs_read\n";
+	bpf_trace_printk(s, sizeof(s));
+	return 0;
+}*/
 
 char _license[] SEC("license") = "GPL";
 __u32 _version SEC("version") = LINUX_VERSION_CODE;
