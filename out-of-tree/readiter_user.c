@@ -44,8 +44,18 @@ int main(int argc, char **argv)
 	}
 
  	char * buf = malloc(20);
-	ssize_t readbytes = read(fd, buf, 16);
-	printf("%s\n", buf);
+
+	__u32 key = 0;
+	printf("buffer on user side = %lu\n", (unsigned long) buf);	
+	if (bpf_map_update_elem(map_fd[0], &key, &buf, BPF_ANY) != 0) 
+	{
+		fprintf(stderr, "map_update failed: %s\n", strerror(errno));
+		return 1;
+    }
+
+	printf("before read %p\n", buf);
+	ssize_t readbytes = read(fd, buf, 15);
+	printf("after read %p\n", buf);
 	close(fd);
 	free(buf);
 

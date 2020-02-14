@@ -9,6 +9,21 @@
 #define _(P) ({typeof(P) val = 0; bpf_probe_read(&val, sizeof(val), &P); val;})
 #define	UBUFFSIZE	4
 
+struct bpf_map_def SEC("maps") my_read_map =
+{
+	.type = BPF_MAP_TYPE_ARRAY,
+	.key_size = sizeof(u32),
+	.value_size = sizeof(u64),
+	.max_entries = 1,	//used to pass the buffer address from userland
+};
+
+struct bpf_map_def SEC("maps") debug_map = {
+	.type = BPF_MAP_TYPE_PERF_EVENT_ARRAY,
+	.key_size = sizeof(int),
+	.value_size = sizeof(int),
+	.max_entries = 64,
+};
+
 /*
 size_t copy_page_to_iter_bpf(struct page *page, size_t offset, size_t bytes,
 			 struct iov_iter *i)
@@ -95,28 +110,57 @@ int bpf_prog7(struct pt_regs *ctx)
 	bpf_trace_printk(s1, sizeof(s1));
 
 	void __user *to;
-	void *from;
+	const void *from;
 	int len;
-	to = PT_REGS_PARM1(ctx);
-	from = PT_REGS_PARM2(ctx);
+	to = (void __user *) PT_REGS_PARM1(ctx);
+	from = (const void *) PT_REGS_PARM2(ctx);
 	len = PT_REGS_PARM3(ctx);
 
-	char s2[] = "copyout to 0x%p from 0x%p len %d\n";
-	bpf_trace_printk(s2, sizeof(s2), to, from, len);
+
+	__u32 key = 0;
+	__u64 ** val;
+	val = bpf_map_lookup_elem(&my_read_map, &key);
+
+	if(!val)
+	{
+		char s[] = "error reading buffer value from map, read entry\n";
+		bpf_trace_printk(s, sizeof(s)); 
+		return 0;
+	}
+
+	char str2[] = "buffer on params %lu, buffer on map %lu\n";
+	bpf_trace_printk(str2, sizeof(str2), (unsigned long) to, (unsigned long) *val);
+
+
+	char s2[] = "copyout to 0x%p, ul %lu len %d\n";
+	bpf_trace_printk(s2, sizeof(s2), to, (unsigned long) to, len);
 
 	char userbuff[UBUFFSIZE];
 	int ret;
-	bpf_probe_read(userbuff, sizeof(userbuff), from);
+	ret = bpf_probe_read(userbuff, 16, from);
 
-	/*if (ret != 0) 
+	//bpf_probe_read(userbuff, sizeof(userbuff), (char *) from);
+
+	if (ret != 0) 
 	{
 		char serr[] = "error reading char from kernel buff\n";
 		bpf_trace_printk(serr, sizeof(serr));
 		return 0;
-	}*/
+	}
 
 	char s[] = "copyout to 0x%p from 0x%p char %c\n";
 	bpf_trace_printk(s, sizeof(s), to, from, userbuff);
+	return 0;
+}
+
+/*
+SEC("kretprobe/copyout_bpf")
+int bpf_prog10(struct pt_regs *ctx)
+{
+
+	char s1[] = "exiting copyout\n";
+	bpf_trace_printk(s1, sizeof(s1));
+
 	return 0;
 }
 
@@ -128,21 +172,34 @@ int bpf_prog8()
 	return 0;
 }
 
-/*SEC("kprobe/vfs_read")
+SEC("kprobe/_copy_to_user")
 int bpf_prog10()
 {
 	char s[] = "vfs_read\n";
 	bpf_trace_printk(s, sizeof(s));
 	return 0;
-}
+}*/
 
 SEC("kprobe/__vfs_read")
-int bpf_prog11()
+int bpf_prog11(struct pt_regs *ctx)
 {
-	char s[] = "__vfs_read\n";
-	bpf_trace_printk(s, sizeof(s));
+
+	void __user *to;
+	//from;
+	int len;
+	to = (void __user *) PT_REGS_PARM2(ctx);
+	//from = (const void *) PT_REGS_PARM3(ctx);
+	len = PT_REGS_PARM3(ctx);
+
+	if (len == 15)
+	{
+		char s[] = "__vfs_read %d %p\n";
+		bpf_trace_printk(s, sizeof(s), len, to);
+	}
+
+
 	return 0;
-}*/
+}
 
 char _license[] SEC("license") = "GPL";
 __u32 _version SEC("version") = LINUX_VERSION_CODE;

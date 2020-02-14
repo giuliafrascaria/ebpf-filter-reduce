@@ -1,5 +1,24 @@
 ## activity log
 
+### 14/2/2020
+- implemented map to pass buffer address to kernel space, turns out the weird different pointer is a printk issue
+- investigating ways to debug bpf programs 
+- https://fosdem.org/2020/schedule/event/debugging_bpf/attachments/slides/3934/export/events/attachments/debugging_bpf/slides/3934/FOSDEM20_QMO_eBPF_debugging_tools.pdf
+- try to install bpftool, to inspect bytecode and to step single instruction with bpf test run
+
+### 13/2/2020
+- meeting
+
+### 12/2/2020
+- prepare presentation for meeting
+- checked that bpf_helper probe read is indeed allowed for kprobe
+
+### 9/2/2020
+- The bpf_probe_read does not get kprobed even in tracex1 which is working and seems to actually trigger it
+- https://developer.ibm.com/technologies/linux/articles/l-kernel-memory-access/
+- not really my fuynction but it's a nice walkthroungh of copy to and from user to kernel space buffers 
+ 
+
 ### 8/2/2020
 - fixed the kernel from yesterday's compilation errors
 - started preparing slides for thursday's presentation
