@@ -1,5 +1,25 @@
 ## activity log
 
+### 16/2/2020
+- trying to use probe write user with reduction of buffer size
+- without changing the size param as well, the write also dumps some nonsense bytes at the end. (makes sense, problem for security)
+- https://stackoverflow.com/questions/43003805/can-ebpf-modify-the-return-value-or-parameters-of-a-syscall
+- kprobes have read only access to ctx parameters so I can modify the content of the buffer, since the pointer remains the same, but cannot alter the size
+- NOTE TO SELF only changing _bpf functions or bpf_probe_read recompiles in 10 minutes or so, avoid touching files that are used everywhere and should be just fine
+
+
+### 15/2/2020
+- wrote an example to test probe read on another point. Used vfs_write and I am able to read the user buff 
+- printk behavior is a bit iffy, also printf fmt string of the previous print, this totally looks like a security issue
+- I can overwrite buffer from user to kernel
+- might be convenient to recompile both read and write path with option to go through both normal and own path e.g. based on a given size value
+- maybe upgrade to 5.5 since there seems to be probe read for user and kernel separately
+```
+<...>-6057  [000] ....  5883.578081: 0: __vfs_write 13 from 0000000000818dc8
+<...>-6057  [000] ....  5883.578186: 0: intercepter ubuff hello world!
+__vfs_write %d from %p
+```
+
 ### 14/2/2020
 - implemented map to pass buffer address to kernel space, turns out the weird different pointer is a printk issue
 - investigating ways to debug bpf programs 

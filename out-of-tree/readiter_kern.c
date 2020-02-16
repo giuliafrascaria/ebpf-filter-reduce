@@ -136,20 +136,26 @@ int bpf_prog7(struct pt_regs *ctx)
 	bpf_trace_printk(s2, sizeof(s2), to, (unsigned long) to, len);
 
 	char userbuff[UBUFFSIZE];
-	int ret;
-	ret = bpf_probe_read(userbuff, 16, from);
+
+	char singlechar;
+	singlechar = (char) _(from);
+
+	//int ret;
+	//ret = bpf_probe_read(userbuff, 16, from);
 
 	//bpf_probe_read(userbuff, sizeof(userbuff), (char *) from);
 
-	if (ret != 0) 
+	//if (ret != 0) 
+	//{
+	//	char serr[] = "error reading char from kernel buff\n";
+	//	bpf_trace_printk(serr, sizeof(serr));
+	//	return 0;
+	//}
+	if (singlechar == '1')
 	{
-		char serr[] = "error reading char from kernel buff\n";
-		bpf_trace_printk(serr, sizeof(serr));
-		return 0;
+		char s[] = "copyout to 0x%p from 0x%p char %c\n";
+		bpf_trace_printk(s, sizeof(s), to, from, singlechar);
 	}
-
-	char s[] = "copyout to 0x%p from 0x%p char %c\n";
-	bpf_trace_printk(s, sizeof(s), to, from, userbuff);
 	return 0;
 }
 
