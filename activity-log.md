@@ -1,5 +1,53 @@
 ## activity log
 
+### 19/2/2020
+- recompiled kernel again with a few more printks because turns out I don't go through the atomic mapped part but the one below
+- created version that uses mmap
+- fixed probe_read, now I can access the buffer
+- The size of the read in userspace must be exactly the size of the buffer in kernel through which I perform the read
+- it's still gonna copy so not sure if there is any gain from this as of now
+- doing a dynamic size based on the parameter read through context causes llvm to fail compilation
+
+```
+        <...>-3298  [002] ....  4349.402961: 0: ext4 file read
+           <...>-3298  [002] ....  4349.402969: 0: generic file read
+           <...>-3298  [002] ....  4349.402971: 0: copy_page_to_iter
+           <...>-3298  [002] ....  4349.402971: 0: copy_page_to_iter_iovec
+           <...>-3298  [002] d...  4349.402975: 0: entering modified copyout
+           <...>-3298  [002] d...  4349.402975: 0: buffer on params 94628466936176, buffer on map 94628466936176
+           <...>-3298  [002] d...  4349.402976: 0: copyout to 0x00000000f9d0a370, ul 94628466936176 len 41
+           <...>-3298  [002] d...  4349.402979: 0: copyout to 0x00000000f9d0a370 from 0x00000000c35b7d33 char 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17yp
+
+-----------------------------------
+making ...readiter
+LLVMSymbolizer: error reading file: No such file or directory
+#0 0x00007fdcfd23f0ea llvm::sys::PrintStackTrace(llvm::raw_ostream&) (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0x81e0ea)
+#1 0x00007fdcfd23d366 llvm::sys::RunSignalHandlers() (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0x81c366)
+#2 0x00007fdcfd23d49b (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0x81c49b)
+#3 0x00007fdcfc2e5f20 (/lib/x86_64-linux-gnu/libc.so.6+0x3ef20)
+#4 0x00007fdcfd81382c llvm::SelectionDAG::getGlobalAddress(llvm::GlobalValue const*, llvm::SDLoc const&, llvm::EVT, long, bool, unsigned char) (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0xdf282c)
+#5 0x00007fdcfe8c1ab6 llvm::BPFTargetLowering::LowerGlobalAddress(llvm::SDValue, llvm::SelectionDAG&) const (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0x1ea0ab6)
+#6 0x00007fdcfd72b751 (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0xd0a751)
+#7 0x00007fdcfd72ee38 llvm::SelectionDAG::Legalize() (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0xd0de38)
+#8 0x00007fdcfd836bf8 llvm::SelectionDAGISel::CodeGenAndEmitDAG() (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0xe15bf8)
+#9 0x00007fdcfd8403fc llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0xe1f3fc)
+#10 0x00007fdcfd842905 (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0xe21905)
+#11 0x00007fdcfd4e3fe0 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0xac2fe0)
+#12 0x00007fdcfd3197f8 llvm::FPPassManager::runOnFunction(llvm::Function&) (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0x8f87f8)
+#13 0x00007fdcfd319843 llvm::FPPassManager::runOnModule(llvm::Module&) (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0x8f8843)
+#14 0x00007fdcfd31908f llvm::legacy::PassManagerImpl::run(llvm::Module&) (/usr/lib/llvm-6.0/bin/../lib/libLLVM-6.0.so.1+0x8f808f)
+#15 0x000055c373262861 (llc+0x21861)
+#16 0x000055c3732575d5 (llc+0x165d5)
+#17 0x00007fdcfc2c8b97 __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x21b97)
+#18 0x000055c37325775a (llc+0x1675a)
+Stack dump:
+0.	Program arguments: llc -march=bpf -filetype=obj -o compiled/readiter_kern.o 
+1.	Running pass 'Function Pass Manager' on module '<stdin>'.
+2.	Running pass 'BPF DAG->DAG Pattern Instruction Selection' on function '@bpf_prog7'
+./make.sh: line 7:  3609 Done                    clang -nostdinc -isystem `clang -print-file-name=include` -D__KERNEL__ -D__ASM_SYSREG_H -D__TARGET_ARCH_x86 $C_FLAGS -Icommon/ -include /usr/src/linux-headers-`uname -r`/include/linux/kconfig.h -I/usr/src/linux-headers-`uname -r`/include/ -I/usr/src/linux-headers-`uname -r`/include/uapi/ -I/usr/src/linux-headers-`uname -r`/include/generated/uapi/ -I/usr/src/linux-headers-`uname -r`/arch/x86/include -I/usr/src/linux-headers-`uname -r`/arch/x86/include/uapi/ -I/usr/src/linux-headers-`uname -r`/arch/x86/include/generated/ -I/usr/src/linux-headers-`uname -r`/arch/x86/include/generated/uapi/ -I/usr/src/linux-headers-`uname -r`/tools/lib/ -include asm_goto_workaround.h -O2 -emit-llvm -c "$KERN".c -o -
+      3610 Segmentation fault      (core dumped) | llc -march=bpf -filetype=obj -o "compiled/$KERN".o
+```
+
 ### 16/2/2020
 - trying to use probe write user with reduction of buffer size
 - without changing the size param as well, the write also dumps some nonsense bytes at the end. (makes sense, problem for security)

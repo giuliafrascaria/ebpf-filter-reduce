@@ -31,7 +31,7 @@ gcc "$USER".c bpf_load.c ~/thesis/libbpf/src/libbpf.a -iquote -I/home/giogge/the
 
 }
 
-targets=( tracex1 readiter hellotrace readbuff buffermap proberead)
+targets=( tracex1 readiter hellotrace readbuff buffermap proberead mmap)
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"

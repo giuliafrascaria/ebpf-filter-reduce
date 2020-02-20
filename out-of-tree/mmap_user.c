@@ -16,6 +16,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
+#include <sys/mman.h>
 
 #include <bpf.h>
 #include "bpf_load.h"
@@ -43,7 +44,12 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
- 	char * buf = malloc(50);
+ 	char * buf = mmap(NULL, 4095, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+     if (buf == NULL)
+    {
+        fprintf(stderr, "mmap failed: %s\n", strerror(errno));
+		return 1;
+    }
 
 	__u32 key = 0;
 	printf("buffer on user side = %lu\n", (unsigned long) buf);	
@@ -57,7 +63,7 @@ int main(int argc, char **argv)
 	ssize_t readbytes = read(fd, buf, 41);
 	printf("after read %p\n", buf);
 	close(fd);
-	free(buf);
+
 
 	printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");
 
