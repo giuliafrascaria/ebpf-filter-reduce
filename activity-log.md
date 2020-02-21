@@ -1,5 +1,41 @@
 ## activity log
 
+### 20/2/2020
+- trying to loop through int numbers in the instrumentation
+- printk behaves in a weird way, looks like it is not flushed or something
+- 
+
+```
+           <...>-3846  [002] ....  1282.081987: 0: ext4 file read
+           <...>-3846  [002] ....  1282.082028: 0: generic file read
+           <...>-3846  [002] ....  1282.082034: 0: copy_page_to_iter
+           <...>-3846  [002] ....  1282.082037: 0: copy_page_to_iter_iovec
+           <...>-3846  [002] ....  1282.082051: 0: entering modified copyout
+           <...>-3846  [002] ....  1282.082054: 0: buffer on params 94337010364880, buffer on map 94337010364880
+           <...>-3846  [002] ....  1282.082059: 0: copyout to 0x00000000fd0daf3f, ul 94337010364880 len 30
+           <...>-3846  [002] ....  1282.082069: 0: full buffer 
+           <...>-3846  [002] ....  1282.082079: 0: copyout to 0x00000000fd0daf3f from 0x000000006aff2d09 char 01full buffer %s
+
+           <...>-3846  [002] ....  1282.082089: 0: copyout to 0x00000000fd0daf3f from 0x000000006aff2d09 char 02full buffer %s
+
+           <...>-3846  [002] ....  1282.082097: 0: copyout to 0x00000000fd0daf3f from 0x000000006aff2d09 char 03full buffer %s
+
+           <...>-3846  [002] ....  1282.082108: 0: copyout to 0x00000000fd0daf3f from 0x000000006aff2d09 char 04full buffer %s
+
+           <...>-3846  [002] ....  1282.082115: 0: copyout to 0x00000000fd0daf3f from 0x000000006aff2d09 char 05full buffer %s
+
+           <...>-3846  [002] ....  1282.082122: 0: copyout to 0x00000000fd0daf3f from 0x000000006aff2d09 char 06full buffer %s
+
+           <...>-3846  [002] ....  1282.082130: 0: copyout to 0x00000000fd0daf3f from 0x000000006aff2d09 char 07full buffer %s
+
+           <...>-3846  [002] ....  1282.082181: 0: copyout to 0x00000000fd0daf3f from 0x000000006aff2d09 char 08full buffer %s
+
+           <...>-3846  [002] ....  1282.082191: 0: copyout to 0x00000000fd0daf3f from 0x000000006aff2d09 char 09full buffer %s
+
+           <...>-3846  [002] ....  1282.082199: 0: copyout to 0x00000000fd0daf3f from 0x000000006aff2d09 char 10full buffer %s
+
+```
+
 ### 19/2/2020
 - recompiled kernel again with a few more printks because turns out I don't go through the atomic mapped part but the one below
 - created version that uses mmap

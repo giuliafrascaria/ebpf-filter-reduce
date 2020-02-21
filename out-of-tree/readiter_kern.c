@@ -3,11 +3,12 @@
 #include <uapi/linux/bpf.h>
 #include <linux/version.h>
 #include <linux/ptrace.h>
+#include <linux/kernel.h>
 #include "bpf_helpers.h"
 
 
 #define _(P) ({typeof(P) val = 0; bpf_probe_read(&val, sizeof(val), &P); val;})
-#define	UBUFFSIZE	41
+#define	UBUFFSIZE	30
 
 struct bpf_map_def SEC("maps") my_read_map =
 {
@@ -140,16 +141,27 @@ int bpf_prog7(struct pt_regs *ctx)
 		char s2[] = "copyout to 0x%p, ul %lu len %d\n";
 		bpf_trace_printk(s2, sizeof(s2), to, (unsigned long) to, blen);
 
-		//char userbuff[UBUFFSIZE];
-		char userbuff[blen];
+		char userbuff[UBUFFSIZE];
+		//char userbuff[blen];
 
 		//char singlechar;
 		//singlechar = (char) _(from);
 		int ret;
 		ret = bpf_probe_read(userbuff, sizeof(userbuff), from);
 
-		char s[] = "copyout to 0x%p from 0x%p char %s\n";
+		char s[] = "full buffer %s\n";
 		bpf_trace_printk(s, sizeof(s), to, from, userbuff);
+
+		
+		int sum = 0;
+		char curr[2];
+		const char delimiters[] = " ";
+		for (int i = 0; i < UBUFFSIZE; i = i+3)
+		{
+			ret = bpf_probe_read(curr, 2, from+i);
+			char s3[] = "copyout to 0x%p from 0x%p char %s\n";
+			bpf_trace_printk(s3, sizeof(s3), to, from, curr);
+		}
 
 	}
 	

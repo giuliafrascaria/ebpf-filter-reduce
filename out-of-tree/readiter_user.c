@@ -54,7 +54,7 @@ int main(int argc, char **argv)
     }
 
 	printf("before read %p\n", buf);
-	ssize_t readbytes = read(fd, buf, 41);
+	ssize_t readbytes = read(fd, buf, 30);
 	printf("after read %p\n", buf);
 	close(fd);
 	free(buf);
