@@ -1,5 +1,11 @@
 ## activity log
 
+### 22/2/2020
+- studied the blogs of Oracle on bpf
+- https://blogs.oracle.com/linux/notes-on-bpf-1
+- I think I need to investigate the skb infrastructure cause it appears to have functions that can be ported to storage almost as is, for my functionality
+
+
 ### 20/2/2020
 - trying to loop through int numbers in the instrumentation
 - printk behaves in a weird way, looks like it is not flushed or something
