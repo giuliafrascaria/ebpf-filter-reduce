@@ -162,15 +162,23 @@ int bpf_prog7(struct pt_regs *ctx)
 			char s3[] = "copyout to 0x%p from 0x%p char %s\n";
 			bpf_trace_printk(s3, sizeof(s3), to, from, curr);
 		}
-
 	}
+	return 0;
+}
+
+/*
+SEC("kretprobe/copyout_bpf")
+int bpf_prog70(struct pt_regs *ctx)
+{
+
+	char s1[] = "return copyout\n";
+	bpf_trace_printk(s1, sizeof(s1));
 	
 
 	return 0;
 }
 
-
-/*SEC("kprobe/copyout_bpf")
+SEC("kprobe/copyout_bpf")
 int bpf_prog7(struct pt_regs *ctx)
 {
 

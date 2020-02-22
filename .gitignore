@@ -1,2 +1,3 @@
 *.o
 /415/src/compiled/*
+/out-of-tree/compiled/*

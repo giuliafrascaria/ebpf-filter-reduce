@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
- 	char buf[] = "hello world!\n";
+ 	char buf[] = "abcd";
 
 	__u32 key = 0;
 	printf("buffer on user side = %lu\n", (unsigned long) buf);	
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     }
 
 
-	ssize_t writebytes = write(fd, buf, 13);
+	ssize_t writebytes = write(fd, buf, 4);
 	
 	printf("return value of write is %ld\n", writebytes);
 

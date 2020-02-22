@@ -28,7 +28,7 @@ int bpf_prog11(struct pt_regs *ctx)
 	from = (const char __user *) PT_REGS_PARM2(ctx);
 	len  = PT_REGS_PARM3(ctx);
 
-	if (len == 13)
+	if (len == 4)
 	{
 
 		char s[] = "__vfs_write %d from %p\n";
@@ -37,12 +37,12 @@ int bpf_prog11(struct pt_regs *ctx)
         char userbuff[UBUFFSIZE]; 
         bpf_probe_read(userbuff, sizeof(userbuff), from);
 
-        if (userbuff[0] == 'h')
+        if (userbuff[0] == 'a')
         {
             char s1[] = "intercepted ubuff %s\n";
             bpf_trace_printk(s1, sizeof(s1), userbuff);
 
-			char mystring[] = "hello giogge\n";
+			char mystring[] = "xyy";
 			bpf_probe_write_user((void *) from, mystring, sizeof(mystring));
 
 			size_t newsize = sizeof(mystring);

@@ -1,3 +1,25 @@
+### meeting 21/2/2020
+- general restriction to pack data in fixed size buffer (4k)
+- wrapper to modify first order params -> turn to pointer
+- try to modify return value
+- write iterator on buffer that avoids copy
+- benchmark the cost of probe_read 1mb, read 4k at a time VS copy to userspace 1mb iovec plus doing filtering in userspace
+- 1 reading from media
+- 2 aggregation/filtering (eg sum)
+- 3 return of value
+- which copy is faster, kernel 2 kernel or kernel 2 user
+- try to use the perf array to debug
+- man od
+- standard functions like aggregator, filter... that bpf can use
+- if user gives certain condition, how to compile so that the user-given condition is passed to the helper
+- checksum example either through shared map or rewrite first value of the buffer and interpret that in userspace
+- where is the ctx made read only for kprobe? can I disable that?
+- prepare summary file of current bpf limitations
+- try to study verifier and see if i can disable checks
+- bpf helper for dynamic buffer size
+- helper function to modify ctx of kprobe 
+- see overwrite ret funcion
+
 ### meeting 13/2/2020
 - cat current kprobes
 - mmap instead of malloc
