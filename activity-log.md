@@ -1,5 +1,10 @@
 ## activity log
 
+### 26/2/2020
+- tried to understand perf array because bpf printk definitely is too iffy to understand what's going on
+- read through the verifier code (partially) to understand how the kprobe read only is enforced
+- finished reading the oravle blogs on skb, definitely what I will need in the long run
+
 ### 22/2/2020
 - studied the blogs of Oracle on bpf
 - https://blogs.oracle.com/linux/notes-on-bpf-1

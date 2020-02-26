@@ -149,8 +149,8 @@ int bpf_prog7(struct pt_regs *ctx)
 		int ret;
 		ret = bpf_probe_read(userbuff, sizeof(userbuff), from);
 
-		char s[] = "full buffer %s\n";
-		bpf_trace_printk(s, sizeof(s), to, from, userbuff);
+		//char s[] = "full buffer %s\n";
+		//bpf_trace_printk(s, sizeof(s), userbuff);
 
 		
 		int sum = 0;
@@ -158,9 +158,9 @@ int bpf_prog7(struct pt_regs *ctx)
 		const char delimiters[] = " ";
 		for (int i = 0; i < UBUFFSIZE; i = i+3)
 		{
-			ret = bpf_probe_read(curr, 2, from+i);
-			char s3[] = "copyout to 0x%p from 0x%p char %s\n";
-			bpf_trace_printk(s3, sizeof(s3), to, from, curr);
+			ret = bpf_probe_read(curr, 2, userbuff+i);
+			char s3[] = "copyout char %s\n";
+			bpf_trace_printk(s3, sizeof(s3), curr);
 		}
 	}
 	return 0;
