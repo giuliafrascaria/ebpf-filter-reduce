@@ -142,25 +142,31 @@ int bpf_prog7(struct pt_regs *ctx)
 		bpf_trace_printk(s2, sizeof(s2), to, (unsigned long) to, blen);
 
 		char userbuff[UBUFFSIZE];
-		//char userbuff[blen];
 
 		//char singlechar;
 		//singlechar = (char) _(from);
-		int ret;
-		ret = bpf_probe_read(userbuff, sizeof(userbuff), from);
+		//int ret;
+		//ret = bpf_probe_read(userbuff, sizeof(userbuff), from);
 
-		//char s[] = "full buffer %s\n";
-		//bpf_trace_printk(s, sizeof(s), userbuff);
+		int ret;
+		ret = bpf_probe_read_str(userbuff, sizeof(userbuff), from);
+
+		char s[] = "full buffer %s\n";
+		bpf_trace_printk(s, sizeof(s), userbuff);
 
 		
 		int sum = 0;
-		char curr[2];
+		char curr[3];
 		const char delimiters[] = " ";
+		long num;
 		for (int i = 0; i < UBUFFSIZE; i = i+3)
 		{
-			ret = bpf_probe_read(curr, 2, userbuff+i);
-			char s3[] = "copyout char %s\n";
-			bpf_trace_printk(s3, sizeof(s3), curr);
+			ret = bpf_probe_read_str(curr, 3, userbuff+i);
+			
+			bpf_strtol(curr, 2, 10, &num);
+
+			char s3[] = "copyout char %s converted to %d\n";
+			bpf_trace_printk(s3, sizeof(s3), curr, num);
 		}
 	}
 	return 0;

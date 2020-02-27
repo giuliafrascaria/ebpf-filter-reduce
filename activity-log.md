@@ -1,5 +1,27 @@
 ## activity log
 
+### 27/2/2020
+- I tested bpf_probe_read_str. it appears to work differently than probe read because it attaches a newline
+- this avoids the overflow with the format string. now I'm trying to convert the char[] to int
+- kstrtol() should do but I think the verifier complains (at JIT time) for a jump out of range. Am I allowed to call that function in bpf code?
+- if not, I have to recompile with a helper T_T 
+- bpf_strtol exists ooooh https://patchwork.kernel.org/patch/10887787/
+- aand of course it doesn't work. It doesn't find the symbol. In fact I checked the kprobe function protos and it's not in the allowed ones so I need to recompile including that one https://elixir.bootlin.com/linux/v5.4/source/kernel/trace/bpf_trace.c#L687
+- https://elixir.bootlin.com/linux/v5.4/source/kernel/bpf/helpers.c#L452
+
+```
+invalid relo for insn[131].code 0x85
+bpf_load_program() err=22
+jump out of range from insn 53 to 151
+processed 0 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+
+
+132: (85) call bpf_strtol#105
+unknown func bpf_strtol#105
+processed 112 insns (limit 1000000) max_states_per_insn 0 total_states 5 peak_states 5 mark_read 3
+
+```
+
 ### 26/2/2020
 - tried to understand perf array because bpf printk definitely is too iffy to understand what's going on
 - read through the verifier code (partially) to understand how the kprobe read only is enforced
@@ -126,7 +148,8 @@ __vfs_write %d from %p
 
 ### 12/2/2020
 - prepare presentation for meeting
-- checked that bpf_helper probe read is indeed allowed for kprobe
+- checked that bpf_helper probe read is indeed allowed for kprobe in the list of allowed helpers for kprobe
+- https://elixir.bootlin.com/linux/v5.4/source/kernel/trace/bpf_trace.c#L687
 
 ### 9/2/2020
 - The bpf_probe_read does not get kprobed even in tracex1 which is working and seems to actually trigger it
