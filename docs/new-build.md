@@ -28,7 +28,12 @@ GRUB_SAVEDEFAULT=true
 GRUB_DEFAULT=saved
 ```
 - reboot should boot successfully to 5.4.0+
+- create header folder in /usr/src
 
+```
+sudo cp -r /home/giogge/linux/include/ /usr/src/linux-headers-5.4.0+/
+sudo cp -r /home/giogge/linux/arch/x86/include/ /usr/src/linux-headers-5.4.0+/arch/x86/
+```
 ## bpf setup 
 
 - clone my repo

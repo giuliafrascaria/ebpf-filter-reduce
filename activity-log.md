@@ -1,5 +1,11 @@
 ## activity log
 
+### 28/2/2020
+- I worked to set up the new VM with more resources
+- wrote the guide file to repeat it one day, if needed
+- I might need to update the local headers to accomodate the bpf helpers that I am adding now
+- I am compiling the userspace bpf samples linking with the libbpf in kernel tree rather than the external one, because the mirror github uses an outdated version of zlib (gzopen64@@ZLIB_1.2.3.3) while the in-kernel links to libz.so.1.2.11, which is the one I have in /lib/x86_64-linux-gnu/ 
+
 ### 27/2/2020
 - I tested bpf_probe_read_str. it appears to work differently than probe read because it attaches a newline
 - this avoids the overflow with the format string. now I'm trying to convert the char[] to int
