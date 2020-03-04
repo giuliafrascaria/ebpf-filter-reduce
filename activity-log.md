@@ -1,5 +1,37 @@
 ## activity log
 
+### 4/3/2020
+- trying to copy cgroup sample from kernel and add a random strtol to test if it is working there
+- looking at the mailing list for the patch that introduced the helpers, they look as if they are supposed to be used just for one cgroup type
+- https://lkml.org/lkml/2019/4/6/139
+- however no reason to believe that once I allow the helper somewhere else the verifier should fail. in the proto definition the arg1 type is a pointer to memory, why do I have an error given that it is a pointer to memory and it expects a map instead??
+- https://elixir.bootlin.com/linux/v5.4/source/tools/testing/selftests/bpf/test_cgroup_storage.c#L69
+https://elixir.bootlin.com/linux/v5.4/source/tools/testing/selftests/bpf/test_sysctl.c#L64 BPF instructions calling that function
+- I will try to write a raw bpf instruction sequence to call strtol
+- apt-get install gcc-multilib libc6-i386 libc6-dev-i386 for selftests
+- https://www.kernel.org/doc/html/latest/bpf/bpf_devel_QA.html#q-samples-bpf-preference-vs-selftests
+
+
+
+``` 
+const struct bpf_func_proto bpf_strtol_proto = {
+	.func		= bpf_strtol,
+	.gpl_only	= false,
+	.ret_type	= RET_INTEGER,
+	.arg1_type	= ARG_PTR_TO_MEM,
+	.arg2_type	= ARG_CONST_SIZE,
+	.arg3_type	= ARG_ANYTHING,
+	.arg4_type	= ARG_PTR_TO_LONG,
+};
+
+
+sudo ./readiter 
+eBPF file to be loaded is : ./readiter_kern.o 
+ioctl PERF_EVENT_IOC_SET_BPF failed err Invalid argument
+``` 
+### 1/3/2020
+- worked on the presentation
+
 ### 29/2/2020
 - checking if I can now use the bpf helper I need to convert strtol
 - so now the code seems to find the right helper function but the verifier still fails with this error
