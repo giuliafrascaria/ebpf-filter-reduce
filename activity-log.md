@@ -1,5 +1,22 @@
 ## activity log
 
+### 29/2/2020
+- checking if I can now use the bpf helper I need to convert strtol
+- so now the code seems to find the right helper function but the verifier still fails with this error
+- trying to understand how to use cgroups so I can first test the helper function in the original env, to understand if it is a problem of my kernel extension of of me not knowing how to use it (most likely)
+- in the meantime also testing override return to see if the return value of the read can be made to be what I want. I saw that it does not happen in kretprobe so that's good since I can only hook one point at a time
+- guess what it doesn't work cause I have to recompile with an explicit flag in the config file CONFIG_BPF_KPROBE_OVERRIDE
+- https://elixir.bootlin.com/linux/v5.4/source/samples/bpf/tracex7_kern.c
+- https://elixir.bootlin.com/linux/v5.4/source/kernel/trace/bpf_trace.c#L755
+
+
+``` 
+bpf_load_program() err=13
+...
+R1 type=map_ptr expected=fp
+processed 21 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+```
+
 ### 28/2/2020
 - I worked to set up the new VM with more resources
 - wrote the guide file to repeat it one day, if needed

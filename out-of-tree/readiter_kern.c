@@ -8,7 +8,7 @@
 
 
 #define _(P) ({typeof(P) val = 0; bpf_probe_read(&val, sizeof(val), &P); val;})
-#define	UBUFFSIZE	30
+#define	UBUFFSIZE	9
 
 struct bpf_map_def SEC("maps") my_read_map =
 {
@@ -111,6 +111,17 @@ int bpf_prog7(struct pt_regs *ctx)
 	char s1[] = "entering modified copyout\n";
 	bpf_trace_printk(s1, sizeof(s1));
 
+/*
+	const char * teststring;
+	teststring = "42";
+	long * num;
+	u64 base = 10;
+	int res = bpf_strtol(teststring, sizeof(teststring), base, num);
+	if (res < 0)
+	{
+		return 1;
+	}*/
+
 	// instantiate parameters
 	void __user *to;
 	const void *from;
@@ -158,92 +169,23 @@ int bpf_prog7(struct pt_regs *ctx)
 		int sum = 0;
 		char curr[3];
 		const char delimiters[] = " ";
-		long num;
+		//long num;
 		for (int i = 0; i < UBUFFSIZE; i = i+3)
 		{
 			ret = bpf_probe_read_str(curr, 3, userbuff+i);
 			
-			bpf_strtol(curr, 2, 10, &num);
+			//bpf_strtol(curr, 2, 10, &num);
 
-			char s3[] = "copyout char %s converted to %d\n";
-			bpf_trace_printk(s3, sizeof(s3), curr, num);
+			char s3[] = "copyout char %s\n";
+			bpf_trace_printk(s3, sizeof(s3), curr);
 		}
 	}
-	return 0;
-}
 
-/*
-SEC("kretprobe/copyout_bpf")
-int bpf_prog70(struct pt_regs *ctx)
-{
-
-	char s1[] = "return copyout\n";
-	bpf_trace_printk(s1, sizeof(s1));
-	
+	unsigned long rc = 2;
+	bpf_override_return(ctx, rc);
 
 	return 0;
 }
-
-SEC("kprobe/copyout_bpf")
-int bpf_prog7(struct pt_regs *ctx)
-{
-
-	char s1[] = "entering modified copyout\n";
-	bpf_trace_printk(s1, sizeof(s1));
-
-	void __user *to;
-	const void *from;
-	int len;
-	to = (void __user *) PT_REGS_PARM1(ctx);
-	from = (const void *) PT_REGS_PARM2(ctx);
-	len = PT_REGS_PARM3(ctx);
-
-
-	__u32 key = 0;
-	__u64 ** val;
-	val = bpf_map_lookup_elem(&my_read_map, &key);
-
-	if(!val)
-	{
-		char s[] = "error reading buffer value from map, read entry\n";
-		bpf_trace_printk(s, sizeof(s)); 
-		return 0;
-	}
-
-	char str2[] = "buffer on params %lu, buffer on map %lu\n";
-	bpf_trace_printk(str2, sizeof(str2), (unsigned long) to, (unsigned long) *val);
-
-
-	char s2[] = "copyout to 0x%p, ul %lu len %d\n";
-	bpf_trace_printk(s2, sizeof(s2), to, (unsigned long) to, len);
-
-	char userbuff[UBUFFSIZE];
-
-	char singlechar;
-	singlechar = (char) _(from);
-
-	char s[] = "copyout to 0x%p from 0x%p char %c\n";
-	bpf_trace_printk(s, sizeof(s), to, from, singlechar);
-
-	//int ret;
-	//ret = bpf_probe_read(userbuff, 16, from);
-
-	//bpf_probe_read(userbuff, sizeof(userbuff), (char *) from);
-
-	//if (ret != 0) 
-	//{
-	//	char serr[] = "error reading char from kernel buff\n";
-	//	bpf_trace_printk(serr, sizeof(serr));
-	//	return 0;
-	//}
-	//if (singlechar == '1')
-	//{
-	//	char s[] = "copyout to 0x%p from 0x%p char %c\n";
-	//	bpf_trace_printk(s, sizeof(s), to, from, singlechar);
-	//}
-	return 0;
-}*/
-
 
 SEC("kprobe/copyout")
 int bpf_prog12(struct pt_regs *ctx)
@@ -302,32 +244,6 @@ int bpf_prog12(struct pt_regs *ctx)
 	
 }
 
-/*
-SEC("kretprobe/copyout_bpf")
-int bpf_prog10(struct pt_regs *ctx)
-{
-
-	char s1[] = "exiting copyout\n";
-	bpf_trace_printk(s1, sizeof(s1));
-
-	return 0;
-}
-
-SEC("kprobe/bpf_probe_read")
-int bpf_prog8()
-{
-	char s[] = "bpf_probe_read\n";
-	bpf_trace_printk(s, sizeof(s));
-	return 0;
-}
-
-SEC("kprobe/_copy_to_user")
-int bpf_prog10()
-{
-	char s[] = "vfs_read\n";
-	bpf_trace_printk(s, sizeof(s));
-	return 0;
-}*/
 
 SEC("kprobe/__vfs_read")
 int bpf_prog11(struct pt_regs *ctx)
