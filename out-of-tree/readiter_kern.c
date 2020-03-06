@@ -114,9 +114,9 @@ int bpf_prog7(struct pt_regs *ctx)
 
 	const char * teststring;
 	teststring = "42";
-	long * num;
+	long num;
 	u64 base = 10;
-	int res = bpf_strtol(teststring, sizeof(teststring), base, num);
+	int res = bpf_strtol(teststring, sizeof(teststring), base, &num);
 	if (res < 0)
 	{
 		return 1;
