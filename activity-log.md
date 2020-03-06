@@ -6,6 +6,7 @@
 - https://github.com/iovisor/bcc/blob/master/docs/kernel-versions.md
 - recompiled to allow pointer to ARG_ANYTHING cause I was having the same issue as before, but now the problem is this
 - ok the way to go now is definitely to try to compile the selftest and compare the opcodes
+- I am not sure if it is an issue witl clang missing an init?
 
 ```
 22: (85) call bpf_strtol#105

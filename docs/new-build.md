@@ -40,3 +40,9 @@ sudo cp -r /home/giogge/linux/arch/x86/include/ /usr/src/linux-headers-5.4.0+/ar
 - clone libbpf
 - install llvm clang libelf-dev
 - local kernel headers should be just fine if the kernel version stays 5.4.0+
+
+## after source coe edits
+
+- update both the global source headers and the local headers when and where relevant
+- sudo rm -rf /usr/src/linux-headers-5.4.0+/include/
+- sudo cp -r /home/giogge/linux/include/ /usr/src/linux-headers-5.4.0+/

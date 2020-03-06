@@ -108,19 +108,23 @@ SEC("kprobe/copyout_bpf")
 int bpf_prog7(struct pt_regs *ctx)
 {
 
-	char s1[] = "entering modified copyout\n";
-	bpf_trace_printk(s1, sizeof(s1));
+	//char s1[] = "entering modified copyout\n";
+	//bpf_trace_printk(s1, sizeof(s1));
 
 
 	const char * teststring;
-	teststring = "42";
-	long num;
+	teststring = "42\n";
+	long testnum = 42;
 	u64 base = 10;
-	int res = bpf_strtol(teststring, sizeof(teststring), base, &num);
+	int res = bpf_strtol(teststring, sizeof(teststring), base, &testnum);
 	if (res < 0)
 	{
 		return 1;
 	}
+
+	char n[] = "converted num to int %d\n";
+	bpf_trace_printk(n, sizeof(n), testnum); 
+
 /*
 	const char * teststring;
 	teststring = "42";
