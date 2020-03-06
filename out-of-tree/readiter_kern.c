@@ -111,7 +111,7 @@ int bpf_prog7(struct pt_regs *ctx)
 	char s1[] = "entering modified copyout\n";
 	bpf_trace_printk(s1, sizeof(s1));
 
-/*
+
 	const char * teststring;
 	teststring = "42";
 	long * num;
@@ -120,8 +120,8 @@ int bpf_prog7(struct pt_regs *ctx)
 	if (res < 0)
 	{
 		return 1;
-	}*/
-
+	}
+/*
 	const char * teststring;
 	teststring = "42";
 	long num;
@@ -130,7 +130,7 @@ int bpf_prog7(struct pt_regs *ctx)
 	if (res < 0)
 	{
 		return 1;
-	}
+	}*/
 
 	// instantiate parameters
 	void __user *to;

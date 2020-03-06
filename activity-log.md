@@ -4,7 +4,15 @@
 - recompiled the kernel adding a kstrtol helper function for bpf
 - found useful reference for bpf helpers
 - https://github.com/iovisor/bcc/blob/master/docs/kernel-versions.md
+- recompiled to allow pointer to ARG_ANYTHING cause I was having the same issue as before, but now the problem is this
+- ok the way to go now is definitely to try to compile the selftest and compare the opcodes
 
+```
+22: (85) call bpf_strtol#105
+kernel subsystem misconfigured func bpf_strtol#105
+processed 19 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+
+```
 
 ### 4/3/2020
 - trying to copy cgroup sample from kernel and add a random strtol to test if it is working there
