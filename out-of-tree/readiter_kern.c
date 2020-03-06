@@ -122,6 +122,16 @@ int bpf_prog7(struct pt_regs *ctx)
 		return 1;
 	}*/
 
+	const char * teststring;
+	teststring = "42";
+	long num;
+	u64 base = 10;
+	int res = bpf_kstrtol(teststring, base, &num);
+	if (res < 0)
+	{
+		return 1;
+	}
+
 	// instantiate parameters
 	void __user *to;
 	const void *from;

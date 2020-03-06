@@ -1,3 +1,14 @@
+### meeting 5/3/2020
+- bpf kernels library
+- first step get working examples in kernels and then see what can be pushed to the bpf
+- think about claims in thesis, try to write last paragraph of thesis of key contributions
+- filters, data reduction operations, what is missing in bpf to get that done
+- document what ebpf cannot do
+- what did it take to make it work
+- how much can be pushed back to bpf
+- tuesday meeting call + thursday
+- userspace bpf verifier 
+
 ### meeting 21/2/2020
 - general restriction to pack data in fixed size buffer (4k)
 - wrapper to modify first order params -> turn to pointer

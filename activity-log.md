@@ -1,5 +1,11 @@
 ## activity log
 
+### 6/3/2020
+- recompiled the kernel adding a kstrtol helper function for bpf
+- found useful reference for bpf helpers
+- https://github.com/iovisor/bcc/blob/master/docs/kernel-versions.md
+
+
 ### 4/3/2020
 - trying to copy cgroup sample from kernel and add a random strtol to test if it is working there
 - looking at the mailing list for the patch that introduced the helpers, they look as if they are supposed to be used just for one cgroup type
