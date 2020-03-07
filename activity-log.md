@@ -12,7 +12,7 @@
 - according to https://blogs.oracle.com/linux/notes-on-bpf-5 this fail is in the second step of the verifier, when all states are being tested
 - https://elixir.bootlin.com/linux/v5.5/source/kernel/bpf/helpers.c#L437 found the function in 5.5
 - manpages are in /include/uapi/linux/bpf.h
-- side by side of selftest example and the compiled code don't look that different but hey, not the problem is the map error anyway. Something is wrong
+- side by side of selftest example and the compiled code don't look that different but hey, not the problem is the map error anyway. Something is wrong.
 
 ```
 invalid relo for insn[5] no map_data match
