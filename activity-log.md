@@ -1,5 +1,68 @@
 ## activity log
 
+### 7/3/2020
+- https://elixir.bootlin.com/linux/v5.4/source/kernel/bpf/verifier.c#L3225
+- https://elixir.bootlin.com/linux/v5.4/source/kernel/trace/bpf_trace.c#L765
+- https://elixir.bootlin.com/linux/v5.4/source/include/linux/bpf.h#L305
+- https://elixir.bootlin.com/linux/v5.4/source/kernel/bpf/cgroup.c#L812
+- I think the fail happens in check_func_arg. I need to understard what goes differently between the prev and actual 
+- probably gets called by this helper check routine https://elixir.bootlin.com/linux/v5.4/source/kernel/bpf/verifier.c#L3940 
+- tried to instrument kprobe on the verifier function and the error changes to this, weird
+- I think that I should deep dive in the verifier to understand what happens, and what data structures are necessary
+- according to https://blogs.oracle.com/linux/notes-on-bpf-5 this fail is in the second step of the verifier, when all states are being tested
+- https://elixir.bootlin.com/linux/v5.5/source/kernel/bpf/helpers.c#L437 found the function in 5.5
+- manpages are in /include/uapi/linux/bpf.h
+- side by side of selftest example and the compiled code don't look that different but hey, not the problem is the map error anyway. Something is wrong
+
+```
+invalid relo for insn[5] no map_data match
+bpf_load_program() err=22
+fd 0 is not pointing to valid bpf_map
+processed 0 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+fd 0 is not pointing to valid bpf_map
+processed 0 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+
+```
+
+```
+bpf_prog7:
+       0:	b7 01 00 00 2a 00 00 00 	r1 = 0x2a
+       1:	7b 1a f8 ff 00 00 00 00 	*(u64 *)(r10 - 0x8) = r1
+       2:	bf a4 00 00 00 00 00 00 	r4 = r10
+       3:	07 04 00 00 f8 ff ff ff 	r4 += -0x8
+       4:	00 00 00 00 00 00 00 00 00 00 	r1 = 0x0 ll
+		0000000000000020:  R_BPF_64_64	.L.str
+       6:	b7 02 00 00 08 00 00 00 	r2 = 0x8
+       7:	b7 03 00 00 0a 00 00 00 	r3 = 0xa
+       8:	85 00 00 00 69 00 00 00 	call 0x69
+       9:	b7 00 00 00 00 00 00 00 	r0 = 0x0
+      10:	95 00 00 00 00 00 00 00 	exit
+
+
+/* arg1 (buf) */
+			BPF_MOV64_REG(BPF_REG_7, BPF_REG_10),
+			BPF_ALU64_IMM(BPF_ADD, BPF_REG_7, -8),
+			/* " -6\0" */
+			BPF_MOV64_IMM(BPF_REG_0,
+				      bpf_ntohl(0x0a2d3600)),
+			BPF_STX_MEM(BPF_W, BPF_REG_7, BPF_REG_0, 0),
+
+			BPF_MOV64_REG(BPF_REG_1, BPF_REG_7),
+
+			/* arg2 (buf_len) */
+			BPF_MOV64_IMM(BPF_REG_2, 4),
+
+			/* arg3 (flags) */
+			BPF_MOV64_IMM(BPF_REG_3, 10),
+
+			/* arg4 (res) */
+			BPF_ALU64_IMM(BPF_ADD, BPF_REG_7, -8),
+			BPF_STX_MEM(BPF_DW, BPF_REG_7, BPF_REG_0, 0),
+			BPF_MOV64_REG(BPF_REG_4, BPF_REG_7),
+
+			BPF_EMIT_CALL(BPF_FUNC_strtol),
+```
+
 ### 6/3/2020
 - recompiled the kernel adding a kstrtol helper function for bpf
 - found useful reference for bpf helpers

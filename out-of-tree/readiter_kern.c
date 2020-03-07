@@ -95,6 +95,14 @@ int bpf_prog5()
 	return 0;
 }
 
+SEC("kprobe/check_func_arg")
+int bpf_prog23()
+{
+	char s[] = "func arg\n";
+	bpf_trace_printk(s, sizeof(s));
+	return 0;
+}
+
 SEC("kprobe/copy_page_to_iter_iovec_bpf")
 int bpf_prog6()
 {
@@ -111,7 +119,7 @@ int bpf_prog7(struct pt_regs *ctx)
 	//char s1[] = "entering modified copyout\n";
 	//bpf_trace_printk(s1, sizeof(s1));
 
-
+	/*
 	const char * teststring;
 	teststring = "42\n";
 	long testnum = 42;
@@ -123,7 +131,7 @@ int bpf_prog7(struct pt_regs *ctx)
 	}
 
 	char n[] = "converted num to int %d\n";
-	bpf_trace_printk(n, sizeof(n), testnum); 
+	bpf_trace_printk(n, sizeof(n), testnum); */
 
 /*
 	const char * teststring;
