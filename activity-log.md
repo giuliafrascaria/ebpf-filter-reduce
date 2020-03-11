@@ -1,5 +1,8 @@
 ## activity log
 
+### 11/3/2020
+- trying to compile the kernel with a harmless helper function to see how the verifier behaves in that case
+
 ### 7/3/2020
 - https://elixir.bootlin.com/linux/v5.4/source/kernel/bpf/verifier.c#L3225
 - https://elixir.bootlin.com/linux/v5.4/source/kernel/trace/bpf_trace.c#L765
