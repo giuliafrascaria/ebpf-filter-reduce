@@ -2,6 +2,10 @@
 
 ### 11/3/2020
 - trying to compile the kernel with a harmless helper function to see how the verifier behaves in that case
+- normal function that just prints to user does work and passes the verifier
+- this means that my procedure to add verifiers is correct and the issue with the other functions is indeed in the formal verification
+- try to use ARG_DONTCARE to avoid the big helper verification step
+
 
 ### 7/3/2020
 - https://elixir.bootlin.com/linux/v5.4/source/kernel/bpf/verifier.c#L3225

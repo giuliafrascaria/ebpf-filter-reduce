@@ -1,6 +1,3 @@
-# cannot find fixdep (/home/giogge/linux/tools/objtool//fixdep)
-# using basic dep data
-
 /home/giogge/linux/tools/objtool/fixdep.o: fixdep.c \
  /usr/include/stdc-predef.h /usr/include/x86_64-linux-gnu/sys/types.h \
  /usr/include/features.h /usr/include/x86_64-linux-gnu/sys/cdefs.h \
@@ -76,5 +73,3 @@
  /usr/include/x86_64-linux-gnu/bits/local_lim.h \
  /usr/include/linux/limits.h \
  /usr/include/x86_64-linux-gnu/bits/posix2_lim.h
-
-cmd_/home/giogge/linux/tools/objtool/fixdep.o := gcc -Wp,-MD,/home/giogge/linux/tools/objtool/.fixdep.o.d -Wp,-MT,/home/giogge/linux/tools/objtool/fixdep.o -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -D"BUILD_STR(s)=$(pound)s"   -c -o /home/giogge/linux/tools/objtool/fixdep.o fixdep.c

@@ -95,13 +95,14 @@ int bpf_prog5()
 	return 0;
 }
 
+/*
 SEC("kprobe/check_func_arg")
 int bpf_prog23()
 {
 	char s[] = "func arg\n";
 	bpf_trace_printk(s, sizeof(s));
 	return 0;
-}
+}*/
 
 SEC("kprobe/copy_page_to_iter_iovec_bpf")
 int bpf_prog6()
@@ -111,7 +112,7 @@ int bpf_prog6()
 	return 0;
 }
 
-
+/*
 SEC("kprobe/copyout_bpf")
 int bpf_prog7(struct pt_regs *ctx)
 {
@@ -119,7 +120,7 @@ int bpf_prog7(struct pt_regs *ctx)
 	//char s1[] = "entering modified copyout\n";
 	//bpf_trace_printk(s1, sizeof(s1));
 
-	/*
+	
 	const char * teststring;
 	teststring = "42\n";
 	long testnum = 42;
@@ -131,9 +132,9 @@ int bpf_prog7(struct pt_regs *ctx)
 	}
 
 	char n[] = "converted num to int %d\n";
-	bpf_trace_printk(n, sizeof(n), testnum); */
+	bpf_trace_printk(n, sizeof(n), testnum); 
 
-/*
+
 	const char * teststring;
 	teststring = "42";
 	long num;
@@ -142,7 +143,7 @@ int bpf_prog7(struct pt_regs *ctx)
 	if (res < 0)
 	{
 		return 1;
-	}*/
+	}
 
 	// instantiate parameters
 	void __user *to;
@@ -208,6 +209,40 @@ int bpf_prog7(struct pt_regs *ctx)
 
 	return 0;
 }
+*/
+
+
+SEC("kprobe/copyout_bpf")
+int bpf_prog7(struct pt_regs *ctx)
+{
+	bpf_my_printk();
+
+	const char * teststring;
+	teststring = "42";
+	long num;
+	u64 base = 10;
+	int res = bpf_kstrtol(teststring, base, &num);
+	if (res < 0)
+	{
+		return 1;
+	}
+
+	/*
+	const char * teststring;
+	teststring = "42";
+	long testnum = 42;
+	u64 base = 10;
+	int res = bpf_strtol(teststring, sizeof(teststring), base, &testnum);
+	if (res < 0)
+	{
+		return 1;
+	}*/
+	char n[] = "converted num to int %d\n";
+	bpf_trace_printk(n, sizeof(n), num); 
+
+	return 0;
+}
+
 
 SEC("kprobe/copyout")
 int bpf_prog12(struct pt_regs *ctx)

@@ -221,8 +221,9 @@ static int (*bpf_sysctl_set_new_value)(void *ctx, const char *buf,
 static int (*bpf_strtol)(const char *buf, unsigned long long buf_len,
 			 unsigned long long flags, long *res) =
 	(void *) BPF_FUNC_strtol;
-static int (*bpf_kstrtol)(const char *buf, unsigned long long buf_len, long *res) =
+static int (*bpf_kstrtol)(const char *buf, unsigned int base, long *res) =
 	(void *) BPF_FUNC_kstrtol;
+static int (*bpf_my_printk)(void) = (void *) BPF_FUNC_my_printk;
 static int (*bpf_strtoul)(const char *buf, unsigned long long buf_len,
 			  unsigned long long flags, unsigned long *res) =
 	(void *) BPF_FUNC_strtoul;
