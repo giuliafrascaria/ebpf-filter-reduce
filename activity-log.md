@@ -1,5 +1,37 @@
 ## activity log
 
+### 13/3/2020
+- investigate the reason for failure in normal arg_ptr_to_mem case
+- hm it doesn't really work
+- when I isolate and only instrument that call, in strtol_kern.c, the error is the following
+- llvm-objdump -d -r -print-imm-hex sample.o
+- wrote a kernel module to double check that the kstrtol is used correctly. It works so this narrows the chances of error
+- it is either in the compiler for the bytecode generation of strtol helper
+- or it is in the verifier for the type propagation and formal verification
+
+```
+invalid relo for insn[2] no map_data match
+bpf_load_program() err=22
+fd 0 is not pointing to valid bpf_map
+processed 0 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+fd 0 is not pointing to valid bpf_map
+processed 0 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+
+```
+
+### 12/3/2020
+- recompiled with header parameter set to arg_dontcare
+- doesn't work
+- investigating the kernel misconfiguration error, gotta start somewhere
+- todo afterwards, investigate the helper function check. I think the error is in type propagation in the formal verification step.
+- check syntax but that looks all right. Try to load kernel module with kstrtol idk
+
+```
+6: (85) call bpf_kstrtol#111
+kernel subsystem misconfigured func bpf_kstrtol#111
+
+```
+
 ### 11/3/2020
 - trying to compile the kernel with a harmless helper function to see how the verifier behaves in that case
 - normal function that just prints to user does work and passes the verifier

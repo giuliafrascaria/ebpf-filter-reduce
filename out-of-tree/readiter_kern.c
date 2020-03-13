@@ -215,10 +215,9 @@ int bpf_prog7(struct pt_regs *ctx)
 SEC("kprobe/copyout_bpf")
 int bpf_prog7(struct pt_regs *ctx)
 {
-	bpf_my_printk();
+	// bpf_my_printk();
 
-	const char * teststring;
-	teststring = "42";
+	const char * teststring = "42";
 	long num;
 	u64 base = 10;
 	int res = bpf_kstrtol(teststring, base, &num);
@@ -237,8 +236,8 @@ int bpf_prog7(struct pt_regs *ctx)
 	{
 		return 1;
 	}*/
-	char n[] = "converted num to int %d\n";
-	bpf_trace_printk(n, sizeof(n), num); 
+	char n[] = "converted num to int %d from %s\n";
+	bpf_trace_printk(n, sizeof(n), num, teststring); 
 
 	return 0;
 }
