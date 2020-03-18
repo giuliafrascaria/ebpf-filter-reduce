@@ -112,38 +112,13 @@ int bpf_prog6()
 	return 0;
 }
 
-/*
+
 SEC("kprobe/copyout_bpf")
 int bpf_prog7(struct pt_regs *ctx)
 {
 
-	//char s1[] = "entering modified copyout\n";
-	//bpf_trace_printk(s1, sizeof(s1));
-
-	
-	const char * teststring;
-	teststring = "42\n";
-	long testnum = 42;
-	u64 base = 10;
-	int res = bpf_strtol(teststring, sizeof(teststring), base, &testnum);
-	if (res < 0)
-	{
-		return 1;
-	}
-
-	char n[] = "converted num to int %d\n";
-	bpf_trace_printk(n, sizeof(n), testnum); 
-
-
-	const char * teststring;
-	teststring = "42";
-	long num;
-	u64 base = 10;
-	int res = bpf_kstrtol(teststring, base, &num);
-	if (res < 0)
-	{
-		return 1;
-	}
+	char s1[] = "entering modified copyout\n";
+	bpf_trace_printk(s1, sizeof(s1));
 
 	// instantiate parameters
 	void __user *to;
@@ -189,56 +164,41 @@ int bpf_prog7(struct pt_regs *ctx)
 		bpf_trace_printk(s, sizeof(s), userbuff);
 
 		
-		int sum = 0;
+		long sum = 0;
 		char curr[3];
-		const char delimiters[] = " ";
-		//long num;
+		long num = 0; // need initialization or verifier complains on strtol
+		u64 base = 10;
+		long elems = 3;
+
 		for (int i = 0; i < UBUFFSIZE; i = i+3)
 		{
 			ret = bpf_probe_read_str(curr, 3, userbuff+i);
 			
-			//bpf_strtol(curr, 2, 10, &num);
+			if (curr != NULL)
+			{
+				int res = bpf_strtol(curr, sizeof(curr), base, &num);
+				if (res < 0)
+				{
+					return 1;
+				}
+			}
 
-			char s3[] = "copyout char %s\n";
-			bpf_trace_printk(s3, sizeof(s3), curr);
+			char s3[] = "copyout char %s converted to %d\n";
+			bpf_trace_printk(s3, sizeof(s3), curr, num);
+
+			sum = sum + num;
 		}
+
+		//unsigned long avg = sum/elems;
+		
+		char s4[] = "sum of numbers is %ld\n";
+		bpf_trace_printk(s4, sizeof(s4), sum);
+
+
 	}
 
 	//unsigned long rc = -2;
 	//bpf_override_return(ctx, rc);
-
-	return 0;
-}
-*/
-
-
-SEC("kprobe/copyout_bpf")
-int bpf_prog7(struct pt_regs *ctx)
-{
-	// bpf_my_printk();
-
-	/*
-	const char * teststring = "42";
-	long num;
-	u64 base = 10;
-	int res = bpf_kstrtol(teststring, base, &num);
-	if (res < 0)
-	{
-		return 1;
-	}*/
-
-	/*
-	const char * teststring;
-	teststring = "42";
-	long testnum = 42;
-	u64 base = 10;
-	int res = bpf_strtol(teststring, sizeof(teststring), base, &testnum);
-	if (res < 0)
-	{
-		return 1;
-	}*/
-	char n[] = "converted num to int\n";
-	bpf_trace_printk(n, sizeof(n)); 
 
 	return 0;
 }

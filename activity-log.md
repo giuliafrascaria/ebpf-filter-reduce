@@ -3,6 +3,25 @@
 
 ### 18/3/2020
 
+- now I am porting the strtol piece of code to the readiter function, to try to parse the numbers that I read from file
+- IT WORKS
+```
+readiter-21940 [002] .N.. 26752.619260: 0: full buffer 01 02 03
+readiter-21940 [002] .N.. 26752.619263: 0: copyout char 01 converted to 1
+readiter-21940 [002] .N.. 26752.619264: 0: copyout char 02 converted to 2
+readiter-21940 [002] .N.. 26752.619264: 0: copyout char 03 converted to 3
+readiter-21940 [002] .N.. 26752.619265: 0: sum of numbers is 6
+```
+- trying to operate with numbers. signed division does not appear to be supported 
+
+```
+making ...readiter
+Error: Unsupport signed division for DAG: 0x560db1216cc8: i64 = sdiv 0x560db1214c40, Constant:i64<3>Please convert to unsigned div/mod.
+```
+
+---------------------------------------------------------------------------------------------------------------
+
+commit ca5e06b33f90dc5ba9803ae889f87e57d185ad2c
 - now I am at the step of debugging the actual kstrtol function. getting invalid stack type error that I originally had
 - checking to see if it is a problem with my usage pattern that is considered unsafe. 
 - important, it is not the wrong type anymore, this is an offset error so totally looks like something that the verifier expects me rto check
