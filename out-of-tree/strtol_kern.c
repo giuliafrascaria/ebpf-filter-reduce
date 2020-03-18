@@ -13,14 +13,19 @@ int bpf_prog7(struct pt_regs *ctx)
 	//char s1[] = "entering modified copyout\n";
 	//bpf_trace_printk(s1, sizeof(s1));
 	
-	const char * teststring = "42";
-	long num;
-	u64 base = 10;
-	int res = bpf_kstrtol(teststring, base, &num);
-	if (res < 0)
+	char teststring[3] = "42\n"; 
+	long num = 42;
+	//u64 base = 10;
+
+	/*if (teststring != NULL)
 	{
-		return 1;
-	}
+		int res = bpf_kstrtol(teststring, base, &num);
+		if (res < 0)
+		{
+			return 1;
+		}
+	}*/
+	
 
 	/*
 	const char * teststring;
@@ -32,6 +37,7 @@ int bpf_prog7(struct pt_regs *ctx)
 	{
 		return 1;
 	}*/
+
 	char n[] = "converted num to int %d from %s\n";
 	bpf_trace_printk(n, sizeof(n), num, teststring); 
 

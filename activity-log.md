@@ -1,5 +1,20 @@
 ## activity log
 
+### 18/3/2020
+commit 8ef272415a046699ad9b6f57a787bffe11d56e34
+- debugging strtol program, now the first verifier error is gone
+- it was a problem with the printk function, not getting invalid relo[] anymore but printk definitely is kinda broken 
+```
+          strtol-18652 [000] d... 21678.730965: 0: converted num to int 42 from 42
+�X:�@O���%!{������p:�����;�@
+
+```
+
+
+### 15/3/2020
+- started looking at commit history in the verifier to understand what changed
+
+
 ### 13/3/2020
 - investigate the reason for failure in normal arg_ptr_to_mem case
 - hm it doesn't really work
