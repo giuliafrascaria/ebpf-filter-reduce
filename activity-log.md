@@ -1,6 +1,29 @@
 ## activity log
 
+
 ### 18/3/2020
+
+- now I am at the step of debugging the actual kstrtol function. getting invalid stack type error that I originally had
+- checking to see if it is a problem with my usage pattern that is considered unsafe. 
+- important, it is not the wrong type anymore, this is an offset error so totally looks like something that the verifier expects me rto check
+
+```
+11: (85) call bpf_kstrtol#111
+invalid stack type R1 off=-4 access_size=10
+processed 12 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+
+```
+- as I heard in the conference from fosdem https://fosdem.org/2020/schedule/event/debugging_bpf/
+- IT DOES PASS THE TEST (but doesn't print). It was considerind 10 to be the size of the buffer although in theory it is the base in kstrtol. will now try with standard bpf_strtol
+- AAAAAAH IT WORKS. (with bpf_strtol). The num needs to be initialized to a default value or the verifier will complain for risky memory access
+
+```
+invalid indirect read from stack off -16+0 size 8
+processed 11 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+
+```
+-------------------------------------------------------------------------------------------------------------
+
 commit 8ef272415a046699ad9b6f57a787bffe11d56e34
 - debugging strtol program, now the first verifier error is gone
 - it was a problem with the printk function, not getting invalid relo[] anymore but printk definitely is kinda broken 

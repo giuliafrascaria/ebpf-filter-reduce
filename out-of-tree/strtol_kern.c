@@ -14,19 +14,18 @@ int bpf_prog7(struct pt_regs *ctx)
 	//bpf_trace_printk(s1, sizeof(s1));
 	
 	char teststring[3] = "42\n"; 
-	long num = 42;
-	//u64 base = 10;
+	long num = 0;
+	u64 base = 10;
 
-	/*if (teststring != NULL)
+	if (teststring != NULL)
 	{
-		int res = bpf_kstrtol(teststring, base, &num);
+		//int res = bpf_kstrtol(teststring, base, &num);
+		int res = bpf_strtol(teststring, sizeof(teststring), base, &num);
 		if (res < 0)
 		{
 			return 1;
-		}
-	}*/
-	
-
+		}	
+	}
 	/*
 	const char * teststring;
 	teststring = "42";
