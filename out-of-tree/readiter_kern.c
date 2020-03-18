@@ -217,6 +217,7 @@ int bpf_prog7(struct pt_regs *ctx)
 {
 	// bpf_my_printk();
 
+	/*
 	const char * teststring = "42";
 	long num;
 	u64 base = 10;
@@ -224,7 +225,7 @@ int bpf_prog7(struct pt_regs *ctx)
 	if (res < 0)
 	{
 		return 1;
-	}
+	}*/
 
 	/*
 	const char * teststring;
@@ -236,8 +237,8 @@ int bpf_prog7(struct pt_regs *ctx)
 	{
 		return 1;
 	}*/
-	char n[] = "converted num to int %d from %s\n";
-	bpf_trace_printk(n, sizeof(n), num, teststring); 
+	char n[] = "converted num to int\n";
+	bpf_trace_printk(n, sizeof(n)); 
 
 	return 0;
 }
