@@ -2,6 +2,10 @@
 
 
 ### 18/3/2020
+- now trying strtoul, had to recompile the kernel because I had changed an arg type
+- 
+----------------------------------------------------------------------------------------
+commit 4e914ce680d6d87e39e7a5e618aa3720fd6e98d8q
 
 - now I am porting the strtol piece of code to the readiter function, to try to parse the numbers that I read from file
 - IT WORKS

@@ -164,11 +164,11 @@ int bpf_prog7(struct pt_regs *ctx)
 		bpf_trace_printk(s, sizeof(s), userbuff);
 
 		
-		long sum = 0;
+		unsigned long sum = 0;
 		char curr[3];
-		long num = 0; // need initialization or verifier complains on strtol
+		unsigned long num = 0; // need initialization or verifier complains on strtol
 		u64 base = 10;
-		long elems = 3;
+		unsigned long elems = 3;
 
 		for (int i = 0; i < UBUFFSIZE; i = i+3)
 		{
@@ -176,7 +176,7 @@ int bpf_prog7(struct pt_regs *ctx)
 			
 			if (curr != NULL)
 			{
-				int res = bpf_strtol(curr, sizeof(curr), base, &num);
+				int res = bpf_strtoul(curr, sizeof(curr), base, &num);
 				if (res < 0)
 				{
 					return 1;
@@ -189,10 +189,10 @@ int bpf_prog7(struct pt_regs *ctx)
 			sum = sum + num;
 		}
 
-		//unsigned long avg = sum/elems;
+		unsigned long avg = sum/elems;
 		
-		char s4[] = "sum of numbers is %ld\n";
-		bpf_trace_printk(s4, sizeof(s4), sum);
+		char s4[] = "sum of numbers is %lu, avg is %lu\n";
+		bpf_trace_printk(s4, sizeof(s4), sum, avg);
 
 
 	}
