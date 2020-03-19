@@ -197,8 +197,8 @@ int bpf_prog7(struct pt_regs *ctx)
 
 	}
 
-	//unsigned long rc = -2;
-	//bpf_override_return(ctx, rc);
+	unsigned long rc = -1;
+	bpf_override_return(ctx, rc);
 
 	return 0;
 }

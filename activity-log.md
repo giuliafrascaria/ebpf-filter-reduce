@@ -1,9 +1,34 @@
 ## activity log
 
+### 19/3/2020
+problems at this point:
+- find a way to link (and potentially chain) different instrumentation. Probably possible to do with bpf_tail call, with a constant hook point (copyout) and the tail calls being called according to user needs
+- unsigned/signed  division
+- how to share data type and format
+- how to overwrite return value
+- stop the data copy on the way back
+- https://www.kernel.org/doc/html/latest/bpf/bpf_design_QA.html
+- examining override return commit https://github.com/torvalds/linux/commit/965de87e54b803223bff703ea6b2a76c056695ae
+- https://elixir.bootlin.com/linux/v5.4/source/arch/x86/lib/error-inject.c#L17 error inject
+- overriding rax value https://elixir.bootlin.com/linux/v5.4/source/arch/x86/include/asm/ptrace.h#L112
+- https://elixir.bootlin.com/linux/v5.4/source/samples/bpf/bpf_load.c#L255 fails here for me 
+- I-m overriding the return of copyout, how is that propagated to the actual read?? most likely not just passed by
+
+```
+eBPF file to be loaded is : ./readiter_kern.o 
+ioctl PERF_EVENT_IOC_SET_BPF failed err Invalid argument
+```
 
 ### 18/3/2020
+commit ab6116ed8cf20e22d6c78ffe85decb0637571f33
 - now trying strtoul, had to recompile the kernel because I had changed an arg type
-- 
+- WORKS
+```
+readiter-2170  [000] d...   244.808086: 0: copyout char 01 converted to 1
+readiter-2170  [000] d...   244.808087: 0: copyout char 02 converted to 2
+readiter-2170  [000] d...   244.808087: 0: copyout char 03 converted to 3
+readiter-2170  [000] d...   244.808088: 0: sum of numbers is 6, avg is 2
+```
 ----------------------------------------------------------------------------------------
 commit 4e914ce680d6d87e39e7a5e618aa3720fd6e98d8q
 

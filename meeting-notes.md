@@ -1,3 +1,13 @@
+### meeting 19/3/2020
+- return average in the map or in the return value
+- try to return that in the buffer avoiding to copy the rest of the daata
+- test limitations for operations like bpf signed division
+- fun things to do with bpf blog post
+
+### meeting 12/3/2020
+- experimenting with bpf_strtol
+- try to add own helper function
+
 ### meeting 5/3/2020
 - bpf kernels library
 - first step get working examples in kernels and then see what can be pushed to the bpf
