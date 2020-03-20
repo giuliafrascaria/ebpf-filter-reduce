@@ -1,5 +1,10 @@
 ## activity log
 
+### 20/3/2020
+- tried to understand the actual read path. Problem is that I don't think I can override return at any point before copyout
+- tomorrow try to call that in kretprobe
+- does that only work when there's a chance to set errno? Cause in theory it is for error injection
+
 ### 19/3/2020
 problems at this point:
 - find a way to link (and potentially chain) different instrumentation. Probably possible to do with bpf_tail call, with a constant hook point (copyout) and the tail calls being called according to user needs

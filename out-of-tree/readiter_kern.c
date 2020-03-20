@@ -44,8 +44,42 @@ size_t copy_page_to_iter_bpf(struct page *page, size_t offset, size_t bytes,
 		return copy_page_to_iter_pipe(page, offset, bytes, i);
 }
 EXPORT_SYMBOL(copy_page_to_iter_bpf);
-}*/
+}
 
+
+
+SEC("kprobe/sys_read")
+int bpf_prog16(struct pt_regs *ctx)
+{
+	// instantiate parameters
+	void __user *to;
+	int blen;
+
+	//parse parameters from ctx
+	to = (void __user *) PT_REGS_PARM2(ctx);
+	blen = (int) PT_REGS_PARM3(ctx);
+
+	//check buffer address
+	__u32 key = 0;
+	__u64 ** val;
+	val = bpf_map_lookup_elem(&my_read_map, &key);
+
+	if(!val)
+	{
+		char s[] = "error reading buffer value from map, read entry\n";
+		bpf_trace_printk(s, sizeof(s)); 
+		return 0;
+	}
+
+	if (to == *val)
+	{
+		char s[] = "sys_read %d to %lu mapped %d\n";
+		bpf_trace_printk(s, sizeof(s), blen, (unsigned long) to, (unsigned long) *val);
+
+	}
+
+	return 0;
+}*/
 
 SEC("kprobe/copy_page_to_iter_bpf")
 int bpf_prog1()
@@ -194,11 +228,10 @@ int bpf_prog7(struct pt_regs *ctx)
 		char s4[] = "sum of numbers is %lu, avg is %lu\n";
 		bpf_trace_printk(s4, sizeof(s4), sum, avg);
 
-
+		
+		//unsigned long rc = 9;
+		//bpf_override_return(ctx, rc);
 	}
-
-	unsigned long rc = -1;
-	bpf_override_return(ctx, rc);
 
 	return 0;
 }
@@ -265,20 +298,89 @@ int bpf_prog12(struct pt_regs *ctx)
 SEC("kprobe/__vfs_read")
 int bpf_prog11(struct pt_regs *ctx)
 {
-
 	void __user *to;
-	//from;
 	int len;
+
 	to = (void __user *) PT_REGS_PARM2(ctx);
-	//from = (const void *) PT_REGS_PARM3(ctx);
 	len = PT_REGS_PARM3(ctx);
 
-	if (len == 15)
+	//check buffer address
+	__u32 key = 0;
+	__u64 ** val;
+	val = bpf_map_lookup_elem(&my_read_map, &key);
+
+	if(!val)
 	{
-		char s[] = "__vfs_read %d %p\n";
-		bpf_trace_printk(s, sizeof(s), len, to);
+		char s[] = "error reading buffer value from map, read entry\n";
+		bpf_trace_printk(s, sizeof(s)); 
+		return 0;
 	}
 
+	if (len == 9 && to == *val)
+	{
+		char s[] = "__vfs_read %d\n";
+		bpf_trace_printk(s, sizeof(s), len);
+	}
+
+	return 0;
+}
+
+SEC("kprobe/vfs_read")
+int bpf_vfs_read(struct pt_regs *ctx)
+{
+	void __user *to;
+	int len;
+
+	to = (void __user *) PT_REGS_PARM2(ctx);
+	len = PT_REGS_PARM3(ctx);
+
+	//check buffer address
+	__u32 key = 0;
+	__u64 ** val;
+	val = bpf_map_lookup_elem(&my_read_map, &key);
+
+	if(!val)
+	{
+		char s[] = "error reading buffer value from map, read entry\n";
+		bpf_trace_printk(s, sizeof(s)); 
+		return 0;
+	}
+
+	if (len == 9 && to == *val)
+	{
+		char s[] = "vfs_read %d\n";
+		bpf_trace_printk(s, sizeof(s), len);
+	}
+
+	return 0;
+}
+
+SEC("kprobe/ksys_read")
+int bpf_ksys_read(struct pt_regs *ctx)
+{
+	void __user *to;
+	int len;
+
+	to = (void __user *) PT_REGS_PARM2(ctx);
+	len = PT_REGS_PARM3(ctx);
+
+	//check buffer address
+	__u32 key = 0;
+	__u64 ** val;
+	val = bpf_map_lookup_elem(&my_read_map, &key);
+
+	if(!val)
+	{
+		char s[] = "error reading buffer value from map, read entry\n";
+		bpf_trace_printk(s, sizeof(s)); 
+		return 0;
+	}
+
+	if (len == 9 && to == *val)
+	{
+		char s[] = "ksys_read %d\n";
+		bpf_trace_printk(s, sizeof(s), len);
+	}
 
 	return 0;
 }
