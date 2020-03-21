@@ -1,5 +1,8 @@
 ## activity log
 
+### 21/3/2020
+- added map to communicate result to userspace
+
 ### 20/3/2020
 - tried to understand the actual read path. Problem is that I don't think I can override return at any point before copyout
 - tomorrow try to call that in kretprobe

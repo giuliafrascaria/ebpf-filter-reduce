@@ -18,6 +18,14 @@ struct bpf_map_def SEC("maps") my_read_map =
 	.max_entries = 1,	//used to pass the buffer address from userland
 };
 
+struct bpf_map_def SEC("maps") result_map =
+{
+	.type = BPF_MAP_TYPE_ARRAY,
+	.key_size = sizeof(u32),
+	.value_size = sizeof(u64),
+	.max_entries = 1,	//used to pass the average back to the user
+};
+
 struct bpf_map_def SEC("maps") debug_map = {
 	.type = BPF_MAP_TYPE_PERF_EVENT_ARRAY,
 	.key_size = sizeof(int),
@@ -228,7 +236,7 @@ int bpf_prog7(struct pt_regs *ctx)
 		char s4[] = "sum of numbers is %lu, avg is %lu\n";
 		bpf_trace_printk(s4, sizeof(s4), sum, avg);
 
-		
+		bpf_map_update_elem(&result_map, &key, &avg, BPF_ANY);
 		//unsigned long rc = 9;
 		//bpf_override_return(ctx, rc);
 	}

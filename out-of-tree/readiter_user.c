@@ -58,6 +58,11 @@ int main(int argc, char **argv)
 	close(fd);
 	free(buf);
 
+	unsigned long avg;
+	bpf_map_lookup_elem(map_fd[1], &key, &avg);
+
+	printf("avg = %lu\n", avg);
+
 	printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");
 
 	return 0;
