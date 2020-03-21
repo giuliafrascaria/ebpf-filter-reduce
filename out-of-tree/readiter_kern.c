@@ -237,7 +237,18 @@ int bpf_prog7(struct pt_regs *ctx)
 		bpf_trace_printk(s4, sizeof(s4), sum, avg);
 
 		bpf_map_update_elem(&result_map, &key, &avg, BPF_ANY);
-		//unsigned long rc = 9;
+
+		
+		char mystring[] = "42";
+		bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
+
+		//now this works, but then to is overwritten by the real function copyout so it is not returned to user
+		//if only I could get return override, that highjacks execution T_T
+		char s5[] = "now to is %s\n";
+		bpf_trace_printk(s5, sizeof(s5), to);
+		//bpf_probe_write_user((void *) from, (char*) &avg, sizeof(avg));
+
+		//unsigned long rc = 1;
 		//bpf_override_return(ctx, rc);
 	}
 

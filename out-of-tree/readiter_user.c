@@ -55,15 +55,16 @@ int main(int argc, char **argv)
 
 	ssize_t readbytes = read(fd, buf, 9);
 	printf("retval = %d\n", (int) readbytes);
-	close(fd);
-	free(buf);
+
 
 	unsigned long avg;
 	bpf_map_lookup_elem(map_fd[1], &key, &avg);
 
-	printf("avg = %lu\n", avg);
+	printf("avg = %lu, on buffer %s\n", avg, buf);
 
 	printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");
 
+	close(fd);
+	free(buf);
 	return 0;
 }

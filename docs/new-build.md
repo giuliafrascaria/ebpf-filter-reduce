@@ -46,3 +46,6 @@ sudo cp -r /home/giogge/linux/arch/x86/include/ /usr/src/linux-headers-5.4.0+/ar
 - update both the global source headers and the local headers when and where relevant
 - sudo rm -rf /usr/src/linux-headers-5.4.0+/include/
 - sudo cp -r /home/giogge/linux/include/ /usr/src/linux-headers-5.4.0+/
+
+- local
+cp -r /home/giogge/linux/include/ /home/giogge/thesis/ebpf-experiments/out-of-tree/usr/

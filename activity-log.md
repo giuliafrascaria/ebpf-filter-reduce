@@ -2,6 +2,19 @@
 
 ### 21/3/2020
 - added map to communicate result to userspace
+- https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git/commit/?id=4b1a29a7f5425d32640b34b8a755f34e02f64d0f
+- not all functions appear to be erro injectable, based on this commit
+- find the list of injectable functions, find how to extend that
+- if I can highjack the return, I can avoid the buffer copy altogether cause the function is highjacked and not called
+- as of now probe write user is not working from kernel to user, cause the to buffer is overwritten by the actual call to copyout
+- https://elixir.bootlin.com/linux/v5.4/ident/ALLOW_ERROR_INJECTION 
+- need to recompile with that macro set to copyout bpf, allowing probably errno_null
+- recompiled with error injection in copyout?bpf, still fails
+
+```
+eBPF file to be loaded is : ./readiter_kern.o 
+ioctl PERF_EVENT_IOC_SET_BPF failed err Invalid argument
+```
 
 ### 20/3/2020
 - tried to understand the actual read path. Problem is that I don't think I can override return at any point before copyout
