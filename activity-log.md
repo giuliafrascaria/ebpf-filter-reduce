@@ -1,5 +1,13 @@
 ## activity log
 
+### 22/3/2020
+- no it didn't fail, I just hadn't completed the upgrade procedure
+- the call works now, but does not behave as I was hoping, propagating all the way to the user
+- checking the source code of the function that calls copyout, it does loop till the return of copyout equals the buffer size so I'm actually at tisk of stalling the system if I return a negative value, I think
+- I need to personalize the semantics in the whole read path so that it is propagated in the right way
+- todo: investigate the file (/linux/)tools/include/uapi/linux/bpf.h cause it has helper copies but not updated with mine, maybe I need that too
+- trying to add custom print helper
+
 ### 21/3/2020
 - added map to communicate result to userspace
 - https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git/commit/?id=4b1a29a7f5425d32640b34b8a755f34e02f64d0f

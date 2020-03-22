@@ -158,6 +158,7 @@ int bpf_prog6()
 SEC("kprobe/copyout_bpf")
 int bpf_prog7(struct pt_regs *ctx)
 {
+	bpf_my_printk();
 
 	char s1[] = "entering modified copyout\n";
 	bpf_trace_printk(s1, sizeof(s1));
@@ -248,8 +249,8 @@ int bpf_prog7(struct pt_regs *ctx)
 		bpf_trace_printk(s5, sizeof(s5), to);
 		//bpf_probe_write_user((void *) from, (char*) &avg, sizeof(avg));
 
-		//unsigned long rc = 1;
-		//bpf_override_return(ctx, rc);
+		unsigned long rc = 1;
+		bpf_override_return(ctx, rc);
 	}
 
 	return 0;
