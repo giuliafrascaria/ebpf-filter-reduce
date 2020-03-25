@@ -8,6 +8,7 @@
 
 
 #define _(P) ({typeof(P) val = 0; bpf_probe_read(&val, sizeof(val), &P); val;})
+#define PROG(F) SEC("kprobe/"__stringify(F)) int bpf_func_##F
 #define	UBUFFSIZE	9
 
 struct bpf_map_def SEC("maps") my_read_map =
@@ -32,6 +33,17 @@ struct bpf_map_def SEC("maps") debug_map = {
 	.value_size = sizeof(int),
 	.max_entries = 64,
 };
+
+struct bpf_map_def SEC("maps") jmp_table = {
+	.type = BPF_MAP_TYPE_PROG_ARRAY,
+	.key_size = sizeof(u32),
+	.value_size = sizeof(u32),
+	.max_entries = 8,
+};
+
+#define AVG_FUNC 1
+#define MAX_FUNC 2
+#define MIN_FUNC 3
 
 /*
 size_t copy_page_to_iter_bpf(struct page *page, size_t offset, size_t bytes,
@@ -239,15 +251,17 @@ int bpf_prog7(struct pt_regs *ctx)
 
 		bpf_map_update_elem(&result_map, &key, &avg, BPF_ANY);
 
-		
-		char mystring[] = "42";
-		bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
+		//doesn't work because then copyout bpf is called and overwrites this, until I have an integrated edit of the return value
+		//char mystring[] = "42";
+		//bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
 
 		//now this works, but then to is overwritten by the real function copyout so it is not returned to user
 		//if only I could get return override, that highjacks execution T_T
 		char s5[] = "now to is %s\n";
 		bpf_trace_printk(s5, sizeof(s5), to);
 		//bpf_probe_write_user((void *) from, (char*) &avg, sizeof(avg));
+
+		bpf_my_printk();
 
 		unsigned long rc = 1;
 		bpf_override_return(ctx, rc);
@@ -400,6 +414,11 @@ int bpf_ksys_read(struct pt_regs *ctx)
 	{
 		char s[] = "ksys_read %d\n";
 		bpf_trace_printk(s, sizeof(s), len);
+
+		bpf_my_printk();
+
+		unsigned long rc = 1;
+		bpf_override_return(ctx, rc);
 	}
 
 	return 0;

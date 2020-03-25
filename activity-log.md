@@ -1,5 +1,37 @@
 ## activity log
 
+### 25/3/2020
+- recompiling with some debug prints and custom print dmesg helper
+- the custom dmesg printk doesn't pass the verifier for whatever reason
+- nice overview of the read path http://www.cs.utah.edu/~xinglin/blog/read-syscall-implementation-in-linux-kernel/
+- I will try to override return of the ksys_read
+
+```
+286: (85) call bpf_dmesg_print#113
+kernel subsystem misconfigured func bpf_dmesg_print#113
+processed 255 insns (limit 1000000) max_states_per_insn 0 total_states 13 peak_states 13 mark_read 10
+
+```
+
+- override return on ksys_read works, but all the subsequent calls are hijacked and the call doesn't go down the read path
+- this is good in the sense that it immediately allows copyout to not happen if I have the result already, but it is bad cause the return value semantics for copyout is not so easy to fit to my use case
+
+```
+eBPF file to be loaded is : ./readiter_kern.o 
+buffer on user side = 94084773690560
+retval = 1
+avg = 0, on buffer 
+loaded module OK.
+Check the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe 
+
+trace_pipe:
+        readiter-2013  [002] ....   474.229227: 0: ksys_read 9
+```
+- https://elixir.bootlin.com/linux/v5.4/source/samples/bpf/sockex3_user.c
+- https://elixir.bootlin.com/linux/v5.4/source/samples/bpf/tracex5_kern.c#L34
+- tail call is not yet working but I think I am just missing some adjustment on user side like here
+- the problem is 
+
 ### 22/3/2020
 - no it didn't fail, I just hadn't completed the upgrade procedure
 - the call works now, but does not behave as I was hoping, propagating all the way to the user

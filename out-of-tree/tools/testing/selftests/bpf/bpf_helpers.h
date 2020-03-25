@@ -224,6 +224,7 @@ static int (*bpf_strtol)(const char *buf, unsigned long long buf_len,
 static int (*bpf_kstrtol)(const char *buf, unsigned int base, long *res) =
 	(void *) BPF_FUNC_kstrtol;
 static int (*bpf_my_printk)(void) = (void *) BPF_FUNC_my_printk;
+static int (*bpf_dmesg_print)(void) = (void *) BPF_FUNC_dmesg_print;
 static int (*bpf_strtoul)(const char *buf, unsigned long long buf_len,
 			  unsigned long long flags, unsigned long *res) =
 	(void *) BPF_FUNC_strtoul;
