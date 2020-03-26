@@ -263,6 +263,9 @@ int bpf_prog7(struct pt_regs *ctx)
 
 		bpf_my_printk();
 
+		const char mydmesg[16] = "aaaabbbbccccdddd";
+		bpf_dmesg_print(mydmesg, sizeof(mydmesg));
+
 		unsigned long rc = blen;
 		bpf_override_return(ctx, rc);
 	}
