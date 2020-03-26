@@ -252,18 +252,18 @@ int bpf_prog7(struct pt_regs *ctx)
 		bpf_map_update_elem(&result_map, &key, &avg, BPF_ANY);
 
 		//doesn't work because then copyout bpf is called and overwrites this, until I have an integrated edit of the return value
-		//char mystring[] = "42";
-		//bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
+		char mystring[] = "42\n";
+		bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
 
 		//now this works, but then to is overwritten by the real function copyout so it is not returned to user
 		//if only I could get return override, that highjacks execution T_T
-		char s5[] = "now to is %s\n";
+		char s5[] = "now the to buffer is %s\n";
 		bpf_trace_printk(s5, sizeof(s5), to);
 		//bpf_probe_write_user((void *) from, (char*) &avg, sizeof(avg));
 
 		bpf_my_printk();
 
-		unsigned long rc = 1;
+		unsigned long rc = blen;
 		bpf_override_return(ctx, rc);
 	}
 
@@ -415,10 +415,10 @@ int bpf_ksys_read(struct pt_regs *ctx)
 		char s[] = "ksys_read %d\n";
 		bpf_trace_printk(s, sizeof(s), len);
 
-		bpf_my_printk();
+		//bpf_my_printk();
 
-		unsigned long rc = 1;
-		bpf_override_return(ctx, rc);
+		//unsigned long rc = 1;
+		//bpf_override_return(ctx, rc);
 	}
 
 	return 0;

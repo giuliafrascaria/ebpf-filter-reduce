@@ -1,5 +1,8 @@
 ## activity log
 
+### 26/3/2020
+- instead of editing the whole semantics, for now I return the correct size value and pass the info on the map
+
 ### 25/3/2020
 - recompiling with some debug prints and custom print dmesg helper
 - the custom dmesg printk doesn't pass the verifier for whatever reason
