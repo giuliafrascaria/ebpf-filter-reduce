@@ -7,7 +7,16 @@
 ```
 dmesg
 [  296.496371] \x80u&\x90\xff\xff\xff\xff
+```
+- it SOMEHOW worked once and returned -1 and I could read 42 on the buffer
+- if I add a printk before override return with the len it works, which means it doesn't work for me
 
+```
+sudo ./readiter 
+eBPF file to be loaded is : ./readiter_kern.o 
+buffer on user side = 94365040205184
+retval = -1
+avg = 2, on buffer 42
 ```
 
 ### 26/3/2020
