@@ -159,16 +159,27 @@ int bpf_prog23()
 }*/
 
 SEC("kprobe/copy_page_to_iter_iovec_bpf")
-int bpf_prog6()
+int bpf_copy_to_iovec(struct pt_regs *ctx)
 {
-	char s[] = "copy_page_to_iter_iovec\n";
+	int copylen;
+	copylen = PT_REGS_PARM3(ctx);
+	char s[] = "copy_page_to_iter_iovec, bytes %d\n";
+	bpf_trace_printk(s, sizeof(s), copylen);
+	return 0;
+}
+
+SEC("kprobe/copy_page_to_iter_pipe_bpf")
+int bpf_copy_to_pipe(struct pt_regs *ctx)
+{
+
+	char s[] = "copy_page_to_iter_pipe\n";
 	bpf_trace_printk(s, sizeof(s));
 	return 0;
 }
 
 
 SEC("kprobe/copyout_bpf")
-int bpf_prog7(struct pt_regs *ctx)
+int bpf_copyout(struct pt_regs *ctx)
 {
 	bpf_my_printk();
 
@@ -269,7 +280,8 @@ int bpf_prog7(struct pt_regs *ctx)
 		//char s6[] = "will override return %d\n";
 		//bpf_trace_printk(s6, sizeof(s6), blen);
 
-		unsigned long rc = blen;
+		//unsigned long rc = blen;
+		unsigned long rc = 0;
 		bpf_override_return(ctx, rc);
 	}
 

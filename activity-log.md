@@ -18,6 +18,29 @@ buffer on user side = 94365040205184
 retval = -1
 avg = 2, on buffer 42
 ```
+or also
+```
+eBPF file to be loaded is : ./readiter_kern.o 
+buffer on user side = 94339293543776
+retval = 10
+avg = 2, on buffer 42
+
+loaded module OK.
+Check the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe 
+```
+- sometimes it looks like it's entering real copyout (not directly linked with the failure case, so there must be some weird thing going on)
+- understanding the semantics of copyout inside copy_iov_to_iter. it's copying 60 bytes and copyout will loop on that until there are no bytes left
+- trying to return that value
+```
+<...>-5733  [001] ....  4383.221691: 0: copy_page_to_iter_iovec, bytes 60
+```
+- ok now it does work SOMETIMES, meaning that I read the 9 as return value and the buffer is not overwritten by the real one.
+- the question is how to make it work reliably. 
+- the copyout is supposed to return 0 on success, so that's what I have to return not to make it loop endlessly
+- I removed the parallel path to real copyout from the iov_copy function to eliminate noise (commit da6939ea2cdb91252ded501c47527a2d1db68711)
+
+- I think it's speculative exec. For now my return value equals to the success one to basically I am fitting the right branch prediction if the speculative exec is copying in advance
+- https://www.golinuxhub.com/2018/01/how-to-disable-or-enable-hyper.html
 
 ### 26/3/2020
 - instead of editing the whole semantics, for now I return the correct size value and pass the info on the map
