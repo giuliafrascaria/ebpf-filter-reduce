@@ -1,5 +1,15 @@
 ## activity log
 
+### 28/3/2020
+- I rewrote the printk verifier following more strictly the example of bpf strtol to see how char * is handled.
+- passes the verifier but prints rubbish, it's something yo!
+
+```
+dmesg
+[  296.496371] \x80u&\x90\xff\xff\xff\xff
+
+```
+
 ### 26/3/2020
 - instead of editing the whole semantics, for now I return the correct size value and pass the info on the map
 
