@@ -217,7 +217,7 @@ int bpf_copyout(struct pt_regs *ctx)
 		unsigned long rc = 0;
 		bpf_override_return(ctx, rc);
 
-
+		
 		char s2[] = "copyout to 0x%p, ul %lu len %d\n";
 		bpf_trace_printk(s2, sizeof(s2), to, (unsigned long) to, blen);
 
@@ -277,10 +277,10 @@ int bpf_copyout(struct pt_regs *ctx)
 		bpf_trace_printk(s5, sizeof(s5), to);
 		//bpf_probe_write_user((void *) from, (char*) &avg, sizeof(avg));
 
-		bpf_my_printk();
+		//bpf_my_printk();
 
-		const char * mydmesg = "aaaabbbbccccdddd";
-		bpf_dmesg_print(mydmesg, sizeof(mydmesg));
+		//const char * mydmesg = "aaaabbbbccccdddd";
+		//bpf_dmesg_print(mydmesg, sizeof(mydmesg));
 
 		//char s6[] = "will override return %d\n";
 		//bpf_trace_printk(s6, sizeof(s6), blen);
@@ -289,8 +289,8 @@ int bpf_copyout(struct pt_regs *ctx)
 		//unsigned long rc = 0;
 		//bpf_override_return(ctx, rc);
 
-		char s6[] = "do I come back here\n";
-		bpf_trace_printk(s6, sizeof(s6));
+		//char s6[] = "do I come back here\n";
+		//bpf_trace_printk(s6, sizeof(s6));
 	}
 
 	return 0;

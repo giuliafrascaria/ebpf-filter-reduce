@@ -57,6 +57,7 @@ PROG(AVG_FUNC)(struct pt_regs *ctx)
 	char s1[] = "entering tail call\n";
 	bpf_trace_printk(s1, sizeof(s1));
 
+
 	// instantiate parameters
 	void __user *to;
 	const void *from;
@@ -82,11 +83,13 @@ PROG(AVG_FUNC)(struct pt_regs *ctx)
 	char str2[] = "buffer on params %lu, buffer on map %lu\n";
 	bpf_trace_printk(str2, sizeof(str2), (unsigned long) to, (unsigned long) *val);
 
+
 	if (to == *val)
 	{
 		char s2[] = "copyout to 0x%p, ul %lu len %d\n";
 		bpf_trace_printk(s2, sizeof(s2), to, (unsigned long) to, blen);
 
+	
 		char userbuff[UBUFFSIZE];
 
 		//char singlechar;
@@ -100,7 +103,7 @@ PROG(AVG_FUNC)(struct pt_regs *ctx)
 		char s[] = "full buffer %s\n";
 		bpf_trace_printk(s, sizeof(s), userbuff);
 
-		
+			
 		unsigned long sum = 0;
 		char curr[3];
 		unsigned long num = 0; // need initialization or verifier complains on strtol
@@ -125,6 +128,7 @@ PROG(AVG_FUNC)(struct pt_regs *ctx)
 
 			sum = sum + num;
 		}
+		
 
 		unsigned long avg = sum/elems;
 		
@@ -132,10 +136,10 @@ PROG(AVG_FUNC)(struct pt_regs *ctx)
 		bpf_trace_printk(s4, sizeof(s4), sum, avg);
 
 		bpf_map_update_elem(&result_map, &key, &avg, BPF_ANY);
-
+		
 		//doesn't work because then copyout bpf is called and overwrites this, until I have an integrated edit of the return value
-		//char mystring[] = "42";
-		//bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
+		char mystring[] = "42";
+		bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
 
 		//now this works, but then to is overwritten by the real function copyout so it is not returned to user
 		//if only I could get return override, that highjacks execution T_T
@@ -145,8 +149,9 @@ PROG(AVG_FUNC)(struct pt_regs *ctx)
 
 		bpf_my_printk();
 
-		unsigned long rc = 1;
-		bpf_override_return(ctx, rc);
+		//unsigned long rc = 1;
+		//bpf_override_return(ctx, rc);
+		
 	}
 
 	return 0;

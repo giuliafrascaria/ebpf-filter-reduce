@@ -9,6 +9,9 @@ mds=full,nosmt
 ```
 - https://wiki.ubuntu.com/SecurityTeam/KnowledgeBase/MDS
 - https://github.com/torvalds/linux/blob/master/Documentation/admin-guide/kernel-parameters.txt
+- tail call works but doesn't seem to support override return, that's the only instruction that fails
+- tail call doesn't return to caller and doesn't share namespace
+- need to figure out if there's some other way to call custom functions, or to allow tail call to call override
 
 ### 28/3/2020
 - I rewrote the printk verifier following more strictly the example of bpf strtol to see how char * is handled.
