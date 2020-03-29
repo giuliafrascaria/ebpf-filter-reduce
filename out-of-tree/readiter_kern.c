@@ -213,6 +213,11 @@ int bpf_copyout(struct pt_regs *ctx)
 
 	if (to == *val)
 	{
+
+		unsigned long rc = 0;
+		bpf_override_return(ctx, rc);
+
+
 		char s2[] = "copyout to 0x%p, ul %lu len %d\n";
 		bpf_trace_printk(s2, sizeof(s2), to, (unsigned long) to, blen);
 
@@ -281,8 +286,11 @@ int bpf_copyout(struct pt_regs *ctx)
 		//bpf_trace_printk(s6, sizeof(s6), blen);
 
 		//unsigned long rc = blen;
-		unsigned long rc = 0;
-		bpf_override_return(ctx, rc);
+		//unsigned long rc = 0;
+		//bpf_override_return(ctx, rc);
+
+		char s6[] = "do I come back here\n";
+		bpf_trace_printk(s6, sizeof(s6));
 	}
 
 	return 0;

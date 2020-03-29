@@ -1,5 +1,15 @@
 ## activity log
 
+### 29/3/2020
+- researched on ways to test if issue comes from SE
+- moved the override return upward in the instrumentation
+- disabling speculative exec (I think) with grub modification settins 
+```
+mds=full,nosmt
+```
+- https://wiki.ubuntu.com/SecurityTeam/KnowledgeBase/MDS
+- https://github.com/torvalds/linux/blob/master/Documentation/admin-guide/kernel-parameters.txt
+
 ### 28/3/2020
 - I rewrote the printk verifier following more strictly the example of bpf strtol to see how char * is handled.
 - passes the verifier but prints rubbish, it's something yo!
