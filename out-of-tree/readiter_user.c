@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 		return 1;
     }
 
-	ssize_t readbytes = read(fd, buf, 9);
+	ssize_t readbytes = read(fd, buf, 30);
 	printf("retval = %d\n", (int) readbytes);
 
 

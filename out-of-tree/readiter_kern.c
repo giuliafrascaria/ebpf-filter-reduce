@@ -9,7 +9,7 @@
 
 #define _(P) ({typeof(P) val = 0; bpf_probe_read(&val, sizeof(val), &P); val;})
 #define PROG(F) SEC("kprobe/"__stringify(F)) int bpf_func_##F
-#define	UBUFFSIZE	9
+#define	UBUFFSIZE	30
 
 struct bpf_map_def SEC("maps") my_read_map =
 {
@@ -239,7 +239,7 @@ int bpf_copyout(struct pt_regs *ctx)
 		char curr[3];
 		unsigned long num = 0; // need initialization or verifier complains on strtol
 		u64 base = 10;
-		unsigned long elems = 3;
+		unsigned long elems = 10;
 
 		for (int i = 0; i < UBUFFSIZE; i = i+3)
 		{
