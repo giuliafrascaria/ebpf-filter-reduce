@@ -16,7 +16,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
-
+#include <time.h>
 #include <bpf.h>
 #include "bpf_load.h"
 
@@ -46,21 +46,31 @@ int main(int argc, char **argv)
  	char * buf = malloc(4096);
 
 	__u32 key = 0;
-	printf("buffer on user side = %lu\n", (unsigned long) buf);	
+	//printf("buffer on user side = %lu\n", (unsigned long) buf);	
 	if (bpf_map_update_elem(map_fd[0], &key, &buf, BPF_ANY) != 0) 
 	{
 		fprintf(stderr, "map_update failed: %s\n", strerror(errno));
 		return 1;
     }
 
-	ssize_t readbytes = read(fd, buf, 4066);
+
+	clock_t start, end;
+
+	start = clock(); 
+
+	ssize_t readbytes = read(fd, buf, 4096);
+
+	end = clock(); 
+
+
+    double time_taken = (double) end - start;
 	printf("retval = %d\n", (int) readbytes);
 
 
 	unsigned long avg;
 	bpf_map_lookup_elem(map_fd[1], &key, &avg);
 
-	printf("avg = %lu, on buffer %s\n", avg, buf);
+	printf("avg = %lu, time taken %f\n", avg, time_taken);
 
 	printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");
 

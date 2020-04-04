@@ -9,7 +9,8 @@
 
 #define _(P) ({typeof(P) val = 0; bpf_probe_read(&val, sizeof(val), &P); val;})
 #define PROG(F) SEC("kprobe/"__stringify(F)) int bpf_func_##F
-#define	UBUFFSIZE	30
+//#define	UBUFFSIZE	2048
+#define	UBUFFSIZE	4096
 
 struct bpf_map_def SEC("maps") my_read_map =
 {
@@ -177,6 +178,15 @@ int bpf_copy_to_pipe(struct pt_regs *ctx)
 	return 0;
 }
 
+/*SEC("kprobe/copy_user_enhanced_fast_string")
+int bpf_enhanced_fast_string(struct pt_regs *ctx)
+{
+
+	char s[] = "enhanced fast string\n";
+	bpf_trace_printk(s, sizeof(s));
+	return 0;
+}*/
+
 
 SEC("kprobe/copyout_bpf")
 int bpf_copyout(struct pt_regs *ctx)
@@ -221,7 +231,7 @@ int bpf_copyout(struct pt_regs *ctx)
 		char s2[] = "copyout to 0x%p, ul %lu len %d\n";
 		bpf_trace_printk(s2, sizeof(s2), to, (unsigned long) to, blen);
 
-		char userbuff[UBUFFSIZE];
+		//char userbuff[UBUFFSIZE];
 
 		//char singlechar;
 		//singlechar = (char) _(from);
@@ -229,21 +239,22 @@ int bpf_copyout(struct pt_regs *ctx)
 		//ret = bpf_probe_read(userbuff, sizeof(userbuff), from);
 
 		int ret;
-		ret = bpf_probe_read_str(userbuff, sizeof(userbuff), from);
+		//ret = bpf_probe_read_str(userbuff, sizeof(userbuff), from);
 
-		char s[] = "full buffer %s\n";
-		bpf_trace_printk(s, sizeof(s), userbuff);
+		//char s[] = "full buffer %s\n";
+		//bpf_trace_printk(s, sizeof(s), userbuff);
 
 		
 		unsigned long sum = 0;
 		char curr[3];
 		unsigned long num = 0; // need initialization or verifier complains on strtol
 		u64 base = 10;
-		unsigned long elems = 10;
+		unsigned long elems = 0;
 
-		for (int i = 0; i < UBUFFSIZE; i = i+3)
+		for (int i = 0; i < UBUFFSIZE - 3; i = i+3)
 		{
-			ret = bpf_probe_read_str(curr, 3, userbuff+i);
+			//ret = bpf_probe_read_str(curr, 3, userbuff+i);
+			ret = bpf_probe_read_str(curr, 3, from+i);
 			
 			if (curr != NULL)
 			{
@@ -252,18 +263,19 @@ int bpf_copyout(struct pt_regs *ctx)
 				{
 					return 1;
 				}
+				elems = elems + 1;
 			}
 
-			char s3[] = "copyout char %s converted to %d\n";
-			bpf_trace_printk(s3, sizeof(s3), curr, num);
+			//char s3[] = "copyout char %s converted to %d\n";
+			//bpf_trace_printk(s3, sizeof(s3), curr, num);
 
 			sum = sum + num;
 		}
 
 		unsigned long avg = sum/elems;
 		
-		char s4[] = "sum of numbers is %lu, avg is %lu\n";
-		bpf_trace_printk(s4, sizeof(s4), sum, avg);
+		char s4[] = "sum of numbers is %lu, avg is %lu, read %lu elements\n";
+		bpf_trace_printk(s4, sizeof(s4), sum, avg, elems);
 
 		bpf_map_update_elem(&result_map, &key, &avg, BPF_ANY);
 
@@ -296,7 +308,7 @@ int bpf_copyout(struct pt_regs *ctx)
 	return 0;
 }
 
-
+/*
 SEC("kprobe/copyout")
 int bpf_prog12(struct pt_regs *ctx)
 {
@@ -352,7 +364,7 @@ int bpf_prog12(struct pt_regs *ctx)
 	}
 	return 0;
 	
-}
+}*/
 
 
 SEC("kprobe/__vfs_read")

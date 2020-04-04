@@ -1,5 +1,29 @@
 ## activity log
 
+### 4/4/2020
+- with long buffers I think that is is not executed speculatively/parallelized. If I read 256 I almost always manage to avoid the copy
+- stack limit is 512 for bpf programs so I need to move the ubuff to a map, percpu map array, to read more than that
+- https://lwn.net/Articles/671399/
+- https://lwn.net/Articles/674443/
+- floating point numbers not supported yet so the average is returned as an integer
+- I timed executions and good news is performance is approximately the same
+- this means that if I can avoid the copy (need access to the from buffer in the ctx) I will improve by a whole lot
+
+### 3/4/2020
+- Recompiling the kernel switching likely and unlikely statements to see if I can detect any change
+- I don't see how that should be the case cause copyout would have been triggered anyway so it just masks my problem
+- https://software.intel.com/sites/default/files/managed/9e/bc/64-ia-32-architectures-optimization-manual.pdf
+- ERMSB enables fast string copy, is it affecting me somehow? what is that specifically?
+- https://stackoverflow.com/questions/43343231/enhanced-rep-movsb-for-memcpy
+- https://elixir.bootlin.com/linux/v5.4/source/arch/x86/include/asm/uaccess_64.h#L28
+- http://alumni.cs.ucr.edu/~tianc/publications/pldi10.pdf
+- https://www.kernel.org/doc/html/v4.17/userspace-api/spec_ctrl.html
+
+
+### 2/4/2020
+- https://elixir.bootlin.com/linux/v5.6/source/include/uapi/linux/bpf.h
+- kernel 5.6 is out and I'm having a look at the new helper functions
+
 ### 29/3/2020
 - researched on ways to test if issue comes from SE
 - moved the override return upward in the instrumentation
