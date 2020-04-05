@@ -1,5 +1,16 @@
 ## activity log
 
+### 5/4/2020
+- examining the verifier to figure out a way to access from buffer, possibly read only for now just to avoid corruptions
+- there are prf prog types that have the possibility to access packet content
+- need to include/extend the verifier to allow that for my bpf prog type
+- this would probably be a good moment to move away from kprobes but hey
+- https://elixir.bootlin.com/linux/v5.4/source/kernel/bpf/verifier.c#L198 bpf_call_arg_meta
+- https://elixir.bootlin.com/linux/v5.4/source/kernel/bpf/verifier.c#L2238 may access direct pkt data I think I need this
+- but it is called only if reg_is_pkt_pointer which I don't think it's my case
+- https://elixir.bootlin.com/linux/v5.4/source/kernel/bpf/verifier.c#L899
+- need to tweak check mem access https://elixir.bootlin.com/linux/v5.4/source/kernel/bpf/verifier.c#L2748
+
 ### 4/4/2020
 - with long buffers I think that is is not executed speculatively/parallelized. If I read 256 I almost always manage to avoid the copy
 - stack limit is 512 for bpf programs so I need to move the ubuff to a map, percpu map array, to read more than that
