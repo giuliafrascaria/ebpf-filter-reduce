@@ -1,5 +1,11 @@
 ## activity log
 
+### 9/4/2020
+- I tried to benchmark. In the script it turns out that the normal program is usually faster (why?)
+- I tried to reduce the number of calls to bpf probe read and in fact it does lower the times on average, so it's not good to use it per number
+- I am trying to recompile the kernel with higher bof max size so I can hopefully read the whole buffer at once (not I'm doing it 16 times)
+- https://elixir.bootlin.com/linux/v5.4/ident/MAX_BPF_STACK
+
 ### 5/4/2020
 - examining the verifier to figure out a way to access from buffer, possibly read only for now just to avoid corruptions
 - there are prf prog types that have the possibility to access packet content

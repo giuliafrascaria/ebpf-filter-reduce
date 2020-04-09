@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 	int ret;
 
 	snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
-	printf("eBPF file to be loaded is : %s \n", filename);
+	//printf("eBPF file to be loaded is : %s \n", filename);
 
 	if (load_bpf_file(filename)) {
 		printf("%s", bpf_log_buf);
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
 	printf("avg = %lu, time taken %f\n", avg, time_taken);
 
-	printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");
+	//printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");
 
 	close(fd);
 	free(buf);

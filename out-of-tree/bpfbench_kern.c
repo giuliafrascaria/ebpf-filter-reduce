@@ -10,7 +10,7 @@
 #define _(P) ({typeof(P) val = 0; bpf_probe_read(&val, sizeof(val), &P); val;})
 #define PROG(F) SEC("kprobe/"__stringify(F)) int bpf_func_##F
 //#define	UBUFFSIZE	2048
-#define	UBUFFSIZE	4096
+#define	UBUFFSIZE	256
 
 struct bpf_map_def SEC("maps") my_read_map =
 {
@@ -81,8 +81,9 @@ int bpf_copyout(struct pt_regs *ctx)
 		unsigned long rc = 0;
 		bpf_override_return(ctx, rc);
 
+		char userbuff[UBUFFSIZE];
 		int ret;
-
+		ret = bpf_probe_read_str(userbuff, sizeof(userbuff), from);
 		
 		unsigned long sum = 0;
 		char curr[3];
@@ -90,6 +91,7 @@ int bpf_copyout(struct pt_regs *ctx)
 		u64 base = 10;
 		unsigned long elems = 0;
 
+		/*
 		for (int i = 0; i < UBUFFSIZE - 3; i = i+3)
 		{
 			//ret = bpf_probe_read_str(curr, 3, userbuff+i);
@@ -107,6 +109,30 @@ int bpf_copyout(struct pt_regs *ctx)
 			}
 
 			sum = sum + num;
+		}*/
+
+		for (int i = 0; i < 16; i++)
+		{
+			//ret = bpf_probe_read_str(curr, 3, userbuff+i);
+			ret = bpf_probe_read_str(userbuff, sizeof(userbuff), from+(i*256));
+
+			for (int j = 0; j < 85; j++)
+			{
+
+				if (userbuff != NULL)
+				{
+					int res = bpf_strtoul(userbuff +j*3, 3, base, &num);
+					//int res = bpf_strtoul((char *) from+i, (size_t) 3, base, &num);
+					if (res < 0)
+					{
+						return 1;
+					}
+					elems = elems + 1;
+				}
+
+				sum = sum + num;
+			}
+			
 		}
 
 		unsigned long avg = sum/elems;
