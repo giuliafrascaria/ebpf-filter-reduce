@@ -10,7 +10,7 @@
 #define _(P) ({typeof(P) val = 0; bpf_probe_read(&val, sizeof(val), &P); val;})
 #define PROG(F) SEC("kprobe/"__stringify(F)) int bpf_func_##F
 //#define	UBUFFSIZE	2048
-#define	UBUFFSIZE	4096
+#define	UBUFFSIZE	256
 
 struct bpf_map_def SEC("maps") my_read_map =
 {

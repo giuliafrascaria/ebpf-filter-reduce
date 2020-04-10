@@ -1,5 +1,16 @@
 ## activity log
 
+### 10/4/2020
+- maybe the one i'm getting now is just an llvm warning and the compilation succeeded anyway
+- http://llvm.org/viewvc/llvm-project/llvm/trunk/lib/Target/BPF/BPFRegisterInfo.cpp?view=markup&pathrev=292180 line 45
+- http://llvm.org/viewvc/llvm-project/llvm/trunk/test/CodeGen/BPF/warn-stack.ll?view=markup&pathrev=292180
+- http://lists.llvm.org/pipermail/llvm-commits/Week-of-Mon-20170116/420316.html
+- https://medium.com/@phylake/bottom-up-ebpf-d7ca9cbe8321
+- testing framework https://lwn.net/Articles/718784/
+- verifier explanation https://books.google.nl/books?id=jtS-DwAAQBAJ&pg=PA11&lpg=PA11&dq=what+happens+bpf+kprobe+call&source=bl&ots=W6Ujnuoeks&sig=ACfU3U2O3ZuHTmIkNSbOCFw_GVMP4ug5zw&hl=en&sa=X&ved=2ahUKEwj_udP6yd3oAhWGLewKHTW8ARQQ6AEwAnoECAwQKQ#v=onepage&q=what%20happens%20bpf%20kprobe%20call&f=false
+- https://cacm.acm.org/magazines/2018/7/229031-always-measure-one-level-deeper/fulltext
+
+
 ### 9/4/2020
 - I tried to benchmark. In the script it turns out that the normal program is usually faster (why?)
 - I tried to reduce the number of calls to bpf probe read
