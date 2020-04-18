@@ -1,5 +1,19 @@
 ## activity log
 
+
+### 18/4/2020
+- trying to figure out the actual behavior of the override
+- I went from having 100% override success (reported in the trace) to basically 0% success, something is wrong
+- read write from random file is less successful, at least so it seems, but I need to ensure it is actually not reading elsewhere
+- read from known file doesn't seem to work although it used to give the opposite result of not overriding on small reads, overriding on big ones. 
+- check if it depends on the size of the program, I suspect a lot of reordering happening and bpf being called somewhat differently
+
+### 17/4/2020
+- read the paper about performance measurement
+
+### 16/4/2020
+- wrote thesis proposal
+
 ### 10/4/2020
 - maybe the one i'm getting now is just an llvm warning and the compilation succeeded anyway
 - http://llvm.org/viewvc/llvm-project/llvm/trunk/lib/Target/BPF/BPFRegisterInfo.cpp?view=markup&pathrev=292180 line 45
