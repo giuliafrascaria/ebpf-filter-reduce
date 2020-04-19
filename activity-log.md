@@ -1,5 +1,28 @@
 ## activity log
 
+### 19/4/2020
+- it looks like the longer the program, the more it will fail
+. if i iterate a handful of times I always succeed
+- if I itterate 20 times I start to see some failures
+- if I iterate 100 times even more so
+- good until 100 times if I avoid all the exponential buffer increase, and only focus on the 4096 size pages
+- with 1000 it starts to be iffy
+
+```
+buffer on user side = 94726941235312
+---------------------------------------------------------
+rand size : 4096
+success: 366
+failed: 634
+---------------------------------------------------------
+buffer on user side = 94726941235312
+---------------------------------------------------------
+known size : 4096
+success: 0
+failed: 1000
+---------------------------------------------------------
+
+```
 
 ### 18/4/2020
 - trying to figure out the actual behavior of the override

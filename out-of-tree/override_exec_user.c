@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     int override_count = 0;
     int exec_count = 0;
 
-    int readsize = 2;
+    int readsize = 4096;
 
 
 
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
     override_count = 0;
     exec_count = 0;
 
-    readsize = 2;
+    readsize = 4096;
 
 
 
