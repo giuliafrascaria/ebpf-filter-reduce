@@ -1,5 +1,21 @@
 ## activity log
 
+### 23/4/2020
+- working on the new prog type BPF_PROG_TYPE_KPROBE_OFFLOAD
+- looking at linux kernel to understand what should be modified
+- initial strategy could be to just modify access permissions for kprobes, but eventually i'd rather extend
+- different options can be to create a parallel type altogether that does not actually follow kprobe
+- but I need to understand how the attach type works
+
+### 22/4/2020
+- explore mmap call stack
+- https://elixir.bootlin.com/linux/v5.4/source/fs/ext4/file.c#L520 file operations
+- https://elixir.bootlin.com/linux/v5.4/source/fs/ext4/file.c#L369 ext4_file_mmap
+- https://elixir.bootlin.com/linux/v5.4/source/fs/ext4/file.c#L363 ext4_file_vm_ops
+- https://elixir.bootlin.com/linux/v5.4/source/mm/filemap.c#L2623 filemap_map_pages
+- ok let me just put this in the backlog, requires more in depth
+
+
 ### 19/4/2020
 - it looks like the longer the program, the more it will fail
 . if i iterate a handful of times I always succeed

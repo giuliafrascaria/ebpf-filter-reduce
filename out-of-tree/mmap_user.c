@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
- 	char * buf = mmap(NULL, 4095, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+ 	char * buf = mmap(NULL, 4095, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
      if (buf == NULL)
     {
         fprintf(stderr, "mmap failed: %s\n", strerror(errno));
@@ -59,9 +59,10 @@ int main(int argc, char **argv)
 		return 1;
     }
 
-	printf("before read %p\n", buf);
-	ssize_t readbytes = read(fd, buf, 41);
-	printf("after read %p\n", buf);
+	printf("buffer content %s\n", buf);
+	//printf("before read %p\n", buf);
+	//ssize_t readbytes = read(fd, buf, 41);
+	//printf("after read %p\n", buf);
 	close(fd);
 
 

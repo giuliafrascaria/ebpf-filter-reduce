@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 
 
 
-    while (readsize <= 4096)
+    while (readsize <= 0)
     {
         char * buf = malloc(readsize + 1);
 
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
         }
 
 
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 100; i++)
         {
 
             char * rand = malloc(readsize + 1);
@@ -143,7 +143,7 @@ int main(int argc, char **argv)
         }
 
 
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 2000; i++)
         {
 
             int fd = open("f", O_RDONLY);
