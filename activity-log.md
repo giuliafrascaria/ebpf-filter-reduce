@@ -1,5 +1,16 @@
 ## activity log
 
+### 26/4/2020
+- digging deeper into influence of cache for my copyout case
+- look at the original functions that can be injected, do they have any characteristic?
+- https://kinvolk.io/blog/2018/02/timing-issues-when-using-bpf-with-virtual-cpus/
+- https://github.com/weaveworks/scope/issues/2650
+- could it have something to do with the virtual cpu?
+- try to put timestamps on kprobe and on copyout actual function call to see if there is any discrepancy, 
+- look for way to print the cpu core where i'm executing to find out if there is some correlation
+- investigate actual IO throughput with iostat
+
+
 ### 25/4/2020
 - added print in copyout, the numbers match 
 - the  kprobe is always executed but sometimes it is not the right order
