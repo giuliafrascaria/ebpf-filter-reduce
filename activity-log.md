@@ -1,11 +1,41 @@
 ## activity log
 
+### 25/4/2020
+- added print in copyout, the numbers match 
+- the  kprobe is always executed but sometimes it is not the right order
+- https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-system-programming-manual-325384.pdf
+- intel manual lfence mfelse sfence page 273. can try this for instruction ordering
+- alternative strategy would be to extend the iov iter with negative number semantics for my use case and see if it is solved
+- I will try both in this order, they can build on top of each other
+- https://hadibrais.wordpress.com/2019/02/26/the-significance-of-the-x86-sfence-instruction/
+- mb rmb wmb
+- https://www.kernel.org/doc/Documentation/memory-barriers.txt
+- https://stackoverflow.com/questions/30236620/what-is-wmb-in-linux-driver
+- https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html
+
+
+### 24/4/2020
+- digging in iostat
+- 
+
+```
+echo 1 > /proc/sys/vm/drop_caches
+echo 2 > /proc/sys/vm/drop_caches
+echo 3 > /proc/sys/vm/drop_caches
+
+Device            r/s     w/s     rkB/s     wkB/s   rrqm/s   wrqm/s  %rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
+loop0            0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+loop1            0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+loop2            0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
+vda             27.00    0.00   1036.00      0.00    93.00     0.00  77.50   0.00    0.19    0.00   0.00    38.37     0.00   1.04   2.80
+
+```
+
 ### 23/4/2020
 - working on the new prog type BPF_PROG_TYPE_KPROBE_OFFLOAD
 - looking at linux kernel to understand what should be modified
 - initial strategy could be to just modify access permissions for kprobes, but eventually i'd rather extend
-- different options can be to create a parallel type altogether that does not actually follow kprobe
-- but I need to understand how the attach type works
+- different options can be to create a parallel type altogether that does not actually follow kprobe but I need to understand how the attach type works
 
 ### 22/4/2020
 - explore mmap call stack

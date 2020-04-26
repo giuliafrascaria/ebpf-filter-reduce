@@ -20,6 +20,15 @@ struct bpf_map_def SEC("maps") my_read_map =
 	.max_entries = 1,	//used to pass the buffer address from userland
 };
 
+
+struct bpf_map_def SEC("maps") counter_map =
+{
+	.type = BPF_MAP_TYPE_ARRAY,
+	.key_size = sizeof(u32),
+	.value_size = sizeof(u64),
+	.max_entries = 1,	//used to pass the buffer address from userland
+};
+
 SEC("kprobe/copyout_bpf")
 int bpf_copyout(struct pt_regs *ctx)
 {
@@ -46,14 +55,30 @@ int bpf_copyout(struct pt_regs *ctx)
 
 	if (to == *val)
 	{
+		__u64 * counter;
+		__u64 num;
+		counter = bpf_map_lookup_elem(&counter_map, &key);
+
+		if (counter)
+		{
+			*counter += 1;
+			bpf_map_update_elem(&counter_map, &key, counter, BPF_ANY);
+
+			num = *counter;
+		}
+		else
+		{
+			num = 1;
+		}
+
 		unsigned long rc = 0;
 		bpf_override_return(ctx, rc);
 		
-        char mystring[] = "42\n";
+        char mystring[] = "42\n"; 
 		bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
 
-		char s2[] = "copyout buf %lu size %d\n";
-		bpf_trace_printk(s2, sizeof(s2), (unsigned long) to, blen);
+		char s2[] = "copyout number %lu buf %lu size %d\n";
+		bpf_trace_printk(s2, sizeof(s2), (unsigned long) num, (unsigned long) to, blen);
 	}
 
 	return 0;
