@@ -1,5 +1,10 @@
 ## activity log
 
+### 27/4/2020
+- recompiled kernel to include timestamps, want to plot to see if there is a pattern in execution order
+- tail -f /var/log/kern.log
+- graphed the time differences cached vs uncached 
+
 ### 26/4/2020
 - digging deeper into influence of cache for my copyout case
 - look at the original functions that can be injected, do they have any characteristic?

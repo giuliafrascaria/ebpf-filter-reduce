@@ -185,6 +185,17 @@ int main(int argc, char **argv)
                     printf("error open file 2\n");
                     exit(EXIT_FAILURE);
                 }
+
+                /*char *i_num = malloc(10);
+                sprintf(i_num, "%d", i);
+                
+                printf("%s\n", i_num);
+                if (bpf_map_update_elem(map_fd[2], &key, &i_num, BPF_ANY) != 0) 
+                {
+                    fprintf(stderr, "map_update failed: %s\n", strerror(errno));
+                    return 1;
+                }*/
+
                 memset(buf, 0, readsize + 1);
                 ssize_t readbytes = read(fd, buf, readsize);
 
