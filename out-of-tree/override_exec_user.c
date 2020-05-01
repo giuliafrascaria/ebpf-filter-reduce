@@ -178,7 +178,7 @@ int main(int argc, char **argv)
             for (int i = 0; i < ITERATIONS; i++)
             {
 
-                int fd = open("f", O_RDONLY);
+                int fd = open("file", O_RDONLY);
 
                 if (fd == -1)
                 {
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
 
                 if ( strncmp(buf, expected, 2) == 0)
                 {
-                    if(strcmp(buf + 2, "A") == 0)
+                    if(strcmp(buf + 2, "a") == 0)
                     {
                         partial_override_count += 1;
                     }

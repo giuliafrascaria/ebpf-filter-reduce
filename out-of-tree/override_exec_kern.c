@@ -81,8 +81,8 @@ int bpf_copyout(struct pt_regs *ctx)
 			num = 1;
 		}
 
-		//unsigned long rc = 0;
-		//bpf_override_return(ctx, rc);
+		unsigned long rc = 0;
+		bpf_override_return(ctx, rc);
 
 		unsigned long long curtime;
 		curtime = bpf_ktime_get_ns();
