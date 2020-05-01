@@ -1,0 +1,1 @@
+cmd_/home/giogge/thesis/ebpf-experiments/procfs/procfs_read.mod := { echo  /home/giogge/thesis/ebpf-experiments/procfs/procfs_read.o; echo; } > /home/giogge/thesis/ebpf-experiments/procfs/procfs_read.mod

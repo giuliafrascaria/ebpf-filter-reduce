@@ -1,0 +1,1 @@
+0x00000000	myread		/home/giogge/thesis/ebpf-experiments/procfs/procfs_read	EXPORT_SYMBOL
