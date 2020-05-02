@@ -3,12 +3,14 @@
 #include <linux/init.h>
 #include <linux/kernel.h>   
 #include <linux/proc_fs.h>
+#include <asm/uaccess.h>
 #include <linux/uaccess.h>
-#define BUFSIZE  100
+
+
+#define BUFSIZE  512
+#define COPYSIZE 1024
+#define procfs_name "helloworld"
  
- 
-MODULE_LICENSE("Dual BSD/GPL");
-MODULE_AUTHOR("Liran B.H");
  
 static int irq=20;
 module_param(irq,int,0660);
@@ -20,12 +22,16 @@ static struct proc_dir_entry *ent;
  
 static ssize_t mywrite(struct file *file, const char __user *ubuf, size_t count, loff_t *ppos) 
 {
+	printk( KERN_DEBUG "write handler\n");
+	return -1;
+	/*
 	int num,c,i,m;
 	char buf[BUFSIZE];
 	if(*ppos > 0 || count > BUFSIZE)
 		return -EFAULT;
 	if(copy_from_user(buf, ubuf, count))
 		return -EFAULT;
+
 	num = sscanf(buf,"%d %d",&i,&m);
 	if(num != 2)
 		return -EFAULT;
@@ -33,7 +39,7 @@ static ssize_t mywrite(struct file *file, const char __user *ubuf, size_t count,
 	mode = m;
 	c = strlen(buf);
 	*ppos = c;
-	return c;
+	return c;*/
 }
  
 static ssize_t myread(struct file *file, char __user *ubuf,size_t count, loff_t *ppos) 
@@ -42,8 +48,11 @@ static ssize_t myread(struct file *file, char __user *ubuf,size_t count, loff_t 
 	int len=0;
 	if(*ppos > 0 || count < BUFSIZE)
 		return 0;
-	len += sprintf(buf,"irq = %d\n",irq);
-	len += sprintf(buf + len,"mode = %d\n",mode);
+	//len += sprintf(buf,"irq = %d\n",irq);
+	//len += sprintf(buf + len,"mode = %d\n",mode);
+
+	len += sprintf(buf,"%0*d", BUFSIZE - 2, 0);
+	len += sprintf(buf + len, "\n");
 	
 	if(copy_to_user(ubuf,buf,len))
 		return -EFAULT;
@@ -62,15 +71,23 @@ static struct file_operations myops =
  
 static int simple_init(void)
 {
-	ent=proc_create("mydev",0660,NULL,&myops);
-	printk(KERN_ALERT "hello...\n");
+	ent=proc_create(procfs_name,0777,NULL,&myops);
+
+	if (ent == NULL)
+	{
+		proc_remove(ent);
+		printk(KERN_ALERT "Error: Could not initialize /proc/%s\n",
+		       procfs_name);
+		return -ENOMEM;
+	}
+	printk(KERN_ALERT "hello world created\n");
 	return 0;
 }
  
 static void simple_cleanup(void)
 {
 	proc_remove(ent);
-	printk(KERN_WARNING "bye ...\n");
+	printk(KERN_WARNING "so long and thanks for all the fish\n");
 }
  
 module_init(simple_init);

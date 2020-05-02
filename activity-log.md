@@ -1,5 +1,17 @@
 ## activity log
 
+### 2/5/2020
+- fixed the module to do the read in the way I want
+- size is still 512, migght have to increase to replicate behavior
+- todo, put all in a read cycle and complete kprobe behavior with override return
+
+### 1/5/2020
+- meeting, discussed about the strategy to reproduce the error for mailing list
+- created kernel module for proc file system
+
+### 30/4/2020
+- sent help request to the linux kernel mailing list
+
 ### 27/4/2020
 - recompiled kernel to include timestamps, want to plot to see if there is a pattern in execution order
 - tail -f /var/log/kern.log

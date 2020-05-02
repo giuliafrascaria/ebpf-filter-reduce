@@ -22,7 +22,7 @@
 
 
 #define ITERATIONS 10000
-#define READ_SIZE 4095
+#define READ_SIZE 16
 #define MAX_READ 4096
 
 
@@ -49,17 +49,25 @@ int main(int argc, char **argv)
 
     int readsize = READ_SIZE;
 
-
-    __u32 key = 0;
-    __u64 counter = 0;
-
-    if (bpf_map_update_elem(map_fd[1], &key, &counter, BPF_ANY) != 0) 
-    {
-        fprintf(stderr, "map_update failed: %s\n", strerror(errno));
-        return 1;
-    }
     
+    int fd = open("/proc/mydev", O_RDONLY);
 
+    if (fd == -1)
+    {
+        printf("error open file 2\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char * buf = malloc(readsize + 1);
+    memset(buf, 0, readsize + 1);
+    ssize_t readbytes = read(fd, buf, readsize);
+
+    if (readbytes > 0)
+    {
+        printf("%s\n", buf);
+    }
+
+    /*
     while (readsize <= MAX_READ)
     {
         char * buf = malloc(readsize + 1);
@@ -120,7 +128,7 @@ int main(int argc, char **argv)
     unsigned long count;
 	bpf_map_lookup_elem(map_fd[1], &key, &count);
 
-    printf("kprobe executed %lu times\n", count);
+    printf("kprobe executed %lu times\n", count);*/
 
 	return 0;
 }
