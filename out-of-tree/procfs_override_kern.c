@@ -24,9 +24,22 @@ struct bpf_map_def SEC("maps") my_read_map =
 SEC("kprobe/myread")
 int bpf_read(struct pt_regs *ctx)
 {
+	// instantiate parameters
+	void __user *to;
+	int len;
+
+	//parse parameters from ctx
+	to = (char __user *) PT_REGS_PARM2(ctx);
+	len = PT_REGS_PARM3(ctx);
 
 	char s[] = "myread\n";
 	bpf_trace_printk(s, sizeof(s)); 
+
+	unsigned long rc = len;
+	bpf_override_return(ctx, rc);
+		
+    char mystring[] = "42\n"; 
+	bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
 
 	return 0;
 }

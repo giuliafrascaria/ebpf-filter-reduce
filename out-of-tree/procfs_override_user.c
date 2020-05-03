@@ -22,8 +22,8 @@
 
 
 #define ITERATIONS 10000
-#define READ_SIZE 16
-#define MAX_READ 4096
+#define READ_SIZE 1024
+#define MAX_READ 1024
 
 
 
@@ -50,43 +50,15 @@ int main(int argc, char **argv)
     int readsize = READ_SIZE;
 
     
-    int fd = open("/proc/mydev", O_RDONLY);
-
-    if (fd == -1)
-    {
-        printf("error open file 2\n");
-        exit(EXIT_FAILURE);
-    }
-
-    char * buf = malloc(readsize + 1);
-    memset(buf, 0, readsize + 1);
-    ssize_t readbytes = read(fd, buf, readsize);
-
-    if (readbytes > 0)
-    {
-        printf("%s\n", buf);
-    }
-
-    /*
     while (readsize <= MAX_READ)
     {
         char * buf = malloc(readsize + 1);
-        //char * buf = mmap(NULL, 4095, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-
-        printf("buffer on user side = %lu\n", (unsigned long) buf);
-
-        __u32 key = 0;	
-        if (bpf_map_update_elem(map_fd[0], &key, &buf, BPF_ANY) != 0) 
-        {
-            fprintf(stderr, "map_update failed: %s\n", strerror(errno));
-            return 1;
-        }
 
 
         for (int i = 0; i < ITERATIONS; i++)
         {
 
-            int fd = open("/proc/mydev", O_RDONLY);
+            int fd = open("/proc/helloworld", O_RDONLY);
 
             if (fd == -1)
             {
@@ -106,7 +78,6 @@ int main(int argc, char **argv)
             else
             {
                 exec_count = exec_count + 1;
-                //printf("read %s\n", buf);
             }
             
             close(fd);
@@ -123,12 +94,6 @@ int main(int argc, char **argv)
         free(buf);
 
     }
-    
-
-    unsigned long count;
-	bpf_map_lookup_elem(map_fd[1], &key, &count);
-
-    printf("kprobe executed %lu times\n", count);*/
 
 	return 0;
 }

@@ -1,5 +1,13 @@
 ## activity log
 
+### 3/5/2020
+- fixed the bpf part, predictably the error doesn't show, I think the problem is with actual IO
+- reading the linux device drivers to write a kernel module to access a real device
+- maybe scull shar device, with own file operations on top?
+- use my code on a non IO based device (dev null? dev urand?) and show that in that case it doesn't fail vs in mine it does
+- measure file IO with iostat
+- increase buffer size to 4096 for the proc file to see if there is any difference, my guess is there's not cause there's no IO happening
+
 ### 2/5/2020
 - fixed the module to do the read in the way I want
 - size is still 512, migght have to increase to replicate behavior

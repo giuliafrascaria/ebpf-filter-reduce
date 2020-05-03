@@ -31,7 +31,7 @@ gcc "$USER".c bpf_load.c ~/thesis/ebpf-experiments/out-of-tree/tools/lib/bpf/lib
 
 }
 
-targets=( override_exec tailcall bpfbench tracex1 readiter hellotrace readbuff buffermap proberead mmap strtol)
+targets=( override_exec procfs_override tailcall bpfbench tracex1 readiter hellotrace readbuff buffermap proberead mmap strtol)
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"
