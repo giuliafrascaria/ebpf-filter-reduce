@@ -1,5 +1,18 @@
 ## activity log
 
+### 6/5/2020
+- got an answer from the mailing list, very obscure so idk
+- testing to see if multiple cpus make a difference. They do in the sense that the multiple cpus male it more reliable wow
+- Alexey suggested to have a look at the latest kernel version for bpf_modify_return but it's in the release cycle for the next kernel
+- not ideal cause my guess is the 5.7 release is a month ahead
+- https://github.com/torvalds/linux/blob/master/tools/testing/selftests/bpf/progs/modify_return.c
+- https://github.com/torvalds/linux/commit/3d08b6f29cf33aeaf301553d8d3805f0aa609df7
+- https://github.com/torvalds/linux/commit/da00d2f117a08fbca262db5ea422c80a568b112b
+- https://elixir.bootlin.com/linux/v5.7-rc4/ident/bpf_modify_return_test
+- https://elixir.bootlin.com/linux/v5.7-rc4/source/net/bpf/test_run.c
+- https://lwn.net/Articles/813724/
+- looks actually very promising if it allows for side effect prevention and can take the params of the original function
+
 ### 5/5/2020
 - the proc file system access does not fail, I think it could depend on the fact that there's no IO involved
 - need to try using a device driver that performs actual I/O from a file
