@@ -1,5 +1,13 @@
 ## activity log
 
+### 5/5/2020
+- the proc file system access does not fail, I think it could depend on the fact that there's no IO involved
+- need to try using a device driver that performs actual I/O from a file
+- getting massive amounts of timestamps, but very sweet, I need to redo all measurements with unsigned long long
+- https://elixir.bootlin.com/linux/v5.4/source/kernel/time/timekeeping.c#L451 
+- __ktime_get_fast_ns timing function that i'm using
+- also put timestamp on return from copyout to see if there is a significant footprint for failures
+
 ### 3/5/2020
 - fixed the bpf part, predictably the error doesn't show, I think the problem is with actual IO
 - reading the linux device drivers to write a kernel module to access a real device

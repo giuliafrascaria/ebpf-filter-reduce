@@ -22,8 +22,8 @@
 
 
 #define ITERATIONS 10000
-#define READ_SIZE 1024
-#define MAX_READ 1024
+#define READ_SIZE 4095
+#define MAX_READ 4096
 
 
 
@@ -71,9 +71,7 @@ int main(int argc, char **argv)
 
             if ( strncmp(buf, expected, 2) == 0)
             {
-                
                 override_count = override_count + 1;
-
             }
             else
             {

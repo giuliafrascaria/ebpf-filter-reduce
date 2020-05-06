@@ -92,7 +92,7 @@ int bpf_copyout(struct pt_regs *ctx)
 
 		//bpf_probe_write_user((void *) to, (void *) counter, sizeof(counter));
 
-		char s2[] = "%lu\n";
+		char s2[] = "%llu, kprobe\n";
 		bpf_trace_printk(s2, sizeof(s2), (unsigned long long) curtime);
 	}
 

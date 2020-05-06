@@ -5,9 +5,10 @@
 #include <linux/proc_fs.h>
 #include <asm/uaccess.h>
 #include <linux/uaccess.h>
+#include <linux/slab.h>
 
 
-#define BUFSIZE  512
+#define BUFSIZE  4096
 #define COPYSIZE 1024
 #define procfs_name "helloworld"
  
@@ -24,27 +25,12 @@ static ssize_t mywrite(struct file *file, const char __user *ubuf, size_t count,
 {
 	printk( KERN_DEBUG "write handler\n");
 	return -1;
-	/*
-	int num,c,i,m;
-	char buf[BUFSIZE];
-	if(*ppos > 0 || count > BUFSIZE)
-		return -EFAULT;
-	if(copy_from_user(buf, ubuf, count))
-		return -EFAULT;
-
-	num = sscanf(buf,"%d %d",&i,&m);
-	if(num != 2)
-		return -EFAULT;
-	irq = i; 
-	mode = m;
-	c = strlen(buf);
-	*ppos = c;
-	return c;*/
 }
  
 static ssize_t myread(struct file *file, char __user *ubuf,size_t count, loff_t *ppos) 
 {
-	char buf[BUFSIZE];
+	//char buf[BUFSIZE];
+	char *buf = kmalloc(BUFSIZE, GFP_KERNEL);
 	int len=0;
 	if(*ppos > 0 || count < BUFSIZE)
 		return 0;
@@ -56,11 +42,15 @@ static ssize_t myread(struct file *file, char __user *ubuf,size_t count, loff_t 
 	
 	if(copy_to_user(ubuf,buf,len))
 		return -EFAULT;
+
+	kfree(buf);
+
 	*ppos = len;
 	return len;
 }
 ALLOW_ERROR_INJECTION(myread, ERRNO);
 EXPORT_SYMBOL(myread);
+
  
 static struct file_operations myops = 
 {
@@ -71,7 +61,7 @@ static struct file_operations myops =
  
 static int simple_init(void)
 {
-	ent=proc_create(procfs_name,0777,NULL,&myops);
+	ent=proc_create(procfs_name, 0, NULL, &myops);
 
 	if (ent == NULL)
 	{
