@@ -1,52 +1,104 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 #ifndef _LINUX_FCNTL_H
 #define _LINUX_FCNTL_H
 
-#include <linux/stat.h>
-#include <uapi/linux/fcntl.h>
+#include <asm/fcntl.h>
+#include <linux/openat2.h>
 
-/* List of all valid flags for the open/openat flags argument: */
-#define VALID_OPEN_FLAGS \
-	(O_RDONLY | O_WRONLY | O_RDWR | O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC | \
-	 O_APPEND | O_NDELAY | O_NONBLOCK | O_NDELAY | __O_SYNC | O_DSYNC | \
-	 FASYNC	| O_DIRECT | O_LARGEFILE | O_DIRECTORY | O_NOFOLLOW | \
-	 O_NOATIME | O_CLOEXEC | O_PATH | __O_TMPFILE)
+#define F_SETLEASE	(F_LINUX_SPECIFIC_BASE + 0)
+#define F_GETLEASE	(F_LINUX_SPECIFIC_BASE + 1)
 
-/* List of all valid flags for the how->upgrade_mask argument: */
-#define VALID_UPGRADE_FLAGS \
-	(UPGRADE_NOWRITE | UPGRADE_NOREAD)
+/*
+ * Cancel a blocking posix lock; internal use only until we expose an
+ * asynchronous lock api to userspace:
+ */
+#define F_CANCELLK	(F_LINUX_SPECIFIC_BASE + 5)
 
-/* List of all valid flags for the how->resolve argument: */
-#define VALID_RESOLVE_FLAGS \
-	(RESOLVE_NO_XDEV | RESOLVE_NO_MAGICLINKS | RESOLVE_NO_SYMLINKS | \
-	 RESOLVE_BENEATH | RESOLVE_IN_ROOT)
+/* Create a file descriptor with FD_CLOEXEC set. */
+#define F_DUPFD_CLOEXEC	(F_LINUX_SPECIFIC_BASE + 6)
 
-/* List of all open_how "versions". */
-#define OPEN_HOW_SIZE_VER0	24 /* sizeof first published struct */
-#define OPEN_HOW_SIZE_LATEST	OPEN_HOW_SIZE_VER0
+/*
+ * Request nofications on a directory.
+ * See below for events that may be notified.
+ */
+#define F_NOTIFY	(F_LINUX_SPECIFIC_BASE+2)
 
-#ifndef force_o_largefile
-#define force_o_largefile() (!IS_ENABLED(CONFIG_ARCH_32BIT_OFF_T))
-#endif
+/*
+ * Set and get of pipe page size array
+ */
+#define F_SETPIPE_SZ	(F_LINUX_SPECIFIC_BASE + 7)
+#define F_GETPIPE_SZ	(F_LINUX_SPECIFIC_BASE + 8)
 
-#if BITS_PER_LONG == 32
-#define IS_GETLK32(cmd)		((cmd) == F_GETLK)
-#define IS_SETLK32(cmd)		((cmd) == F_SETLK)
-#define IS_SETLKW32(cmd)	((cmd) == F_SETLKW)
-#define IS_GETLK64(cmd)		((cmd) == F_GETLK64)
-#define IS_SETLK64(cmd)		((cmd) == F_SETLK64)
-#define IS_SETLKW64(cmd)	((cmd) == F_SETLKW64)
-#else
-#define IS_GETLK32(cmd)		(0)
-#define IS_SETLK32(cmd)		(0)
-#define IS_SETLKW32(cmd)	(0)
-#define IS_GETLK64(cmd)		((cmd) == F_GETLK)
-#define IS_SETLK64(cmd)		((cmd) == F_SETLK)
-#define IS_SETLKW64(cmd)	((cmd) == F_SETLKW)
-#endif /* BITS_PER_LONG == 32 */
+/*
+ * Set/Get seals
+ */
+#define F_ADD_SEALS	(F_LINUX_SPECIFIC_BASE + 9)
+#define F_GET_SEALS	(F_LINUX_SPECIFIC_BASE + 10)
 
-#define IS_GETLK(cmd)	(IS_GETLK32(cmd)  || IS_GETLK64(cmd))
-#define IS_SETLK(cmd)	(IS_SETLK32(cmd)  || IS_SETLK64(cmd))
-#define IS_SETLKW(cmd)	(IS_SETLKW32(cmd) || IS_SETLKW64(cmd))
+/*
+ * Types of seals
+ */
+#define F_SEAL_SEAL	0x0001	/* prevent further seals from being set */
+#define F_SEAL_SHRINK	0x0002	/* prevent file from shrinking */
+#define F_SEAL_GROW	0x0004	/* prevent file from growing */
+#define F_SEAL_WRITE	0x0008	/* prevent writes */
+#define F_SEAL_FUTURE_WRITE	0x0010  /* prevent future writes while mapped */
+/* (1U << 31) is reserved for signed error codes */
 
-#endif
+/*
+ * Set/Get write life time hints. {GET,SET}_RW_HINT operate on the
+ * underlying inode, while {GET,SET}_FILE_RW_HINT operate only on
+ * the specific file.
+ */
+#define F_GET_RW_HINT		(F_LINUX_SPECIFIC_BASE + 11)
+#define F_SET_RW_HINT		(F_LINUX_SPECIFIC_BASE + 12)
+#define F_GET_FILE_RW_HINT	(F_LINUX_SPECIFIC_BASE + 13)
+#define F_SET_FILE_RW_HINT	(F_LINUX_SPECIFIC_BASE + 14)
+
+/*
+ * Valid hint values for F_{GET,SET}_RW_HINT. 0 is "not set", or can be
+ * used to clear any hints previously set.
+ */
+#define RWH_WRITE_LIFE_NOT_SET	0
+#define RWH_WRITE_LIFE_NONE	1
+#define RWH_WRITE_LIFE_SHORT	2
+#define RWH_WRITE_LIFE_MEDIUM	3
+#define RWH_WRITE_LIFE_LONG	4
+#define RWH_WRITE_LIFE_EXTREME	5
+
+/*
+ * The originally introduced spelling is remained from the first
+ * versions of the patch set that introduced the feature, see commit
+ * v4.13-rc1~212^2~51.
+ */
+#define RWF_WRITE_LIFE_NOT_SET	RWH_WRITE_LIFE_NOT_SET
+
+/*
+ * Types of directory notifications that may be requested.
+ */
+#define DN_ACCESS	0x00000001	/* File accessed */
+#define DN_MODIFY	0x00000002	/* File modified */
+#define DN_CREATE	0x00000004	/* File created */
+#define DN_DELETE	0x00000008	/* File removed */
+#define DN_RENAME	0x00000010	/* File renamed */
+#define DN_ATTRIB	0x00000020	/* File changed attibutes */
+#define DN_MULTISHOT	0x80000000	/* Don't remove notifier */
+
+#define AT_FDCWD		-100    /* Special value used to indicate
+                                           openat should use the current
+                                           working directory. */
+#define AT_SYMLINK_NOFOLLOW	0x100   /* Do not follow symbolic links.  */
+#define AT_REMOVEDIR		0x200   /* Remove directory instead of
+                                           unlinking file.  */
+#define AT_SYMLINK_FOLLOW	0x400   /* Follow symbolic links.  */
+#define AT_NO_AUTOMOUNT		0x800	/* Suppress terminal automount traversal */
+#define AT_EMPTY_PATH		0x1000	/* Allow empty relative pathname */
+
+#define AT_STATX_SYNC_TYPE	0x6000	/* Type of synchronisation required from statx() */
+#define AT_STATX_SYNC_AS_STAT	0x0000	/* - Do whatever stat() does */
+#define AT_STATX_FORCE_SYNC	0x2000	/* - Force the attributes to be sync'd with the server */
+#define AT_STATX_DONT_SYNC	0x4000	/* - Don't sync attributes with the server */
+
+#define AT_RECURSIVE		0x8000	/* Apply to the entire subtree */
+
+#endif /* _LINUX_FCNTL_H */

@@ -1,157 +1,172 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /* Copyright (c) 2018 Facebook */
-
-#ifndef _LINUX_BTF_H
-#define _LINUX_BTF_H 1
+#ifndef __LINUX_BTF_H__
+#define __LINUX_BTF_H__
 
 #include <linux/types.h>
-#include <uapi/linux/btf.h>
 
-#define BTF_TYPE_EMIT(type) ((void)(type *)0)
+#define BTF_MAGIC	0xeB9F
+#define BTF_VERSION	1
 
-struct btf;
-struct btf_member;
-struct btf_type;
-union bpf_attr;
+struct btf_header {
+	__u16	magic;
+	__u8	version;
+	__u8	flags;
+	__u32	hdr_len;
 
-extern const struct file_operations btf_fops;
+	/* All offsets are in bytes relative to the end of this header */
+	__u32	type_off;	/* offset of type section	*/
+	__u32	type_len;	/* length of type section	*/
+	__u32	str_off;	/* offset of string section	*/
+	__u32	str_len;	/* length of string section	*/
+};
 
-void btf_put(struct btf *btf);
-int btf_new_fd(const union bpf_attr *attr);
-struct btf *btf_get_by_fd(int fd);
-int btf_get_info_by_fd(const struct btf *btf,
-		       const union bpf_attr *attr,
-		       union bpf_attr __user *uattr);
-/* Figure out the size of a type_id.  If type_id is a modifier
- * (e.g. const), it will be resolved to find out the type with size.
- *
- * For example:
- * In describing "const void *",  type_id is "const" and "const"
- * refers to "void *".  The return type will be "void *".
- *
- * If type_id is a simple "int", then return type will be "int".
- *
- * @btf: struct btf object
- * @type_id: Find out the size of type_id. The type_id of the return
- *           type is set to *type_id.
- * @ret_size: It can be NULL.  If not NULL, the size of the return
- *            type is set to *ret_size.
- * Return: The btf_type (resolved to another type with size info if needed).
- *         NULL is returned if type_id itself does not have size info
- *         (e.g. void) or it cannot be resolved to another type that
- *         has size info.
- *         *type_id and *ret_size will not be changed in the
- *         NULL return case.
+/* Max # of type identifier */
+#define BTF_MAX_TYPE	0x000fffff
+/* Max offset into the string section */
+#define BTF_MAX_NAME_OFFSET	0x00ffffff
+/* Max # of struct/union/enum members or func args */
+#define BTF_MAX_VLEN	0xffff
+
+struct btf_type {
+	__u32 name_off;
+	/* "info" bits arrangement
+	 * bits  0-15: vlen (e.g. # of struct's members)
+	 * bits 16-23: unused
+	 * bits 24-27: kind (e.g. int, ptr, array...etc)
+	 * bits 28-30: unused
+	 * bit     31: kind_flag, currently used by
+	 *             struct, union and fwd
+	 */
+	__u32 info;
+	/* "size" is used by INT, ENUM, STRUCT, UNION and DATASEC.
+	 * "size" tells the size of the type it is describing.
+	 *
+	 * "type" is used by PTR, TYPEDEF, VOLATILE, CONST, RESTRICT,
+	 * FUNC, FUNC_PROTO and VAR.
+	 * "type" is a type_id referring to another type.
+	 */
+	union {
+		__u32 size;
+		__u32 type;
+	};
+};
+
+#define BTF_INFO_KIND(info)	(((info) >> 24) & 0x0f)
+#define BTF_INFO_VLEN(info)	((info) & 0xffff)
+#define BTF_INFO_KFLAG(info)	((info) >> 31)
+
+#define BTF_KIND_UNKN		0	/* Unknown	*/
+#define BTF_KIND_INT		1	/* Integer	*/
+#define BTF_KIND_PTR		2	/* Pointer	*/
+#define BTF_KIND_ARRAY		3	/* Array	*/
+#define BTF_KIND_STRUCT		4	/* Struct	*/
+#define BTF_KIND_UNION		5	/* Union	*/
+#define BTF_KIND_ENUM		6	/* Enumeration	*/
+#define BTF_KIND_FWD		7	/* Forward	*/
+#define BTF_KIND_TYPEDEF	8	/* Typedef	*/
+#define BTF_KIND_VOLATILE	9	/* Volatile	*/
+#define BTF_KIND_CONST		10	/* Const	*/
+#define BTF_KIND_RESTRICT	11	/* Restrict	*/
+#define BTF_KIND_FUNC		12	/* Function	*/
+#define BTF_KIND_FUNC_PROTO	13	/* Function Proto	*/
+#define BTF_KIND_VAR		14	/* Variable	*/
+#define BTF_KIND_DATASEC	15	/* Section	*/
+#define BTF_KIND_MAX		BTF_KIND_DATASEC
+#define NR_BTF_KINDS		(BTF_KIND_MAX + 1)
+
+/* For some specific BTF_KIND, "struct btf_type" is immediately
+ * followed by extra data.
  */
-const struct btf_type *btf_type_id_size(const struct btf *btf,
-					u32 *type_id,
-					u32 *ret_size);
-void btf_type_seq_show(const struct btf *btf, u32 type_id, void *obj,
-		       struct seq_file *m);
-int btf_get_fd_by_id(u32 id);
-u32 btf_id(const struct btf *btf);
-bool btf_member_is_reg_int(const struct btf *btf, const struct btf_type *s,
-			   const struct btf_member *m,
-			   u32 expected_offset, u32 expected_size);
-int btf_find_spin_lock(const struct btf *btf, const struct btf_type *t);
-bool btf_type_is_void(const struct btf_type *t);
-s32 btf_find_by_name_kind(const struct btf *btf, const char *name, u8 kind);
-const struct btf_type *btf_type_skip_modifiers(const struct btf *btf,
-					       u32 id, u32 *res_id);
-const struct btf_type *btf_type_resolve_ptr(const struct btf *btf,
-					    u32 id, u32 *res_id);
-const struct btf_type *btf_type_resolve_func_ptr(const struct btf *btf,
-						 u32 id, u32 *res_id);
-const struct btf_type *
-btf_resolve_size(const struct btf *btf, const struct btf_type *type,
-		 u32 *type_size, const struct btf_type **elem_type,
-		 u32 *total_nelems);
 
-#define for_each_member(i, struct_type, member)			\
-	for (i = 0, member = btf_type_member(struct_type);	\
-	     i < btf_type_vlen(struct_type);			\
-	     i++, member++)
+/* BTF_KIND_INT is followed by a u32 and the following
+ * is the 32 bits arrangement:
+ */
+#define BTF_INT_ENCODING(VAL)	(((VAL) & 0x0f000000) >> 24)
+#define BTF_INT_OFFSET(VAL)	(((VAL) & 0x00ff0000) >> 16)
+#define BTF_INT_BITS(VAL)	((VAL)  & 0x000000ff)
 
-static inline bool btf_type_is_ptr(const struct btf_type *t)
-{
-	return BTF_INFO_KIND(t->info) == BTF_KIND_PTR;
-}
+/* Attributes stored in the BTF_INT_ENCODING */
+#define BTF_INT_SIGNED	(1 << 0)
+#define BTF_INT_CHAR	(1 << 1)
+#define BTF_INT_BOOL	(1 << 2)
 
-static inline bool btf_type_is_int(const struct btf_type *t)
-{
-	return BTF_INFO_KIND(t->info) == BTF_KIND_INT;
-}
+/* BTF_KIND_ENUM is followed by multiple "struct btf_enum".
+ * The exact number of btf_enum is stored in the vlen (of the
+ * info in "struct btf_type").
+ */
+struct btf_enum {
+	__u32	name_off;
+	__s32	val;
+};
 
-static inline bool btf_type_is_enum(const struct btf_type *t)
-{
-	return BTF_INFO_KIND(t->info) == BTF_KIND_ENUM;
-}
+/* BTF_KIND_ARRAY is followed by one "struct btf_array" */
+struct btf_array {
+	__u32	type;
+	__u32	index_type;
+	__u32	nelems;
+};
 
-static inline bool btf_type_is_typedef(const struct btf_type *t)
-{
-	return BTF_INFO_KIND(t->info) == BTF_KIND_TYPEDEF;
-}
+/* BTF_KIND_STRUCT and BTF_KIND_UNION are followed
+ * by multiple "struct btf_member".  The exact number
+ * of btf_member is stored in the vlen (of the info in
+ * "struct btf_type").
+ */
+struct btf_member {
+	__u32	name_off;
+	__u32	type;
+	/* If the type info kind_flag is set, the btf_member offset
+	 * contains both member bitfield size and bit offset. The
+	 * bitfield size is set for bitfield members. If the type
+	 * info kind_flag is not set, the offset contains only bit
+	 * offset.
+	 */
+	__u32	offset;
+};
 
-static inline bool btf_type_is_func(const struct btf_type *t)
-{
-	return BTF_INFO_KIND(t->info) == BTF_KIND_FUNC;
-}
+/* If the struct/union type info kind_flag is set, the
+ * following two macros are used to access bitfield_size
+ * and bit_offset from btf_member.offset.
+ */
+#define BTF_MEMBER_BITFIELD_SIZE(val)	((val) >> 24)
+#define BTF_MEMBER_BIT_OFFSET(val)	((val) & 0xffffff)
 
-static inline bool btf_type_is_func_proto(const struct btf_type *t)
-{
-	return BTF_INFO_KIND(t->info) == BTF_KIND_FUNC_PROTO;
-}
+/* BTF_KIND_FUNC_PROTO is followed by multiple "struct btf_param".
+ * The exact number of btf_param is stored in the vlen (of the
+ * info in "struct btf_type").
+ */
+struct btf_param {
+	__u32	name_off;
+	__u32	type;
+};
 
-static inline u16 btf_type_vlen(const struct btf_type *t)
-{
-	return BTF_INFO_VLEN(t->info);
-}
+enum {
+	BTF_VAR_STATIC = 0,
+	BTF_VAR_GLOBAL_ALLOCATED = 1,
+	BTF_VAR_GLOBAL_EXTERN = 2,
+};
 
-static inline u16 btf_func_linkage(const struct btf_type *t)
-{
-	return BTF_INFO_VLEN(t->info);
-}
+enum btf_func_linkage {
+	BTF_FUNC_STATIC = 0,
+	BTF_FUNC_GLOBAL = 1,
+	BTF_FUNC_EXTERN = 2,
+};
 
-static inline bool btf_type_kflag(const struct btf_type *t)
-{
-	return BTF_INFO_KFLAG(t->info);
-}
+/* BTF_KIND_VAR is followed by a single "struct btf_var" to describe
+ * additional information related to the variable such as its linkage.
+ */
+struct btf_var {
+	__u32	linkage;
+};
 
-static inline u32 btf_member_bit_offset(const struct btf_type *struct_type,
-					const struct btf_member *member)
-{
-	return btf_type_kflag(struct_type) ? BTF_MEMBER_BIT_OFFSET(member->offset)
-					   : member->offset;
-}
+/* BTF_KIND_DATASEC is followed by multiple "struct btf_var_secinfo"
+ * to describe all BTF_KIND_VAR types it contains along with it's
+ * in-section offset as well as size.
+ */
+struct btf_var_secinfo {
+	__u32	type;
+	__u32	offset;
+	__u32	size;
+};
 
-static inline u32 btf_member_bitfield_size(const struct btf_type *struct_type,
-					   const struct btf_member *member)
-{
-	return btf_type_kflag(struct_type) ? BTF_MEMBER_BITFIELD_SIZE(member->offset)
-					   : 0;
-}
-
-static inline const struct btf_member *btf_type_member(const struct btf_type *t)
-{
-	return (const struct btf_member *)(t + 1);
-}
-
-#ifdef CONFIG_BPF_SYSCALL
-const struct btf_type *btf_type_by_id(const struct btf *btf, u32 type_id);
-const char *btf_name_by_offset(const struct btf *btf, u32 offset);
-struct btf *btf_parse_vmlinux(void);
-struct btf *bpf_prog_get_target_btf(const struct bpf_prog *prog);
-#else
-static inline const struct btf_type *btf_type_by_id(const struct btf *btf,
-						    u32 type_id)
-{
-	return NULL;
-}
-static inline const char *btf_name_by_offset(const struct btf *btf,
-					     u32 offset)
-{
-	return NULL;
-}
-#endif
-
-#endif
+#endif /* __LINUX_BTF_H__ */

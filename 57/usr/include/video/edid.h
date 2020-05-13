@@ -1,10 +1,10 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 #ifndef __linux_video_edid_h__
 #define __linux_video_edid_h__
 
-#include <uapi/video/edid.h>
+struct edid_info {
+	unsigned char dummy[128];
+};
 
-#ifdef CONFIG_X86
-extern struct edid_info edid_info;
-#endif
+
 #endif /* __linux_video_edid_h__ */

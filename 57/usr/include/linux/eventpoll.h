@@ -1,80 +1,94 @@
-/* SPDX-License-Identifier: GPL-2.0-or-later */
+/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
  *  include/linux/eventpoll.h ( Efficient event polling implementation )
  *  Copyright (C) 2001,...,2006	 Davide Libenzi
  *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
  *  Davide Libenzi <davidel@xmailserver.org>
+ *
  */
+
 #ifndef _LINUX_EVENTPOLL_H
 #define _LINUX_EVENTPOLL_H
 
-#include <uapi/linux/eventpoll.h>
-#include <uapi/linux/kcmp.h>
+/* For O_CLOEXEC */
+#include <linux/fcntl.h>
+#include <linux/types.h>
 
+/* Flags for epoll_create1.  */
+#define EPOLL_CLOEXEC O_CLOEXEC
 
-/* Forward declarations to avoid compiler errors */
-struct file;
+/* Valid opcodes to issue to sys_epoll_ctl() */
+#define EPOLL_CTL_ADD 1
+#define EPOLL_CTL_DEL 2
+#define EPOLL_CTL_MOD 3
 
+/* Epoll event masks */
+#define EPOLLIN		(__poll_t)0x00000001
+#define EPOLLPRI	(__poll_t)0x00000002
+#define EPOLLOUT	(__poll_t)0x00000004
+#define EPOLLERR	(__poll_t)0x00000008
+#define EPOLLHUP	(__poll_t)0x00000010
+#define EPOLLNVAL	(__poll_t)0x00000020
+#define EPOLLRDNORM	(__poll_t)0x00000040
+#define EPOLLRDBAND	(__poll_t)0x00000080
+#define EPOLLWRNORM	(__poll_t)0x00000100
+#define EPOLLWRBAND	(__poll_t)0x00000200
+#define EPOLLMSG	(__poll_t)0x00000400
+#define EPOLLRDHUP	(__poll_t)0x00002000
 
-#ifdef CONFIG_EPOLL
-
-#ifdef CONFIG_CHECKPOINT_RESTORE
-struct file *get_epoll_tfile_raw_ptr(struct file *file, int tfd, unsigned long toff);
-#endif
-
-/* Used to initialize the epoll bits inside the "struct file" */
-static inline void eventpoll_init_file(struct file *file)
-{
-	INIT_LIST_HEAD(&file->f_ep_links);
-	INIT_LIST_HEAD(&file->f_tfile_llink);
-}
-
-
-/* Used to release the epoll bits inside the "struct file" */
-void eventpoll_release_file(struct file *file);
+/* Set exclusive wakeup mode for the target file descriptor */
+#define EPOLLEXCLUSIVE	((__poll_t)(1U << 28))
 
 /*
- * This is called from inside fs/file_table.c:__fput() to unlink files
- * from the eventpoll interface. We need to have this facility to cleanup
- * correctly files that are closed without being removed from the eventpoll
- * interface.
+ * Request the handling of system wakeup events so as to prevent system suspends
+ * from happening while those events are being processed.
+ *
+ * Assuming neither EPOLLET nor EPOLLONESHOT is set, system suspends will not be
+ * re-allowed until epoll_wait is called again after consuming the wakeup
+ * event(s).
+ *
+ * Requires CAP_BLOCK_SUSPEND
  */
-static inline void eventpoll_release(struct file *file)
-{
+#define EPOLLWAKEUP	((__poll_t)(1U << 29))
 
-	/*
-	 * Fast check to avoid the get/release of the semaphore. Since
-	 * we're doing this outside the semaphore lock, it might return
-	 * false negatives, but we don't care. It'll help in 99.99% of cases
-	 * to avoid the semaphore lock. False positives simply cannot happen
-	 * because the file in on the way to be removed and nobody ( but
-	 * eventpoll ) has still a reference to this file.
-	 */
-	if (likely(list_empty(&file->f_ep_links)))
-		return;
+/* Set the One Shot behaviour for the target file descriptor */
+#define EPOLLONESHOT	((__poll_t)(1U << 30))
 
-	/*
-	 * The file is being closed while it is still linked to an epoll
-	 * descriptor. We need to handle this by correctly unlinking it
-	 * from its containers.
-	 */
-	eventpoll_release_file(file);
-}
+/* Set the Edge Triggered behaviour for the target file descriptor */
+#define EPOLLET		((__poll_t)(1U << 31))
 
-int do_epoll_ctl(int epfd, int op, int fd, struct epoll_event *epds,
-		 bool nonblock);
-
-/* Tells if the epoll_ctl(2) operation needs an event copy from userspace */
-static inline int ep_op_has_event(int op)
-{
-	return op != EPOLL_CTL_DEL;
-}
-
+/* 
+ * On x86-64 make the 64bit structure have the same alignment as the
+ * 32bit structure. This makes 32bit emulation easier.
+ *
+ * UML/x86_64 needs the same packing as x86_64
+ */
+#ifdef __x86_64__
+#define EPOLL_PACKED __attribute__((packed))
 #else
-
-static inline void eventpoll_init_file(struct file *file) {}
-static inline void eventpoll_release(struct file *file) {}
-
+#define EPOLL_PACKED
 #endif
 
-#endif /* #ifndef _LINUX_EVENTPOLL_H */
+struct epoll_event {
+	__poll_t events;
+	__u64 data;
+} EPOLL_PACKED;
+
+#ifdef CONFIG_PM_SLEEP
+static __inline__ void ep_take_care_of_epollwakeup(struct epoll_event *epev)
+{
+	if ((epev->events & EPOLLWAKEUP) && !capable(CAP_BLOCK_SUSPEND))
+		epev->events &= ~EPOLLWAKEUP;
+}
+#else
+static __inline__ void ep_take_care_of_epollwakeup(struct epoll_event *epev)
+{
+	epev->events &= ~EPOLLWAKEUP;
+}
+#endif
+#endif /* _LINUX_EVENTPOLL_H */

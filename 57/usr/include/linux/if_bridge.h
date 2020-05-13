@@ -1,149 +1,404 @@
-/* SPDX-License-Identifier: GPL-2.0-or-later */
+/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
  *	Linux ethernet bridge
  *
  *	Authors:
  *	Lennert Buytenhek		<buytenh@gnu.org>
+ *
+ *	This program is free software; you can redistribute it and/or
+ *	modify it under the terms of the GNU General Public License
+ *	as published by the Free Software Foundation; either version
+ *	2 of the License, or (at your option) any later version.
  */
+
 #ifndef _LINUX_IF_BRIDGE_H
 #define _LINUX_IF_BRIDGE_H
 
+#include <linux/types.h>
+#include <linux/if_ether.h>
+#include <linux/in6.h>
 
-#include <linux/netdevice.h>
-#include <uapi/linux/if_bridge.h>
-#include <linux/bitops.h>
+#define SYSFS_BRIDGE_ATTR	"bridge"
+#define SYSFS_BRIDGE_FDB	"brforward"
+#define SYSFS_BRIDGE_PORT_SUBDIR "brif"
+#define SYSFS_BRIDGE_PORT_ATTR	"brport"
+#define SYSFS_BRIDGE_PORT_LINK	"bridge"
 
-struct br_ip {
-	union {
-		__be32	ip4;
-#if IS_ENABLED(CONFIG_IPV6)
-		struct in6_addr ip6;
-#endif
-	} u;
-	__be16		proto;
-	__u16           vid;
+#define BRCTL_VERSION 1
+
+#define BRCTL_GET_VERSION 0
+#define BRCTL_GET_BRIDGES 1
+#define BRCTL_ADD_BRIDGE 2
+#define BRCTL_DEL_BRIDGE 3
+#define BRCTL_ADD_IF 4
+#define BRCTL_DEL_IF 5
+#define BRCTL_GET_BRIDGE_INFO 6
+#define BRCTL_GET_PORT_LIST 7
+#define BRCTL_SET_BRIDGE_FORWARD_DELAY 8
+#define BRCTL_SET_BRIDGE_HELLO_TIME 9
+#define BRCTL_SET_BRIDGE_MAX_AGE 10
+#define BRCTL_SET_AGEING_TIME 11
+#define BRCTL_SET_GC_INTERVAL 12
+#define BRCTL_GET_PORT_INFO 13
+#define BRCTL_SET_BRIDGE_STP_STATE 14
+#define BRCTL_SET_BRIDGE_PRIORITY 15
+#define BRCTL_SET_PORT_PRIORITY 16
+#define BRCTL_SET_PATH_COST 17
+#define BRCTL_GET_FDB_ENTRIES 18
+
+#define BR_STATE_DISABLED 0
+#define BR_STATE_LISTENING 1
+#define BR_STATE_LEARNING 2
+#define BR_STATE_FORWARDING 3
+#define BR_STATE_BLOCKING 4
+
+struct __bridge_info {
+	__u64 designated_root;
+	__u64 bridge_id;
+	__u32 root_path_cost;
+	__u32 max_age;
+	__u32 hello_time;
+	__u32 forward_delay;
+	__u32 bridge_max_age;
+	__u32 bridge_hello_time;
+	__u32 bridge_forward_delay;
+	__u8 topology_change;
+	__u8 topology_change_detected;
+	__u8 root_port;
+	__u8 stp_enabled;
+	__u32 ageing_time;
+	__u32 gc_interval;
+	__u32 hello_timer_value;
+	__u32 tcn_timer_value;
+	__u32 topology_change_timer_value;
+	__u32 gc_timer_value;
 };
 
-struct br_ip_list {
-	struct list_head list;
-	struct br_ip addr;
+struct __port_info {
+	__u64 designated_root;
+	__u64 designated_bridge;
+	__u16 port_id;
+	__u16 designated_port;
+	__u32 path_cost;
+	__u32 designated_cost;
+	__u8 state;
+	__u8 top_change_ack;
+	__u8 config_pending;
+	__u8 unused0;
+	__u32 message_age_timer_value;
+	__u32 forward_delay_timer_value;
+	__u32 hold_timer_value;
 };
 
-#define BR_HAIRPIN_MODE		BIT(0)
-#define BR_BPDU_GUARD		BIT(1)
-#define BR_ROOT_BLOCK		BIT(2)
-#define BR_MULTICAST_FAST_LEAVE	BIT(3)
-#define BR_ADMIN_COST		BIT(4)
-#define BR_LEARNING		BIT(5)
-#define BR_FLOOD		BIT(6)
-#define BR_AUTO_MASK		(BR_FLOOD | BR_LEARNING)
-#define BR_PROMISC		BIT(7)
-#define BR_PROXYARP		BIT(8)
-#define BR_LEARNING_SYNC	BIT(9)
-#define BR_PROXYARP_WIFI	BIT(10)
-#define BR_MCAST_FLOOD		BIT(11)
-#define BR_MULTICAST_TO_UNICAST	BIT(12)
-#define BR_VLAN_TUNNEL		BIT(13)
-#define BR_BCAST_FLOOD		BIT(14)
-#define BR_NEIGH_SUPPRESS	BIT(15)
-#define BR_ISOLATED		BIT(16)
+struct __fdb_entry {
+	__u8 mac_addr[ETH_ALEN];
+	__u8 port_no;
+	__u8 is_local;
+	__u32 ageing_timer_value;
+	__u8 port_hi;
+	__u8 pad0;
+	__u16 unused;
+};
 
-#define BR_DEFAULT_AGEING_TIME	(300 * HZ)
+/* Bridge Flags */
+#define BRIDGE_FLAGS_MASTER	1	/* Bridge command to/from master */
+#define BRIDGE_FLAGS_SELF	2	/* Bridge command to/from lowerdev */
 
-extern void brioctl_set(int (*ioctl_hook)(struct net *, unsigned int, void __user *));
+#define BRIDGE_MODE_VEB		0	/* Default loopback mode */
+#define BRIDGE_MODE_VEPA	1	/* 802.1Qbg defined VEPA mode */
+#define BRIDGE_MODE_UNDEF	0xFFFF  /* mode undefined */
 
-#if IS_ENABLED(CONFIG_BRIDGE) && IS_ENABLED(CONFIG_BRIDGE_IGMP_SNOOPING)
-int br_multicast_list_adjacent(struct net_device *dev,
-			       struct list_head *br_ip_list);
-bool br_multicast_has_querier_anywhere(struct net_device *dev, int proto);
-bool br_multicast_has_querier_adjacent(struct net_device *dev, int proto);
-bool br_multicast_enabled(const struct net_device *dev);
-bool br_multicast_router(const struct net_device *dev);
-#else
-static inline int br_multicast_list_adjacent(struct net_device *dev,
-					     struct list_head *br_ip_list)
-{
-	return 0;
-}
-static inline bool br_multicast_has_querier_anywhere(struct net_device *dev,
-						     int proto)
-{
-	return false;
-}
-static inline bool br_multicast_has_querier_adjacent(struct net_device *dev,
-						     int proto)
-{
-	return false;
-}
-static inline bool br_multicast_enabled(const struct net_device *dev)
-{
-	return false;
-}
-static inline bool br_multicast_router(const struct net_device *dev)
-{
-	return false;
-}
-#endif
+/* Bridge management nested attributes
+ * [IFLA_AF_SPEC] = {
+ *     [IFLA_BRIDGE_FLAGS]
+ *     [IFLA_BRIDGE_MODE]
+ *     [IFLA_BRIDGE_VLAN_INFO]
+ * }
+ */
+enum {
+	IFLA_BRIDGE_FLAGS,
+	IFLA_BRIDGE_MODE,
+	IFLA_BRIDGE_VLAN_INFO,
+	IFLA_BRIDGE_VLAN_TUNNEL_INFO,
+	__IFLA_BRIDGE_MAX,
+};
+#define IFLA_BRIDGE_MAX (__IFLA_BRIDGE_MAX - 1)
 
-#if IS_ENABLED(CONFIG_BRIDGE) && IS_ENABLED(CONFIG_BRIDGE_VLAN_FILTERING)
-bool br_vlan_enabled(const struct net_device *dev);
-int br_vlan_get_pvid(const struct net_device *dev, u16 *p_pvid);
-int br_vlan_get_pvid_rcu(const struct net_device *dev, u16 *p_pvid);
-int br_vlan_get_proto(const struct net_device *dev, u16 *p_proto);
-int br_vlan_get_info(const struct net_device *dev, u16 vid,
-		     struct bridge_vlan_info *p_vinfo);
-#else
-static inline bool br_vlan_enabled(const struct net_device *dev)
-{
-	return false;
-}
+#define BRIDGE_VLAN_INFO_MASTER	(1<<0)	/* Operate on Bridge device as well */
+#define BRIDGE_VLAN_INFO_PVID	(1<<1)	/* VLAN is PVID, ingress untagged */
+#define BRIDGE_VLAN_INFO_UNTAGGED	(1<<2)	/* VLAN egresses untagged */
+#define BRIDGE_VLAN_INFO_RANGE_BEGIN	(1<<3) /* VLAN is start of vlan range */
+#define BRIDGE_VLAN_INFO_RANGE_END	(1<<4) /* VLAN is end of vlan range */
+#define BRIDGE_VLAN_INFO_BRENTRY	(1<<5) /* Global bridge VLAN entry */
+#define BRIDGE_VLAN_INFO_ONLY_OPTS	(1<<6) /* Skip create/delete/flags */
 
-static inline int br_vlan_get_pvid(const struct net_device *dev, u16 *p_pvid)
-{
-	return -EINVAL;
-}
+struct bridge_vlan_info {
+	__u16 flags;
+	__u16 vid;
+};
 
-static inline int br_vlan_get_proto(const struct net_device *dev, u16 *p_proto)
-{
-	return -EINVAL;
-}
+enum {
+	IFLA_BRIDGE_VLAN_TUNNEL_UNSPEC,
+	IFLA_BRIDGE_VLAN_TUNNEL_ID,
+	IFLA_BRIDGE_VLAN_TUNNEL_VID,
+	IFLA_BRIDGE_VLAN_TUNNEL_FLAGS,
+	__IFLA_BRIDGE_VLAN_TUNNEL_MAX,
+};
 
-static inline int br_vlan_get_pvid_rcu(const struct net_device *dev, u16 *p_pvid)
-{
-	return -EINVAL;
-}
+#define IFLA_BRIDGE_VLAN_TUNNEL_MAX (__IFLA_BRIDGE_VLAN_TUNNEL_MAX - 1)
 
-static inline int br_vlan_get_info(const struct net_device *dev, u16 vid,
-				   struct bridge_vlan_info *p_vinfo)
-{
-	return -EINVAL;
-}
-#endif
+struct bridge_vlan_xstats {
+	__u64 rx_bytes;
+	__u64 rx_packets;
+	__u64 tx_bytes;
+	__u64 tx_packets;
+	__u16 vid;
+	__u16 flags;
+	__u32 pad2;
+};
 
-#if IS_ENABLED(CONFIG_BRIDGE)
-struct net_device *br_fdb_find_port(const struct net_device *br_dev,
-				    const unsigned char *addr,
-				    __u16 vid);
-void br_fdb_clear_offload(const struct net_device *dev, u16 vid);
-bool br_port_flag_is_set(const struct net_device *dev, unsigned long flag);
-#else
-static inline struct net_device *
-br_fdb_find_port(const struct net_device *br_dev,
-		 const unsigned char *addr,
-		 __u16 vid)
-{
-	return NULL;
-}
+struct bridge_stp_xstats {
+	__u64 transition_blk;
+	__u64 transition_fwd;
+	__u64 rx_bpdu;
+	__u64 tx_bpdu;
+	__u64 rx_tcn;
+	__u64 tx_tcn;
+};
 
-static inline void br_fdb_clear_offload(const struct net_device *dev, u16 vid)
-{
-}
+/* Bridge vlan RTM header */
+struct br_vlan_msg {
+	__u8 family;
+	__u8 reserved1;
+	__u16 reserved2;
+	__u32 ifindex;
+};
 
-static inline bool
-br_port_flag_is_set(const struct net_device *dev, unsigned long flag)
-{
-	return false;
-}
-#endif
+enum {
+	BRIDGE_VLANDB_DUMP_UNSPEC,
+	BRIDGE_VLANDB_DUMP_FLAGS,
+	__BRIDGE_VLANDB_DUMP_MAX,
+};
+#define BRIDGE_VLANDB_DUMP_MAX (__BRIDGE_VLANDB_DUMP_MAX - 1)
 
-#endif
+/* flags used in BRIDGE_VLANDB_DUMP_FLAGS attribute to affect dumps */
+#define BRIDGE_VLANDB_DUMPF_STATS	(1 << 0) /* Include stats in the dump */
+
+/* Bridge vlan RTM attributes
+ * [BRIDGE_VLANDB_ENTRY] = {
+ *     [BRIDGE_VLANDB_ENTRY_INFO]
+ *     ...
+ * }
+ */
+enum {
+	BRIDGE_VLANDB_UNSPEC,
+	BRIDGE_VLANDB_ENTRY,
+	__BRIDGE_VLANDB_MAX,
+};
+#define BRIDGE_VLANDB_MAX (__BRIDGE_VLANDB_MAX - 1)
+
+enum {
+	BRIDGE_VLANDB_ENTRY_UNSPEC,
+	BRIDGE_VLANDB_ENTRY_INFO,
+	BRIDGE_VLANDB_ENTRY_RANGE,
+	BRIDGE_VLANDB_ENTRY_STATE,
+	BRIDGE_VLANDB_ENTRY_TUNNEL_INFO,
+	BRIDGE_VLANDB_ENTRY_STATS,
+	__BRIDGE_VLANDB_ENTRY_MAX,
+};
+#define BRIDGE_VLANDB_ENTRY_MAX (__BRIDGE_VLANDB_ENTRY_MAX - 1)
+
+/* [BRIDGE_VLANDB_ENTRY] = {
+ *     [BRIDGE_VLANDB_ENTRY_TUNNEL_INFO] = {
+ *         [BRIDGE_VLANDB_TINFO_ID]
+ *         ...
+ *     }
+ * }
+ */
+enum {
+	BRIDGE_VLANDB_TINFO_UNSPEC,
+	BRIDGE_VLANDB_TINFO_ID,
+	BRIDGE_VLANDB_TINFO_CMD,
+	__BRIDGE_VLANDB_TINFO_MAX,
+};
+#define BRIDGE_VLANDB_TINFO_MAX (__BRIDGE_VLANDB_TINFO_MAX - 1)
+
+/* [BRIDGE_VLANDB_ENTRY] = {
+ *     [BRIDGE_VLANDB_ENTRY_STATS] = {
+ *         [BRIDGE_VLANDB_STATS_RX_BYTES]
+ *         ...
+ *     }
+ *     ...
+ * }
+ */
+enum {
+	BRIDGE_VLANDB_STATS_UNSPEC,
+	BRIDGE_VLANDB_STATS_RX_BYTES,
+	BRIDGE_VLANDB_STATS_RX_PACKETS,
+	BRIDGE_VLANDB_STATS_TX_BYTES,
+	BRIDGE_VLANDB_STATS_TX_PACKETS,
+	BRIDGE_VLANDB_STATS_PAD,
+	__BRIDGE_VLANDB_STATS_MAX,
+};
+#define BRIDGE_VLANDB_STATS_MAX (__BRIDGE_VLANDB_STATS_MAX - 1)
+
+/* Bridge multicast database attributes
+ * [MDBA_MDB] = {
+ *     [MDBA_MDB_ENTRY] = {
+ *         [MDBA_MDB_ENTRY_INFO] {
+ *		struct br_mdb_entry
+ *		[MDBA_MDB_EATTR attributes]
+ *         }
+ *     }
+ * }
+ * [MDBA_ROUTER] = {
+ *    [MDBA_ROUTER_PORT] = {
+ *        u32 ifindex
+ *        [MDBA_ROUTER_PATTR attributes]
+ *    }
+ * }
+ */
+enum {
+	MDBA_UNSPEC,
+	MDBA_MDB,
+	MDBA_ROUTER,
+	__MDBA_MAX,
+};
+#define MDBA_MAX (__MDBA_MAX - 1)
+
+enum {
+	MDBA_MDB_UNSPEC,
+	MDBA_MDB_ENTRY,
+	__MDBA_MDB_MAX,
+};
+#define MDBA_MDB_MAX (__MDBA_MDB_MAX - 1)
+
+enum {
+	MDBA_MDB_ENTRY_UNSPEC,
+	MDBA_MDB_ENTRY_INFO,
+	__MDBA_MDB_ENTRY_MAX,
+};
+#define MDBA_MDB_ENTRY_MAX (__MDBA_MDB_ENTRY_MAX - 1)
+
+/* per mdb entry additional attributes */
+enum {
+	MDBA_MDB_EATTR_UNSPEC,
+	MDBA_MDB_EATTR_TIMER,
+	__MDBA_MDB_EATTR_MAX
+};
+#define MDBA_MDB_EATTR_MAX (__MDBA_MDB_EATTR_MAX - 1)
+
+/* multicast router types */
+enum {
+	MDB_RTR_TYPE_DISABLED,
+	MDB_RTR_TYPE_TEMP_QUERY,
+	MDB_RTR_TYPE_PERM,
+	MDB_RTR_TYPE_TEMP
+};
+
+enum {
+	MDBA_ROUTER_UNSPEC,
+	MDBA_ROUTER_PORT,
+	__MDBA_ROUTER_MAX,
+};
+#define MDBA_ROUTER_MAX (__MDBA_ROUTER_MAX - 1)
+
+/* router port attributes */
+enum {
+	MDBA_ROUTER_PATTR_UNSPEC,
+	MDBA_ROUTER_PATTR_TIMER,
+	MDBA_ROUTER_PATTR_TYPE,
+	__MDBA_ROUTER_PATTR_MAX
+};
+#define MDBA_ROUTER_PATTR_MAX (__MDBA_ROUTER_PATTR_MAX - 1)
+
+struct br_port_msg {
+	__u8  family;
+	__u32 ifindex;
+};
+
+struct br_mdb_entry {
+	__u32 ifindex;
+#define MDB_TEMPORARY 0
+#define MDB_PERMANENT 1
+	__u8 state;
+#define MDB_FLAGS_OFFLOAD	(1 << 0)
+#define MDB_FLAGS_FAST_LEAVE	(1 << 1)
+	__u8 flags;
+	__u16 vid;
+	struct {
+		union {
+			__be32	ip4;
+			struct in6_addr ip6;
+		} u;
+		__be16		proto;
+	} addr;
+};
+
+enum {
+	MDBA_SET_ENTRY_UNSPEC,
+	MDBA_SET_ENTRY,
+	__MDBA_SET_ENTRY_MAX,
+};
+#define MDBA_SET_ENTRY_MAX (__MDBA_SET_ENTRY_MAX - 1)
+
+/* Embedded inside LINK_XSTATS_TYPE_BRIDGE */
+enum {
+	BRIDGE_XSTATS_UNSPEC,
+	BRIDGE_XSTATS_VLAN,
+	BRIDGE_XSTATS_MCAST,
+	BRIDGE_XSTATS_PAD,
+	BRIDGE_XSTATS_STP,
+	__BRIDGE_XSTATS_MAX
+};
+#define BRIDGE_XSTATS_MAX (__BRIDGE_XSTATS_MAX - 1)
+
+enum {
+	BR_MCAST_DIR_RX,
+	BR_MCAST_DIR_TX,
+	BR_MCAST_DIR_SIZE
+};
+
+/* IGMP/MLD statistics */
+struct br_mcast_stats {
+	__u64 igmp_v1queries[BR_MCAST_DIR_SIZE];
+	__u64 igmp_v2queries[BR_MCAST_DIR_SIZE];
+	__u64 igmp_v3queries[BR_MCAST_DIR_SIZE];
+	__u64 igmp_leaves[BR_MCAST_DIR_SIZE];
+	__u64 igmp_v1reports[BR_MCAST_DIR_SIZE];
+	__u64 igmp_v2reports[BR_MCAST_DIR_SIZE];
+	__u64 igmp_v3reports[BR_MCAST_DIR_SIZE];
+	__u64 igmp_parse_errors;
+
+	__u64 mld_v1queries[BR_MCAST_DIR_SIZE];
+	__u64 mld_v2queries[BR_MCAST_DIR_SIZE];
+	__u64 mld_leaves[BR_MCAST_DIR_SIZE];
+	__u64 mld_v1reports[BR_MCAST_DIR_SIZE];
+	__u64 mld_v2reports[BR_MCAST_DIR_SIZE];
+	__u64 mld_parse_errors;
+
+	__u64 mcast_bytes[BR_MCAST_DIR_SIZE];
+	__u64 mcast_packets[BR_MCAST_DIR_SIZE];
+};
+
+/* bridge boolean options
+ * BR_BOOLOPT_NO_LL_LEARN - disable learning from link-local packets
+ *
+ * IMPORTANT: if adding a new option do not forget to handle
+ *            it in br_boolopt_toggle/get and bridge sysfs
+ */
+enum br_boolopt_id {
+	BR_BOOLOPT_NO_LL_LEARN,
+	BR_BOOLOPT_MAX
+};
+
+/* struct br_boolopt_multi - change multiple bridge boolean options
+ *
+ * @optval: new option values (bit per option)
+ * @optmask: options to change (bit per option)
+ */
+struct br_boolopt_multi {
+	__u32 optval;
+	__u32 optmask;
+};
+#endif /* _LINUX_IF_BRIDGE_H */

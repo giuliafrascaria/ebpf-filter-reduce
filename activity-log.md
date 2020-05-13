@@ -1,9 +1,19 @@
 ## activity log
 
+### 13/5/2020
+- tried to fix new compilation setup
+- had to modify the test_attr__enabled macro in perf-sys
+- still missing the asm/types.h in the compilation
+- collected traces from samples compilation in the kernel to have all the includes
+
 ### 12/5/2020
 - had to undo some stuff cause the new build didn't work
 - currently working, I am rebuilding new infrastructure on new kernel although rc5 is already there, but shouldn't change much
 - doing scripting for automated rebuild of bpf headers as needed
+
+### 7/5/2020
+- weekly meeting, I need to both dig in the reasons why override return doesn't work and test the new one
+- try to be ready for next week's bpf office hour
 
 ### 6/5/2020
 - got an answer from the mailing list, very obscure so idk

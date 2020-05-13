@@ -1,82 +1,73 @@
-// SPDX-License-Identifier: GPL-2.0
-// Copyright (C) 2017 Arm Ltd.
-#ifndef __LINUX_ARM_SDEI_H
-#define __LINUX_ARM_SDEI_H
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+/* Copyright (C) 2017 Arm Ltd. */
+#ifndef _LINUX_ARM_SDEI_H
+#define _LINUX_ARM_SDEI_H
 
-#include <uapi/linux/arm_sdei.h>
+#define SDEI_1_0_FN_BASE			0xC4000020
+#define SDEI_1_0_MASK				0xFFFFFFE0
+#define SDEI_1_0_FN(n)				(SDEI_1_0_FN_BASE + (n))
 
-#include <acpi/ghes.h>
+#define SDEI_1_0_FN_SDEI_VERSION			SDEI_1_0_FN(0x00)
+#define SDEI_1_0_FN_SDEI_EVENT_REGISTER			SDEI_1_0_FN(0x01)
+#define SDEI_1_0_FN_SDEI_EVENT_ENABLE			SDEI_1_0_FN(0x02)
+#define SDEI_1_0_FN_SDEI_EVENT_DISABLE			SDEI_1_0_FN(0x03)
+#define SDEI_1_0_FN_SDEI_EVENT_CONTEXT			SDEI_1_0_FN(0x04)
+#define SDEI_1_0_FN_SDEI_EVENT_COMPLETE			SDEI_1_0_FN(0x05)
+#define SDEI_1_0_FN_SDEI_EVENT_COMPLETE_AND_RESUME	SDEI_1_0_FN(0x06)
+#define SDEI_1_0_FN_SDEI_EVENT_UNREGISTER		SDEI_1_0_FN(0x07)
+#define SDEI_1_0_FN_SDEI_EVENT_STATUS			SDEI_1_0_FN(0x08)
+#define SDEI_1_0_FN_SDEI_EVENT_GET_INFO			SDEI_1_0_FN(0x09)
+#define SDEI_1_0_FN_SDEI_EVENT_ROUTING_SET		SDEI_1_0_FN(0x0A)
+#define SDEI_1_0_FN_SDEI_PE_MASK			SDEI_1_0_FN(0x0B)
+#define SDEI_1_0_FN_SDEI_PE_UNMASK			SDEI_1_0_FN(0x0C)
+#define SDEI_1_0_FN_SDEI_INTERRUPT_BIND			SDEI_1_0_FN(0x0D)
+#define SDEI_1_0_FN_SDEI_INTERRUPT_RELEASE		SDEI_1_0_FN(0x0E)
+#define SDEI_1_0_FN_SDEI_PRIVATE_RESET			SDEI_1_0_FN(0x11)
+#define SDEI_1_0_FN_SDEI_SHARED_RESET			SDEI_1_0_FN(0x12)
 
-#ifdef CONFIG_ARM_SDE_INTERFACE
-#include <asm/sdei.h>
-#endif
+#define SDEI_VERSION_MAJOR_SHIFT			48
+#define SDEI_VERSION_MAJOR_MASK				0x7fff
+#define SDEI_VERSION_MINOR_SHIFT			32
+#define SDEI_VERSION_MINOR_MASK				0xffff
+#define SDEI_VERSION_VENDOR_SHIFT			0
+#define SDEI_VERSION_VENDOR_MASK			0xffffffff
 
-/* Arch code should override this to set the entry point from firmware... */
-#ifndef sdei_arch_get_entry_point
-#define sdei_arch_get_entry_point(conduit)	(0)
-#endif
+#define SDEI_VERSION_MAJOR(x)	(x>>SDEI_VERSION_MAJOR_SHIFT & SDEI_VERSION_MAJOR_MASK)
+#define SDEI_VERSION_MINOR(x)	(x>>SDEI_VERSION_MINOR_SHIFT & SDEI_VERSION_MINOR_MASK)
+#define SDEI_VERSION_VENDOR(x)	(x>>SDEI_VERSION_VENDOR_SHIFT & SDEI_VERSION_VENDOR_MASK)
 
-/*
- * When an event occurs sdei_event_handler() will call a user-provided callback
- * like this in NMI context on the CPU that received the event.
- */
-typedef int (sdei_event_callback)(u32 event, struct pt_regs *regs, void *arg);
+/* SDEI return values */
+#define SDEI_SUCCESS		0
+#define SDEI_NOT_SUPPORTED	-1
+#define SDEI_INVALID_PARAMETERS	-2
+#define SDEI_DENIED		-3
+#define SDEI_PENDING		-5
+#define SDEI_OUT_OF_RESOURCE	-10
 
-/*
- * Register your callback to claim an event. The event must be described
- * by firmware.
- */
-int sdei_event_register(u32 event_num, sdei_event_callback *cb, void *arg);
+/* EVENT_REGISTER flags */
+#define SDEI_EVENT_REGISTER_RM_ANY	0
+#define SDEI_EVENT_REGISTER_RM_PE	1
 
-/*
- * Calls to sdei_event_unregister() may return EINPROGRESS. Keep calling
- * it until it succeeds.
- */
-int sdei_event_unregister(u32 event_num);
+/* EVENT_STATUS return value bits */
+#define SDEI_EVENT_STATUS_RUNNING	2
+#define SDEI_EVENT_STATUS_ENABLED	1
+#define SDEI_EVENT_STATUS_REGISTERED	0
 
-int sdei_event_enable(u32 event_num);
-int sdei_event_disable(u32 event_num);
+/* EVENT_COMPLETE status values */
+#define SDEI_EV_HANDLED	0
+#define SDEI_EV_FAILED	1
 
-/* GHES register/unregister helpers */
-int sdei_register_ghes(struct ghes *ghes, sdei_event_callback *normal_cb,
-		       sdei_event_callback *critical_cb);
-int sdei_unregister_ghes(struct ghes *ghes);
+/* GET_INFO values */
+#define SDEI_EVENT_INFO_EV_TYPE			0
+#define SDEI_EVENT_INFO_EV_SIGNALED		1
+#define SDEI_EVENT_INFO_EV_PRIORITY		2
+#define SDEI_EVENT_INFO_EV_ROUTING_MODE		3
+#define SDEI_EVENT_INFO_EV_ROUTING_AFF		4
 
-#ifdef CONFIG_ARM_SDE_INTERFACE
-/* For use by arch code when CPU hotplug notifiers are not appropriate. */
-int sdei_mask_local_cpu(void);
-int sdei_unmask_local_cpu(void);
-#else
-static inline int sdei_mask_local_cpu(void) { return 0; }
-static inline int sdei_unmask_local_cpu(void) { return 0; }
-#endif /* CONFIG_ARM_SDE_INTERFACE */
+/* and their results */
+#define SDEI_EVENT_TYPE_PRIVATE			0
+#define SDEI_EVENT_TYPE_SHARED			1
+#define SDEI_EVENT_PRIORITY_NORMAL		0
+#define SDEI_EVENT_PRIORITY_CRITICAL		1
 
-
-/*
- * This struct represents an event that has been registered. The driver
- * maintains a list of all events, and which ones are registered. (Private
- * events have one entry in the list, but are registered on each CPU).
- * A pointer to this struct is passed to firmware, and back to the event
- * handler. The event handler can then use this to invoke the registered
- * callback, without having to walk the list.
- *
- * For CPU private events, this structure is per-cpu.
- */
-struct sdei_registered_event {
-	/* For use by arch code: */
-	struct pt_regs          interrupted_regs;
-
-	sdei_event_callback	*callback;
-	void			*callback_arg;
-	u32			 event_num;
-	u8			 priority;
-};
-
-/* The arch code entry point should then call this when an event arrives. */
-int notrace sdei_event_handler(struct pt_regs *regs,
-			       struct sdei_registered_event *arg);
-
-/* arch code may use this to retrieve the extra registers. */
-int sdei_api_event_context(u32 query, u64 *result);
-
-#endif /* __LINUX_ARM_SDEI_H */
+#endif /* _LINUX_ARM_SDEI_H */

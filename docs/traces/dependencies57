@@ -1,0 +1,43 @@
+set -e;  echo '  CC  samples/bpf//tracex1_user.o'; gcc -Wp,-MD,samples/bpf//.tracex1_user.o.d -Wall -O2 -Wmissing-prototypes -Wstrict-prototypes 
+-I./usr/include 
+-I./tools/testing/selftests/bpf/ 
+-I./tools/lib/ 
+-I./tools/include 
+-I./tools/perf -DHAVE_ATTR_TEST=0  -c -o samples/bpf//tracex1_user.o samples/bpf//tracex1_user.c; 
+scripts/basic/fixdep samples/bpf//.tracex1_user.o.d samples/bpf//tracex1_user.o 
+
+
+
+gcc -Wp,-MD,samples/bpf//.tracex1_user.o.d 
+-Wall -O2 -Wmissing-prototypes -Wstrict-prototypes 
+
+-I./usr/include 
+-I./tools/testing/selftests/bpf/ 
+-I./tools/lib/ 
+-I./tools/include 
+-I./tools/perf -DHAVE_ATTR_TEST=0  
+-c -o samples/bpf//tracex1_user.o samples/bpf//tracex1_user.c' 
+
+
+
+clang  -nostdinc -isystem 
+/usr/lib/gcc/x86_64-linux-gnu/7/include 
+-I./arch/x86/include 
+-I./arch/x86/include/generated  
+-I./include 
+-I./arch/x86/include/uapi 
+-I./arch/x86/include/generated/uapi 
+-I./include/uapi 
+-I./include/generated/uapi 
+-include ./include/linux/kconfig.h -fno-stack-protector \
+-Isamples/bpf/ -I./tools/testing/selftests/bpf/ \
+-I./tools/lib/ \
+-D__KERNEL__ -D__BPF_TRACING__ -Wno-unused-value -Wno-pointer-sign \
+-D__TARGET_ARCH_x86 -Wno-compare-distinct-pointer-types \
+-Wno-gnu-variable-sized-type-not-at-end \
+-Wno-address-of-packed-member -Wno-tautological-compare \
+-Wno-unknown-warning-option  \
+-I./samples/bpf/ -include asm_goto_workaround.h \
+-O2 -emit-llvm -c samples/bpf//tracex1_kern.c -o -| 
+ llc -march=bpf  -filetype=obj 
+-o samples/bpf//tracex1_kern.o

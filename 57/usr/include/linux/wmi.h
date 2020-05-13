@@ -1,55 +1,70 @@
-/* SPDX-License-Identifier: GPL-2.0-only */
+/* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
 /*
- * wmi.h - ACPI WMI interface
+ *  User API methods for ACPI-WMI mapping driver
  *
- * Copyright (c) 2015 Andrew Lutomirski
+ *  Copyright (C) 2017 Dell, Inc.
  */
-
 #ifndef _LINUX_WMI_H
 #define _LINUX_WMI_H
 
-#include <linux/device.h>
-#include <linux/acpi.h>
-#include <linux/mod_devicetable.h>
-#include <uapi/linux/wmi.h>
+#include <linux/ioctl.h>
+#include <linux/types.h>
 
-struct wmi_device {
-	struct device dev;
+/* WMI bus will filter all WMI vendor driver requests through this IOC */
+#define WMI_IOC 'W'
 
-	 /* True for data blocks implementing the Set Control Method */
-	bool setable;
+/* All ioctl requests through WMI should declare their size followed by
+ * relevant data objects
+ */
+struct wmi_ioctl_buffer {
+	__u64	length;
+	__u8	data[];
 };
 
-/* evaluate the ACPI method associated with this device */
-extern acpi_status wmidev_evaluate_method(struct wmi_device *wdev,
-					  u8 instance, u32 method_id,
-					  const struct acpi_buffer *in,
-					  struct acpi_buffer *out);
+/* This structure may be modified by the firmware when we enter
+ * system management mode through SMM, hence the volatiles
+ */
+struct calling_interface_buffer {
+	__u16 cmd_class;
+	__u16 cmd_select;
+	__volatile__ __u32 input[4];
+	__volatile__ __u32 output[4];
+} __attribute__((packed));
 
-/* Caller must kfree the result. */
-extern union acpi_object *wmidev_block_query(struct wmi_device *wdev,
-					     u8 instance);
+struct dell_wmi_extensions {
+	__u32 argattrib;
+	__u32 blength;
+	__u8 data[];
+} __attribute__((packed));
 
-extern int set_required_buffer_size(struct wmi_device *wdev, u64 length);
+struct dell_wmi_smbios_buffer {
+	__u64 length;
+	struct calling_interface_buffer std;
+	struct dell_wmi_extensions	ext;
+} __attribute__((packed));
 
-struct wmi_driver {
-	struct device_driver driver;
-	const struct wmi_device_id *id_table;
+/* Whitelisted smbios class/select commands */
+#define CLASS_TOKEN_READ	0
+#define CLASS_TOKEN_WRITE	1
+#define SELECT_TOKEN_STD	0
+#define SELECT_TOKEN_BAT	1
+#define SELECT_TOKEN_AC		2
+#define CLASS_FLASH_INTERFACE	7
+#define SELECT_FLASH_INTERFACE	3
+#define CLASS_ADMIN_PROP	10
+#define SELECT_ADMIN_PROP	3
+#define CLASS_INFO		17
+#define SELECT_RFKILL		11
+#define SELECT_APP_REGISTRATION	3
+#define SELECT_DOCK		22
 
-	int (*probe)(struct wmi_device *wdev, const void *context);
-	int (*remove)(struct wmi_device *wdev);
-	void (*notify)(struct wmi_device *device, union acpi_object *data);
-	long (*filter_callback)(struct wmi_device *wdev, unsigned int cmd,
-				struct wmi_ioctl_buffer *arg);
-};
+/* whitelisted tokens */
+#define CAPSULE_EN_TOKEN	0x0461
+#define CAPSULE_DIS_TOKEN	0x0462
+#define WSMT_EN_TOKEN		0x04EC
+#define WSMT_DIS_TOKEN		0x04ED
 
-extern int __must_check __wmi_driver_register(struct wmi_driver *driver,
-					      struct module *owner);
-extern void wmi_driver_unregister(struct wmi_driver *driver);
-#define wmi_driver_register(driver) __wmi_driver_register((driver), THIS_MODULE)
-
-#define module_wmi_driver(__wmi_driver) \
-	module_driver(__wmi_driver, wmi_driver_register, \
-		      wmi_driver_unregister)
+/* Dell SMBIOS calling IOCTL command used by dell-smbios-wmi */
+#define DELL_WMI_SMBIOS_CMD	_IOWR(WMI_IOC, 0, struct dell_wmi_smbios_buffer)
 
 #endif

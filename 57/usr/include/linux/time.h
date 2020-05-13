@@ -1,116 +1,73 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 #ifndef _LINUX_TIME_H
 #define _LINUX_TIME_H
 
-# include <linux/cache.h>
-# include <linux/seqlock.h>
-# include <linux/math64.h>
-# include <linux/time64.h>
+#include <linux/types.h>
+#include <linux/time_types.h>
 
-extern struct timezone sys_tz;
-
-int get_timespec64(struct timespec64 *ts,
-		const struct __kernel_timespec __user *uts);
-int put_timespec64(const struct timespec64 *ts,
-		struct __kernel_timespec __user *uts);
-int get_itimerspec64(struct itimerspec64 *it,
-			const struct __kernel_itimerspec __user *uit);
-int put_itimerspec64(const struct itimerspec64 *it,
-			struct __kernel_itimerspec __user *uit);
-
-extern time64_t mktime64(const unsigned int year, const unsigned int mon,
-			const unsigned int day, const unsigned int hour,
-			const unsigned int min, const unsigned int sec);
-
-/* Some architectures do not supply their own clocksource.
- * This is mainly the case in architectures that get their
- * inter-tick times by reading the counter on their interval
- * timer. Since these timers wrap every tick, they're not really
- * useful as clocksources. Wrapping them to act like one is possible
- * but not very efficient. So we provide a callout these arches
- * can implement for use with the jiffies clocksource to provide
- * finer then tick granular time.
- */
-#ifdef CONFIG_ARCH_USES_GETTIMEOFFSET
-extern u32 (*arch_gettimeoffset)(void);
+#ifndef _STRUCT_TIMESPEC
+#define _STRUCT_TIMESPEC
+struct timespec {
+	__kernel_old_time_t	tv_sec;		/* seconds */
+	long			tv_nsec;	/* nanoseconds */
+};
 #endif
 
-#ifdef CONFIG_POSIX_TIMERS
-extern void clear_itimer(void);
-#else
-static inline void clear_itimer(void) {}
-#endif
-
-extern long do_utimes(int dfd, const char __user *filename, struct timespec64 *times, int flags);
-
-/*
- * Similar to the struct tm in userspace <time.h>, but it needs to be here so
- * that the kernel source is self contained.
- */
-struct tm {
-	/*
-	 * the number of seconds after the minute, normally in the range
-	 * 0 to 59, but can be up to 60 to allow for leap seconds
-	 */
-	int tm_sec;
-	/* the number of minutes after the hour, in the range 0 to 59*/
-	int tm_min;
-	/* the number of hours past midnight, in the range 0 to 23 */
-	int tm_hour;
-	/* the day of the month, in the range 1 to 31 */
-	int tm_mday;
-	/* the number of months since January, in the range 0 to 11 */
-	int tm_mon;
-	/* the number of years since 1900 */
-	long tm_year;
-	/* the number of days since Sunday, in the range 0 to 6 */
-	int tm_wday;
-	/* the number of days since January 1, in the range 0 to 365 */
-	int tm_yday;
+struct timeval {
+	__kernel_old_time_t	tv_sec;		/* seconds */
+	__kernel_suseconds_t	tv_usec;	/* microseconds */
 };
 
-void time64_to_tm(time64_t totalsecs, int offset, struct tm *result);
+struct itimerspec {
+	struct timespec it_interval;/* timer period */
+	struct timespec it_value;	/* timer expiration */
+};
 
-# include <linux/time32.h>
+struct itimerval {
+	struct timeval it_interval;/* timer interval */
+	struct timeval it_value;	/* current value */
+};
 
-static inline bool itimerspec64_valid(const struct itimerspec64 *its)
-{
-	if (!timespec64_valid(&(its->it_interval)) ||
-		!timespec64_valid(&(its->it_value)))
-		return false;
+struct timezone {
+	int	tz_minuteswest;	/* minutes west of Greenwich */
+	int	tz_dsttime;	/* type of dst correction */
+};
 
-	return true;
-}
-
-/**
- * time_after32 - compare two 32-bit relative times
- * @a:	the time which may be after @b
- * @b:	the time which may be before @a
- *
- * time_after32(a, b) returns true if the time @a is after time @b.
- * time_before32(b, a) returns true if the time @b is before time @a.
- *
- * Similar to time_after(), compare two 32-bit timestamps for relative
- * times.  This is useful for comparing 32-bit seconds values that can't
- * be converted to 64-bit values (e.g. due to disk format or wire protocol
- * issues) when it is known that the times are less than 68 years apart.
+/*
+ * Names of the interval timers, and structure
+ * defining a timer setting:
  */
-#define time_after32(a, b)	((s32)((u32)(b) - (u32)(a)) < 0)
-#define time_before32(b, a)	time_after32(a, b)
+#define	ITIMER_REAL		0
+#define	ITIMER_VIRTUAL		1
+#define	ITIMER_PROF		2
 
-/**
- * time_between32 - check if a 32-bit timestamp is within a given time range
- * @t:	the time which may be within [l,h]
- * @l:	the lower bound of the range
- * @h:	the higher bound of the range
- *
- * time_before32(t, l, h) returns true if @l <= @t <= @h. All operands are
- * treated as 32-bit integers.
- *
- * Equivalent to !(time_before32(@t, @l) || time_after32(@t, @h)).
+/*
+ * The IDs of the various system clocks (for POSIX.1b interval timers):
  */
-#define time_between32(t, l, h) ((u32)(h) - (u32)(l) >= (u32)(t) - (u32)(l))
+#define CLOCK_REALTIME			0
+#define CLOCK_MONOTONIC			1
+#define CLOCK_PROCESS_CPUTIME_ID	2
+#define CLOCK_THREAD_CPUTIME_ID		3
+#define CLOCK_MONOTONIC_RAW		4
+#define CLOCK_REALTIME_COARSE		5
+#define CLOCK_MONOTONIC_COARSE		6
+#define CLOCK_BOOTTIME			7
+#define CLOCK_REALTIME_ALARM		8
+#define CLOCK_BOOTTIME_ALARM		9
+/*
+ * The driver implementing this got removed. The clock ID is kept as a
+ * place holder. Do not reuse!
+ */
+#define CLOCK_SGI_CYCLE			10
+#define CLOCK_TAI			11
 
-# include <vdso/time.h>
+#define MAX_CLOCKS			16
+#define CLOCKS_MASK			(CLOCK_REALTIME | CLOCK_MONOTONIC)
+#define CLOCKS_MONO			CLOCK_MONOTONIC
 
-#endif
+/*
+ * The various flags for setting POSIX.1b interval timers:
+ */
+#define TIMER_ABSTIME			0x01
+
+#endif /* _LINUX_TIME_H */

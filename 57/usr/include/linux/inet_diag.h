@@ -1,82 +1,218 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 #ifndef _INET_DIAG_H_
-#define _INET_DIAG_H_ 1
+#define _INET_DIAG_H_
 
-#include <net/netlink.h>
-#include <uapi/linux/inet_diag.h>
+#include <linux/types.h>
 
-struct inet_hashinfo;
+/* Just some random number */
+#define TCPDIAG_GETSOCK 18
+#define DCCPDIAG_GETSOCK 19
 
-struct inet_diag_handler {
-	void		(*dump)(struct sk_buff *skb,
-				struct netlink_callback *cb,
-				const struct inet_diag_req_v2 *r);
+#define INET_DIAG_GETSOCK_MAX 24
 
-	int		(*dump_one)(struct netlink_callback *cb,
-				    const struct inet_diag_req_v2 *req);
-
-	void		(*idiag_get_info)(struct sock *sk,
-					  struct inet_diag_msg *r,
-					  void *info);
-
-	int		(*idiag_get_aux)(struct sock *sk,
-					 bool net_admin,
-					 struct sk_buff *skb);
-
-	size_t		(*idiag_get_aux_size)(struct sock *sk,
-					      bool net_admin);
-
-	int		(*destroy)(struct sk_buff *in_skb,
-				   const struct inet_diag_req_v2 *req);
-
-	__u16		idiag_type;
-	__u16		idiag_info_size;
+/* Socket identity */
+struct inet_diag_sockid {
+	__be16	idiag_sport;
+	__be16	idiag_dport;
+	__be32	idiag_src[4];
+	__be32	idiag_dst[4];
+	__u32	idiag_if;
+	__u32	idiag_cookie[2];
+#define INET_DIAG_NOCOOKIE (~0U)
 };
 
-struct bpf_sk_storage_diag;
-struct inet_diag_dump_data {
-	struct nlattr *req_nlas[__INET_DIAG_REQ_MAX];
-#define inet_diag_nla_bc req_nlas[INET_DIAG_REQ_BYTECODE]
-#define inet_diag_nla_bpf_stgs req_nlas[INET_DIAG_REQ_SK_BPF_STORAGES]
+/* Request structure */
 
-	struct bpf_sk_storage_diag *bpf_stg_diag;
+struct inet_diag_req {
+	__u8	idiag_family;		/* Family of addresses. */
+	__u8	idiag_src_len;
+	__u8	idiag_dst_len;
+	__u8	idiag_ext;		/* Query extended information */
+
+	struct inet_diag_sockid id;
+
+	__u32	idiag_states;		/* States to dump */
+	__u32	idiag_dbs;		/* Tables to dump (NI) */
 };
 
-struct inet_connection_sock;
-int inet_sk_diag_fill(struct sock *sk, struct inet_connection_sock *icsk,
-		      struct sk_buff *skb, struct netlink_callback *cb,
-		      const struct inet_diag_req_v2 *req,
-		      u16 nlmsg_flags, bool net_admin);
-void inet_diag_dump_icsk(struct inet_hashinfo *h, struct sk_buff *skb,
-			 struct netlink_callback *cb,
-			 const struct inet_diag_req_v2 *r);
-int inet_diag_dump_one_icsk(struct inet_hashinfo *hashinfo,
-			    struct netlink_callback *cb,
-			    const struct inet_diag_req_v2 *req);
+struct inet_diag_req_v2 {
+	__u8	sdiag_family;
+	__u8	sdiag_protocol;
+	__u8	idiag_ext;
+	__u8	pad;
+	__u32	idiag_states;
+	struct inet_diag_sockid id;
+};
 
-struct sock *inet_diag_find_one_icsk(struct net *net,
-				     struct inet_hashinfo *hashinfo,
-				     const struct inet_diag_req_v2 *req);
+/*
+ * SOCK_RAW sockets require the underlied protocol to be
+ * additionally specified so we can use @pad member for
+ * this, but we can't rename it because userspace programs
+ * still may depend on this name. Instead lets use another
+ * structure definition as an alias for struct
+ * @inet_diag_req_v2.
+ */
+struct inet_diag_req_raw {
+	__u8	sdiag_family;
+	__u8	sdiag_protocol;
+	__u8	idiag_ext;
+	__u8	sdiag_raw_protocol;
+	__u32	idiag_states;
+	struct inet_diag_sockid id;
+};
 
-int inet_diag_bc_sk(const struct nlattr *_bc, struct sock *sk);
+enum {
+	INET_DIAG_REQ_NONE,
+	INET_DIAG_REQ_BYTECODE,
+	INET_DIAG_REQ_SK_BPF_STORAGES,
+	__INET_DIAG_REQ_MAX,
+};
 
-void inet_diag_msg_common_fill(struct inet_diag_msg *r, struct sock *sk);
+#define INET_DIAG_REQ_MAX (__INET_DIAG_REQ_MAX - 1)
 
-static inline size_t inet_diag_msg_attrs_size(void)
-{
-	return	  nla_total_size(1)  /* INET_DIAG_SHUTDOWN */
-		+ nla_total_size(1)  /* INET_DIAG_TOS */
-#if IS_ENABLED(CONFIG_IPV6)
-		+ nla_total_size(1)  /* INET_DIAG_TCLASS */
-		+ nla_total_size(1)  /* INET_DIAG_SKV6ONLY */
-#endif
-		+ nla_total_size(4)  /* INET_DIAG_MARK */
-		+ nla_total_size(4); /* INET_DIAG_CLASS_ID */
-}
-int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
-			     struct inet_diag_msg *r, int ext,
-			     struct user_namespace *user_ns, bool net_admin);
+/* Bytecode is sequence of 4 byte commands followed by variable arguments.
+ * All the commands identified by "code" are conditional jumps forward:
+ * to offset cc+"yes" or to offset cc+"no". "yes" is supposed to be
+ * length of the command and its arguments.
+ */
+ 
+struct inet_diag_bc_op {
+	unsigned char	code;
+	unsigned char	yes;
+	unsigned short	no;
+};
 
-extern int  inet_diag_register(const struct inet_diag_handler *handler);
-extern void inet_diag_unregister(const struct inet_diag_handler *handler);
+enum {
+	INET_DIAG_BC_NOP,
+	INET_DIAG_BC_JMP,
+	INET_DIAG_BC_S_GE,
+	INET_DIAG_BC_S_LE,
+	INET_DIAG_BC_D_GE,
+	INET_DIAG_BC_D_LE,
+	INET_DIAG_BC_AUTO,
+	INET_DIAG_BC_S_COND,
+	INET_DIAG_BC_D_COND,
+	INET_DIAG_BC_DEV_COND,   /* u32 ifindex */
+	INET_DIAG_BC_MARK_COND,
+	INET_DIAG_BC_S_EQ,
+	INET_DIAG_BC_D_EQ,
+};
+
+struct inet_diag_hostcond {
+	__u8	family;
+	__u8	prefix_len;
+	int	port;
+	__be32	addr[0];
+};
+
+struct inet_diag_markcond {
+	__u32 mark;
+	__u32 mask;
+};
+
+/* Base info structure. It contains socket identity (addrs/ports/cookie)
+ * and, alas, the information shown by netstat. */
+struct inet_diag_msg {
+	__u8	idiag_family;
+	__u8	idiag_state;
+	__u8	idiag_timer;
+	__u8	idiag_retrans;
+
+	struct inet_diag_sockid id;
+
+	__u32	idiag_expires;
+	__u32	idiag_rqueue;
+	__u32	idiag_wqueue;
+	__u32	idiag_uid;
+	__u32	idiag_inode;
+};
+
+/* Extensions */
+
+enum {
+	INET_DIAG_NONE,
+	INET_DIAG_MEMINFO,
+	INET_DIAG_INFO,
+	INET_DIAG_VEGASINFO,
+	INET_DIAG_CONG,
+	INET_DIAG_TOS,
+	INET_DIAG_TCLASS,
+	INET_DIAG_SKMEMINFO,
+	INET_DIAG_SHUTDOWN,
+
+	/*
+	 * Next extenstions cannot be requested in struct inet_diag_req_v2:
+	 * its field idiag_ext has only 8 bits.
+	 */
+
+	INET_DIAG_DCTCPINFO,	/* request as INET_DIAG_VEGASINFO */
+	INET_DIAG_PROTOCOL,	/* response attribute only */
+	INET_DIAG_SKV6ONLY,
+	INET_DIAG_LOCALS,
+	INET_DIAG_PEERS,
+	INET_DIAG_PAD,
+	INET_DIAG_MARK,		/* only with CAP_NET_ADMIN */
+	INET_DIAG_BBRINFO,	/* request as INET_DIAG_VEGASINFO */
+	INET_DIAG_CLASS_ID,	/* request as INET_DIAG_TCLASS */
+	INET_DIAG_MD5SIG,
+	INET_DIAG_ULP_INFO,
+	INET_DIAG_SK_BPF_STORAGES,
+	__INET_DIAG_MAX,
+};
+
+#define INET_DIAG_MAX (__INET_DIAG_MAX - 1)
+
+enum {
+	INET_ULP_INFO_UNSPEC,
+	INET_ULP_INFO_NAME,
+	INET_ULP_INFO_TLS,
+	INET_ULP_INFO_MPTCP,
+	__INET_ULP_INFO_MAX,
+};
+#define INET_ULP_INFO_MAX (__INET_ULP_INFO_MAX - 1)
+
+/* INET_DIAG_MEM */
+
+struct inet_diag_meminfo {
+	__u32	idiag_rmem;
+	__u32	idiag_wmem;
+	__u32	idiag_fmem;
+	__u32	idiag_tmem;
+};
+
+/* INET_DIAG_VEGASINFO */
+
+struct tcpvegas_info {
+	__u32	tcpv_enabled;
+	__u32	tcpv_rttcnt;
+	__u32	tcpv_rtt;
+	__u32	tcpv_minrtt;
+};
+
+/* INET_DIAG_DCTCPINFO */
+
+struct tcp_dctcp_info {
+	__u16	dctcp_enabled;
+	__u16	dctcp_ce_state;
+	__u32	dctcp_alpha;
+	__u32	dctcp_ab_ecn;
+	__u32	dctcp_ab_tot;
+};
+
+/* INET_DIAG_BBRINFO */
+
+struct tcp_bbr_info {
+	/* u64 bw: max-filtered BW (app throughput) estimate in Byte per sec: */
+	__u32	bbr_bw_lo;		/* lower 32 bits of bw */
+	__u32	bbr_bw_hi;		/* upper 32 bits of bw */
+	__u32	bbr_min_rtt;		/* min-filtered RTT in uSec */
+	__u32	bbr_pacing_gain;	/* pacing gain shifted left 8 bits */
+	__u32	bbr_cwnd_gain;		/* cwnd gain shifted left 8 bits */
+};
+
+union tcp_cc_info {
+	struct tcpvegas_info	vegas;
+	struct tcp_dctcp_info	dctcp;
+	struct tcp_bbr_info	bbr;
+};
 #endif /* _INET_DIAG_H_ */

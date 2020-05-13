@@ -1,265 +1,248 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 #ifndef __LINUX_NETLINK_H
 #define __LINUX_NETLINK_H
 
+#include <linux/kernel.h>
+#include <linux/socket.h> /* for __kernel_sa_family_t */
+#include <linux/types.h>
 
-#include <linux/capability.h>
-#include <linux/skbuff.h>
-#include <linux/export.h>
-#include <net/scm.h>
-#include <uapi/linux/netlink.h>
+#define NETLINK_ROUTE		0	/* Routing/device hook				*/
+#define NETLINK_UNUSED		1	/* Unused number				*/
+#define NETLINK_USERSOCK	2	/* Reserved for user mode socket protocols 	*/
+#define NETLINK_FIREWALL	3	/* Unused number, formerly ip_queue		*/
+#define NETLINK_SOCK_DIAG	4	/* socket monitoring				*/
+#define NETLINK_NFLOG		5	/* netfilter/iptables ULOG */
+#define NETLINK_XFRM		6	/* ipsec */
+#define NETLINK_SELINUX		7	/* SELinux event notifications */
+#define NETLINK_ISCSI		8	/* Open-iSCSI */
+#define NETLINK_AUDIT		9	/* auditing */
+#define NETLINK_FIB_LOOKUP	10	
+#define NETLINK_CONNECTOR	11
+#define NETLINK_NETFILTER	12	/* netfilter subsystem */
+#define NETLINK_IP6_FW		13
+#define NETLINK_DNRTMSG		14	/* DECnet routing messages */
+#define NETLINK_KOBJECT_UEVENT	15	/* Kernel messages to userspace */
+#define NETLINK_GENERIC		16
+/* leave room for NETLINK_DM (DM Events) */
+#define NETLINK_SCSITRANSPORT	18	/* SCSI Transports */
+#define NETLINK_ECRYPTFS	19
+#define NETLINK_RDMA		20
+#define NETLINK_CRYPTO		21	/* Crypto layer */
+#define NETLINK_SMC		22	/* SMC monitoring */
 
-struct net;
+#define NETLINK_INET_DIAG	NETLINK_SOCK_DIAG
 
-static inline struct nlmsghdr *nlmsg_hdr(const struct sk_buff *skb)
-{
-	return (struct nlmsghdr *)skb->data;
-}
+#define MAX_LINKS 32		
 
-enum netlink_skb_flags {
-	NETLINK_SKB_DST		= 0x8,	/* Dst set in sendto or sendmsg */
+struct sockaddr_nl {
+	__kernel_sa_family_t	nl_family;	/* AF_NETLINK	*/
+	unsigned short	nl_pad;		/* zero		*/
+	__u32		nl_pid;		/* port ID	*/
+       	__u32		nl_groups;	/* multicast groups mask */
 };
 
-struct netlink_skb_parms {
-	struct scm_creds	creds;		/* Skb credentials	*/
-	__u32			portid;
-	__u32			dst_group;
-	__u32			flags;
-	struct sock		*sk;
-	bool			nsid_is_set;
-	int			nsid;
+struct nlmsghdr {
+	__u32		nlmsg_len;	/* Length of message including header */
+	__u16		nlmsg_type;	/* Message content */
+	__u16		nlmsg_flags;	/* Additional flags */
+	__u32		nlmsg_seq;	/* Sequence number */
+	__u32		nlmsg_pid;	/* Sending process port ID */
 };
 
-#define NETLINK_CB(skb)		(*(struct netlink_skb_parms*)&((skb)->cb))
-#define NETLINK_CREDS(skb)	(&NETLINK_CB((skb)).creds)
+/* Flags values */
 
+#define NLM_F_REQUEST		0x01	/* It is request message. 	*/
+#define NLM_F_MULTI		0x02	/* Multipart message, terminated by NLMSG_DONE */
+#define NLM_F_ACK		0x04	/* Reply with ack, with zero or error code */
+#define NLM_F_ECHO		0x08	/* Echo this request 		*/
+#define NLM_F_DUMP_INTR		0x10	/* Dump was inconsistent due to sequence change */
+#define NLM_F_DUMP_FILTERED	0x20	/* Dump was filtered as requested */
 
-void netlink_table_grab(void);
-void netlink_table_ungrab(void);
+/* Modifiers to GET request */
+#define NLM_F_ROOT	0x100	/* specify tree	root	*/
+#define NLM_F_MATCH	0x200	/* return all matching	*/
+#define NLM_F_ATOMIC	0x400	/* atomic GET		*/
+#define NLM_F_DUMP	(NLM_F_ROOT|NLM_F_MATCH)
 
-#define NL_CFG_F_NONROOT_RECV	(1 << 0)
-#define NL_CFG_F_NONROOT_SEND	(1 << 1)
+/* Modifiers to NEW request */
+#define NLM_F_REPLACE	0x100	/* Override existing		*/
+#define NLM_F_EXCL	0x200	/* Do not touch, if it exists	*/
+#define NLM_F_CREATE	0x400	/* Create, if it does not exist	*/
+#define NLM_F_APPEND	0x800	/* Add to end of list		*/
 
-/* optional Netlink kernel configuration parameters */
-struct netlink_kernel_cfg {
-	unsigned int	groups;
-	unsigned int	flags;
-	void		(*input)(struct sk_buff *skb);
-	struct mutex	*cb_mutex;
-	int		(*bind)(struct net *net, int group);
-	void		(*unbind)(struct net *net, int group);
-	bool		(*compare)(struct net *net, struct sock *sk);
-};
+/* Modifiers to DELETE request */
+#define NLM_F_NONREC	0x100	/* Do not delete recursively	*/
 
-struct sock *__netlink_kernel_create(struct net *net, int unit,
-					    struct module *module,
-					    struct netlink_kernel_cfg *cfg);
-static inline struct sock *
-netlink_kernel_create(struct net *net, int unit, struct netlink_kernel_cfg *cfg)
-{
-	return __netlink_kernel_create(net, unit, THIS_MODULE, cfg);
-}
-
-/* this can be increased when necessary - don't expose to userland */
-#define NETLINK_MAX_COOKIE_LEN	20
-
-/**
- * struct netlink_ext_ack - netlink extended ACK report struct
- * @_msg: message string to report - don't access directly, use
- *	%NL_SET_ERR_MSG
- * @bad_attr: attribute with error
- * @cookie: cookie data to return to userspace (for success)
- * @cookie_len: actual cookie data length
- */
-struct netlink_ext_ack {
-	const char *_msg;
-	const struct nlattr *bad_attr;
-	u8 cookie[NETLINK_MAX_COOKIE_LEN];
-	u8 cookie_len;
-};
-
-/* Always use this macro, this allows later putting the
- * message into a separate section or such for things
- * like translation or listing all possible messages.
- * Currently string formatting is not supported (due
- * to the lack of an output buffer.)
- */
-#define NL_SET_ERR_MSG(extack, msg) do {		\
-	static const char __msg[] = msg;		\
-	struct netlink_ext_ack *__extack = (extack);	\
-							\
-	if (__extack)					\
-		__extack->_msg = __msg;			\
-} while (0)
-
-#define NL_SET_ERR_MSG_MOD(extack, msg)			\
-	NL_SET_ERR_MSG((extack), KBUILD_MODNAME ": " msg)
-
-#define NL_SET_BAD_ATTR(extack, attr) do {		\
-	if ((extack))					\
-		(extack)->bad_attr = (attr);		\
-} while (0)
-
-#define NL_SET_ERR_MSG_ATTR(extack, attr, msg) do {	\
-	static const char __msg[] = msg;		\
-	struct netlink_ext_ack *__extack = (extack);	\
-							\
-	if (__extack) {					\
-		__extack->_msg = __msg;			\
-		__extack->bad_attr = (attr);		\
-	}						\
-} while (0)
-
-static inline void nl_set_extack_cookie_u64(struct netlink_ext_ack *extack,
-					    u64 cookie)
-{
-	u64 __cookie = cookie;
-
-	if (!extack)
-		return;
-	memcpy(extack->cookie, &__cookie, sizeof(__cookie));
-	extack->cookie_len = sizeof(__cookie);
-}
-
-static inline void nl_set_extack_cookie_u32(struct netlink_ext_ack *extack,
-					    u32 cookie)
-{
-	u32 __cookie = cookie;
-
-	if (!extack)
-		return;
-	memcpy(extack->cookie, &__cookie, sizeof(__cookie));
-	extack->cookie_len = sizeof(__cookie);
-}
-
-void netlink_kernel_release(struct sock *sk);
-int __netlink_change_ngroups(struct sock *sk, unsigned int groups);
-int netlink_change_ngroups(struct sock *sk, unsigned int groups);
-void __netlink_clear_multicast_users(struct sock *sk, unsigned int group);
-void netlink_ack(struct sk_buff *in_skb, struct nlmsghdr *nlh, int err,
-		 const struct netlink_ext_ack *extack);
-int netlink_has_listeners(struct sock *sk, unsigned int group);
-bool netlink_strict_get_check(struct sk_buff *skb);
-
-int netlink_unicast(struct sock *ssk, struct sk_buff *skb, __u32 portid, int nonblock);
-int netlink_broadcast(struct sock *ssk, struct sk_buff *skb, __u32 portid,
-		      __u32 group, gfp_t allocation);
-int netlink_broadcast_filtered(struct sock *ssk, struct sk_buff *skb,
-			       __u32 portid, __u32 group, gfp_t allocation,
-			       int (*filter)(struct sock *dsk, struct sk_buff *skb, void *data),
-			       void *filter_data);
-int netlink_set_err(struct sock *ssk, __u32 portid, __u32 group, int code);
-int netlink_register_notifier(struct notifier_block *nb);
-int netlink_unregister_notifier(struct notifier_block *nb);
-
-/* finegrained unicast helpers: */
-struct sock *netlink_getsockbyfilp(struct file *filp);
-int netlink_attachskb(struct sock *sk, struct sk_buff *skb,
-		      long *timeo, struct sock *ssk);
-void netlink_detachskb(struct sock *sk, struct sk_buff *skb);
-int netlink_sendskb(struct sock *sk, struct sk_buff *skb);
-
-static inline struct sk_buff *
-netlink_skb_clone(struct sk_buff *skb, gfp_t gfp_mask)
-{
-	struct sk_buff *nskb;
-
-	nskb = skb_clone(skb, gfp_mask);
-	if (!nskb)
-		return NULL;
-
-	/* This is a large skb, set destructor callback to release head */
-	if (is_vmalloc_addr(skb->head))
-		nskb->destructor = skb->destructor;
-
-	return nskb;
-}
+/* Flags for ACK message */
+#define NLM_F_CAPPED	0x100	/* request was capped */
+#define NLM_F_ACK_TLVS	0x200	/* extended ACK TVLs were included */
 
 /*
- *	skb should fit one page. This choice is good for headerless malloc.
- *	But we should limit to 8K so that userspace does not have to
- *	use enormous buffer sizes on recvmsg() calls just to avoid
- *	MSG_TRUNC when PAGE_SIZE is very large.
+   4.4BSD ADD		NLM_F_CREATE|NLM_F_EXCL
+   4.4BSD CHANGE	NLM_F_REPLACE
+
+   True CHANGE		NLM_F_CREATE|NLM_F_REPLACE
+   Append		NLM_F_CREATE
+   Check		NLM_F_EXCL
  */
-#if PAGE_SIZE < 8192UL
-#define NLMSG_GOODSIZE	SKB_WITH_OVERHEAD(PAGE_SIZE)
-#else
-#define NLMSG_GOODSIZE	SKB_WITH_OVERHEAD(8192UL)
-#endif
 
-#define NLMSG_DEFAULT_SIZE (NLMSG_GOODSIZE - NLMSG_HDRLEN)
+#define NLMSG_ALIGNTO	4U
+#define NLMSG_ALIGN(len) ( ((len)+NLMSG_ALIGNTO-1) & ~(NLMSG_ALIGNTO-1) )
+#define NLMSG_HDRLEN	 ((int) NLMSG_ALIGN(sizeof(struct nlmsghdr)))
+#define NLMSG_LENGTH(len) ((len) + NLMSG_HDRLEN)
+#define NLMSG_SPACE(len) NLMSG_ALIGN(NLMSG_LENGTH(len))
+#define NLMSG_DATA(nlh)  ((void*)(((char*)nlh) + NLMSG_LENGTH(0)))
+#define NLMSG_NEXT(nlh,len)	 ((len) -= NLMSG_ALIGN((nlh)->nlmsg_len), \
+				  (struct nlmsghdr*)(((char*)(nlh)) + NLMSG_ALIGN((nlh)->nlmsg_len)))
+#define NLMSG_OK(nlh,len) ((len) >= (int)sizeof(struct nlmsghdr) && \
+			   (nlh)->nlmsg_len >= sizeof(struct nlmsghdr) && \
+			   (nlh)->nlmsg_len <= (len))
+#define NLMSG_PAYLOAD(nlh,len) ((nlh)->nlmsg_len - NLMSG_SPACE((len)))
 
+#define NLMSG_NOOP		0x1	/* Nothing.		*/
+#define NLMSG_ERROR		0x2	/* Error		*/
+#define NLMSG_DONE		0x3	/* End of a dump	*/
+#define NLMSG_OVERRUN		0x4	/* Data lost		*/
 
-struct netlink_callback {
-	struct sk_buff		*skb;
-	const struct nlmsghdr	*nlh;
-	int			(*dump)(struct sk_buff * skb,
-					struct netlink_callback *cb);
-	int			(*done)(struct netlink_callback *cb);
-	void			*data;
-	/* the module that dump function belong to */
-	struct module		*module;
-	struct netlink_ext_ack	*extack;
-	u16			family;
-	u16			answer_flags;
-	u32			min_dump_alloc;
-	unsigned int		prev_seq, seq;
-	bool			strict_check;
-	union {
-		u8		ctx[48];
+#define NLMSG_MIN_TYPE		0x10	/* < 0x10: reserved control messages */
 
-		/* args is deprecated. Cast a struct over ctx instead
-		 * for proper type safety.
-		 */
-		long		args[6];
-	};
+struct nlmsgerr {
+	int		error;
+	struct nlmsghdr msg;
+	/*
+	 * followed by the message contents unless NETLINK_CAP_ACK was set
+	 * or the ACK indicates success (error == 0)
+	 * message length is aligned with NLMSG_ALIGN()
+	 */
+	/*
+	 * followed by TLVs defined in enum nlmsgerr_attrs
+	 * if NETLINK_EXT_ACK was set
+	 */
 };
 
-struct netlink_notify {
-	struct net *net;
-	u32 portid;
-	int protocol;
+/**
+ * enum nlmsgerr_attrs - nlmsgerr attributes
+ * @NLMSGERR_ATTR_UNUSED: unused
+ * @NLMSGERR_ATTR_MSG: error message string (string)
+ * @NLMSGERR_ATTR_OFFS: offset of the invalid attribute in the original
+ *	 message, counting from the beginning of the header (u32)
+ * @NLMSGERR_ATTR_COOKIE: arbitrary subsystem specific cookie to
+ *	be used - in the success case - to identify a created
+ *	object or operation or similar (binary)
+ * @__NLMSGERR_ATTR_MAX: number of attributes
+ * @NLMSGERR_ATTR_MAX: highest attribute number
+ */
+enum nlmsgerr_attrs {
+	NLMSGERR_ATTR_UNUSED,
+	NLMSGERR_ATTR_MSG,
+	NLMSGERR_ATTR_OFFS,
+	NLMSGERR_ATTR_COOKIE,
+
+	__NLMSGERR_ATTR_MAX,
+	NLMSGERR_ATTR_MAX = __NLMSGERR_ATTR_MAX - 1
 };
 
-struct nlmsghdr *
-__nlmsg_put(struct sk_buff *skb, u32 portid, u32 seq, int type, int len, int flags);
+#define NETLINK_ADD_MEMBERSHIP		1
+#define NETLINK_DROP_MEMBERSHIP		2
+#define NETLINK_PKTINFO			3
+#define NETLINK_BROADCAST_ERROR		4
+#define NETLINK_NO_ENOBUFS		5
+#define NETLINK_RX_RING			6
+#define NETLINK_TX_RING			7
+#define NETLINK_LISTEN_ALL_NSID		8
+#define NETLINK_LIST_MEMBERSHIPS	9
+#define NETLINK_CAP_ACK			10
+#define NETLINK_EXT_ACK			11
+#define NETLINK_GET_STRICT_CHK		12
 
-struct netlink_dump_control {
-	int (*start)(struct netlink_callback *);
-	int (*dump)(struct sk_buff *skb, struct netlink_callback *);
-	int (*done)(struct netlink_callback *);
-	void *data;
-	struct module *module;
-	u16 min_dump_alloc;
+struct nl_pktinfo {
+	__u32	group;
 };
 
-int __netlink_dump_start(struct sock *ssk, struct sk_buff *skb,
-				const struct nlmsghdr *nlh,
-				struct netlink_dump_control *control);
-static inline int netlink_dump_start(struct sock *ssk, struct sk_buff *skb,
-				     const struct nlmsghdr *nlh,
-				     struct netlink_dump_control *control)
-{
-	if (!control->module)
-		control->module = THIS_MODULE;
-
-	return __netlink_dump_start(ssk, skb, nlh, control);
-}
-
-struct netlink_tap {
-	struct net_device *dev;
-	struct module *module;
-	struct list_head list;
+struct nl_mmap_req {
+	unsigned int	nm_block_size;
+	unsigned int	nm_block_nr;
+	unsigned int	nm_frame_size;
+	unsigned int	nm_frame_nr;
 };
 
-int netlink_add_tap(struct netlink_tap *nt);
-int netlink_remove_tap(struct netlink_tap *nt);
+struct nl_mmap_hdr {
+	unsigned int	nm_status;
+	unsigned int	nm_len;
+	__u32		nm_group;
+	/* credentials */
+	__u32		nm_pid;
+	__u32		nm_uid;
+	__u32		nm_gid;
+};
 
-bool __netlink_ns_capable(const struct netlink_skb_parms *nsp,
-			  struct user_namespace *ns, int cap);
-bool netlink_ns_capable(const struct sk_buff *skb,
-			struct user_namespace *ns, int cap);
-bool netlink_capable(const struct sk_buff *skb, int cap);
-bool netlink_net_capable(const struct sk_buff *skb, int cap);
+enum nl_mmap_status {
+	NL_MMAP_STATUS_UNUSED,
+	NL_MMAP_STATUS_RESERVED,
+	NL_MMAP_STATUS_VALID,
+	NL_MMAP_STATUS_COPY,
+	NL_MMAP_STATUS_SKIP,
+};
 
-#endif	/* __LINUX_NETLINK_H */
+#define NL_MMAP_MSG_ALIGNMENT		NLMSG_ALIGNTO
+#define NL_MMAP_MSG_ALIGN(sz)		__ALIGN_KERNEL(sz, NL_MMAP_MSG_ALIGNMENT)
+#define NL_MMAP_HDRLEN			NL_MMAP_MSG_ALIGN(sizeof(struct nl_mmap_hdr))
+
+#define NET_MAJOR 36		/* Major 36 is reserved for networking 						*/
+
+enum {
+	NETLINK_UNCONNECTED = 0,
+	NETLINK_CONNECTED,
+};
+
+/*
+ *  <------- NLA_HDRLEN ------> <-- NLA_ALIGN(payload)-->
+ * +---------------------+- - -+- - - - - - - - - -+- - -+
+ * |        Header       | Pad |     Payload       | Pad |
+ * |   (struct nlattr)   | ing |                   | ing |
+ * +---------------------+- - -+- - - - - - - - - -+- - -+
+ *  <-------------- nlattr->nla_len -------------->
+ */
+
+struct nlattr {
+	__u16           nla_len;
+	__u16           nla_type;
+};
+
+/*
+ * nla_type (16 bits)
+ * +---+---+-------------------------------+
+ * | N | O | Attribute Type                |
+ * +---+---+-------------------------------+
+ * N := Carries nested attributes
+ * O := Payload stored in network byte order
+ *
+ * Note: The N and O flag are mutually exclusive.
+ */
+#define NLA_F_NESTED		(1 << 15)
+#define NLA_F_NET_BYTEORDER	(1 << 14)
+#define NLA_TYPE_MASK		~(NLA_F_NESTED | NLA_F_NET_BYTEORDER)
+
+#define NLA_ALIGNTO		4
+#define NLA_ALIGN(len)		(((len) + NLA_ALIGNTO - 1) & ~(NLA_ALIGNTO - 1))
+#define NLA_HDRLEN		((int) NLA_ALIGN(sizeof(struct nlattr)))
+
+/* Generic 32 bitflags attribute content sent to the kernel.
+ *
+ * The value is a bitmap that defines the values being set
+ * The selector is a bitmask that defines which value is legit
+ *
+ * Examples:
+ *  value = 0x0, and selector = 0x1
+ *  implies we are selecting bit 1 and we want to set its value to 0.
+ *
+ *  value = 0x2, and selector = 0x2
+ *  implies we are selecting bit 2 and we want to set its value to 1.
+ *
+ */
+struct nla_bitfield32 {
+	__u32 value;
+	__u32 selector;
+};
+
+#endif /* __LINUX_NETLINK_H */

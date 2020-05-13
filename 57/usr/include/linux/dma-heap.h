@@ -1,59 +1,53 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * DMABUF Heaps Allocation Infrastructure
+ * DMABUF Heaps Userspace API
  *
  * Copyright (C) 2011 Google, Inc.
  * Copyright (C) 2019 Linaro Ltd.
  */
+#ifndef _LINUX_DMABUF_POOL_H
+#define _LINUX_DMABUF_POOL_H
 
-#ifndef _DMA_HEAPS_H
-#define _DMA_HEAPS_H
-
-#include <linux/cdev.h>
+#include <linux/ioctl.h>
 #include <linux/types.h>
 
-struct dma_heap;
+/**
+ * DOC: DMABUF Heaps Userspace API
+ */
+
+/* Valid FD_FLAGS are O_CLOEXEC, O_RDONLY, O_WRONLY, O_RDWR */
+#define DMA_HEAP_VALID_FD_FLAGS (O_CLOEXEC | O_ACCMODE)
+
+/* Currently no heap flags */
+#define DMA_HEAP_VALID_HEAP_FLAGS (0)
 
 /**
- * struct dma_heap_ops - ops to operate on a given heap
- * @allocate:		allocate dmabuf and return fd
+ * struct dma_heap_allocation_data - metadata passed from userspace for
+ *                                      allocations
+ * @len:		size of the allocation
+ * @fd:			will be populated with a fd which provides the
+ *			handle to the allocated dma-buf
+ * @fd_flags:		file descriptor flags used when allocating
+ * @heap_flags:		flags passed to heap
  *
- * allocate returns dmabuf fd  on success, -errno on error.
+ * Provided by userspace as an argument to the ioctl
  */
-struct dma_heap_ops {
-	int (*allocate)(struct dma_heap *heap,
-			unsigned long len,
-			unsigned long fd_flags,
-			unsigned long heap_flags);
+struct dma_heap_allocation_data {
+	__u64 len;
+	__u32 fd;
+	__u32 fd_flags;
+	__u64 heap_flags;
 };
 
+#define DMA_HEAP_IOC_MAGIC		'H'
+
 /**
- * struct dma_heap_export_info - information needed to export a new dmabuf heap
- * @name:	used for debugging/device-node name
- * @ops:	ops struct for this heap
- * @priv:	heap exporter private data
+ * DOC: DMA_HEAP_IOCTL_ALLOC - allocate memory from pool
  *
- * Information needed to export a new dmabuf heap.
+ * Takes a dma_heap_allocation_data struct and returns it with the fd field
+ * populated with the dmabuf handle of the allocation.
  */
-struct dma_heap_export_info {
-	const char *name;
-	const struct dma_heap_ops *ops;
-	void *priv;
-};
+#define DMA_HEAP_IOCTL_ALLOC	_IOWR(DMA_HEAP_IOC_MAGIC, 0x0,\
+				      struct dma_heap_allocation_data)
 
-/**
- * dma_heap_get_drvdata() - get per-heap driver data
- * @heap: DMA-Heap to retrieve private data for
- *
- * Returns:
- * The per-heap data for the heap.
- */
-void *dma_heap_get_drvdata(struct dma_heap *heap);
-
-/**
- * dma_heap_add - adds a heap to dmabuf heaps
- * @exp_info:		information needed to register this heap
- */
-struct dma_heap *dma_heap_add(const struct dma_heap_export_info *exp_info);
-
-#endif /* _DMA_HEAPS_H */
+#endif /* _LINUX_DMABUF_POOL_H */

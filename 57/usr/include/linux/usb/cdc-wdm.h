@@ -1,8 +1,6 @@
-// SPDX-License-Identifier: GPL-2.0
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * USB CDC Device Management subdriver
- *
- * Copyright (c) 2012  Bjørn Mork <bjorn@mork.no>
+ * USB CDC Device Management userspace API definitions
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -12,11 +10,15 @@
 #ifndef __LINUX_USB_CDC_WDM_H
 #define __LINUX_USB_CDC_WDM_H
 
-#include <uapi/linux/usb/cdc-wdm.h>
+#include <linux/types.h>
 
-extern struct usb_driver *usb_cdc_wdm_register(struct usb_interface *intf,
-					struct usb_endpoint_descriptor *ep,
-					int bufsize,
-					int (*manage_power)(struct usb_interface *, int));
+/*
+ * This IOCTL is used to retrieve the wMaxCommand for the device,
+ * defining the message limit for both reading and writing.
+ *
+ * For CDC WDM functions this will be the wMaxCommand field of the
+ * Device Management Functional Descriptor.
+ */
+#define IOCTL_WDM_MAX_COMMAND _IOR('H', 0xA0, __u16)
 
 #endif /* __LINUX_USB_CDC_WDM_H */

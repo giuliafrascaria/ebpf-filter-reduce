@@ -1,250 +1,212 @@
-/* SPDX-License-Identifier: GPL-2.0 */
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * <linux/gpio.h>
+ * <linux/gpio.h> - userspace ABI for the GPIO character devices
  *
- * This is the LEGACY GPIO bulk include file, including legacy APIs. It is
- * used for GPIO drivers still referencing the global GPIO numberspace,
- * and should not be included in new code.
+ * Copyright (C) 2016 Linus Walleij
  *
- * If you're implementing a GPIO driver, only include <linux/gpio/driver.h>
- * If you're implementing a GPIO consumer, only include <linux/gpio/consumer.h>
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 as published by
+ * the Free Software Foundation.
  */
-#ifndef __LINUX_GPIO_H
-#define __LINUX_GPIO_H
+#ifndef _GPIO_H_
+#define _GPIO_H_
 
-#include <linux/errno.h>
-
-/* see Documentation/driver-api/gpio/legacy.rst */
-
-/* make these flag values available regardless of GPIO kconfig options */
-#define GPIOF_DIR_OUT	(0 << 0)
-#define GPIOF_DIR_IN	(1 << 0)
-
-#define GPIOF_INIT_LOW	(0 << 1)
-#define GPIOF_INIT_HIGH	(1 << 1)
-
-#define GPIOF_IN		(GPIOF_DIR_IN)
-#define GPIOF_OUT_INIT_LOW	(GPIOF_DIR_OUT | GPIOF_INIT_LOW)
-#define GPIOF_OUT_INIT_HIGH	(GPIOF_DIR_OUT | GPIOF_INIT_HIGH)
-
-/* Gpio pin is active-low */
-#define GPIOF_ACTIVE_LOW        (1 << 2)
-
-/* Gpio pin is open drain */
-#define GPIOF_OPEN_DRAIN	(1 << 3)
-
-/* Gpio pin is open source */
-#define GPIOF_OPEN_SOURCE	(1 << 4)
-
-#define GPIOF_EXPORT		(1 << 5)
-#define GPIOF_EXPORT_CHANGEABLE	(1 << 6)
-#define GPIOF_EXPORT_DIR_FIXED	(GPIOF_EXPORT)
-#define GPIOF_EXPORT_DIR_CHANGEABLE (GPIOF_EXPORT | GPIOF_EXPORT_CHANGEABLE)
+#include <linux/ioctl.h>
+#include <linux/types.h>
 
 /**
- * struct gpio - a structure describing a GPIO with configuration
- * @gpio:	the GPIO number
- * @flags:	GPIO configuration as specified by GPIOF_*
- * @label:	a literal description string of this GPIO
+ * struct gpiochip_info - Information about a certain GPIO chip
+ * @name: the Linux kernel name of this GPIO chip
+ * @label: a functional name for this GPIO chip, such as a product
+ * number, may be empty
+ * @lines: number of GPIO lines on this chip
  */
-struct gpio {
-	unsigned	gpio;
-	unsigned long	flags;
-	const char	*label;
+struct gpiochip_info {
+	char name[32];
+	char label[32];
+	__u32 lines;
 };
 
-#ifdef CONFIG_GPIOLIB
+/* Informational flags */
+#define GPIOLINE_FLAG_KERNEL		(1UL << 0) /* Line used by the kernel */
+#define GPIOLINE_FLAG_IS_OUT		(1UL << 1)
+#define GPIOLINE_FLAG_ACTIVE_LOW	(1UL << 2)
+#define GPIOLINE_FLAG_OPEN_DRAIN	(1UL << 3)
+#define GPIOLINE_FLAG_OPEN_SOURCE	(1UL << 4)
+#define GPIOLINE_FLAG_BIAS_PULL_UP	(1UL << 5)
+#define GPIOLINE_FLAG_BIAS_PULL_DOWN	(1UL << 6)
+#define GPIOLINE_FLAG_BIAS_DISABLE	(1UL << 7)
 
-#ifdef CONFIG_ARCH_HAVE_CUSTOM_GPIO_H
-#include <asm/gpio.h>
-#else
+/**
+ * struct gpioline_info - Information about a certain GPIO line
+ * @line_offset: the local offset on this GPIO device, fill this in when
+ * requesting the line information from the kernel
+ * @flags: various flags for this line
+ * @name: the name of this GPIO line, such as the output pin of the line on the
+ * chip, a rail or a pin header name on a board, as specified by the gpio
+ * chip, may be empty
+ * @consumer: a functional name for the consumer of this GPIO line as set by
+ * whatever is using it, will be empty if there is no current user but may
+ * also be empty if the consumer doesn't set this up
+ */
+struct gpioline_info {
+	__u32 line_offset;
+	__u32 flags;
+	char name[32];
+	char consumer[32];
+};
 
-#include <asm-generic/gpio.h>
+/* Maximum number of requested handles */
+#define GPIOHANDLES_MAX 64
 
-static inline int gpio_get_value(unsigned int gpio)
-{
-	return __gpio_get_value(gpio);
-}
+/* Possible line status change events */
+enum {
+	GPIOLINE_CHANGED_REQUESTED = 1,
+	GPIOLINE_CHANGED_RELEASED,
+	GPIOLINE_CHANGED_CONFIG,
+};
 
-static inline void gpio_set_value(unsigned int gpio, int value)
-{
-	__gpio_set_value(gpio, value);
-}
+/**
+ * struct gpioline_info_changed - Information about a change in status
+ * of a GPIO line
+ * @info: updated line information
+ * @timestamp: estimate of time of status change occurrence, in nanoseconds
+ * and GPIOLINE_CHANGED_CONFIG
+ * @event_type: one of GPIOLINE_CHANGED_REQUESTED, GPIOLINE_CHANGED_RELEASED
+ *
+ * Note: struct gpioline_info embedded here has 32-bit alignment on its own,
+ * but it works fine with 64-bit alignment too. With its 72 byte size, we can
+ * guarantee there are no implicit holes between it and subsequent members.
+ * The 20-byte padding at the end makes sure we don't add any implicit padding
+ * at the end of the structure on 64-bit architectures.
+ */
+struct gpioline_info_changed {
+	struct gpioline_info info;
+	__u64 timestamp;
+	__u32 event_type;
+	__u32 padding[5]; /* for future use */
+};
 
-static inline int gpio_cansleep(unsigned int gpio)
-{
-	return __gpio_cansleep(gpio);
-}
+/* Linerequest flags */
+#define GPIOHANDLE_REQUEST_INPUT	(1UL << 0)
+#define GPIOHANDLE_REQUEST_OUTPUT	(1UL << 1)
+#define GPIOHANDLE_REQUEST_ACTIVE_LOW	(1UL << 2)
+#define GPIOHANDLE_REQUEST_OPEN_DRAIN	(1UL << 3)
+#define GPIOHANDLE_REQUEST_OPEN_SOURCE	(1UL << 4)
+#define GPIOHANDLE_REQUEST_BIAS_PULL_UP	(1UL << 5)
+#define GPIOHANDLE_REQUEST_BIAS_PULL_DOWN	(1UL << 6)
+#define GPIOHANDLE_REQUEST_BIAS_DISABLE	(1UL << 7)
 
-static inline int gpio_to_irq(unsigned int gpio)
-{
-	return __gpio_to_irq(gpio);
-}
+/**
+ * struct gpiohandle_request - Information about a GPIO handle request
+ * @lineoffsets: an array of desired lines, specified by offset index for the
+ * associated GPIO device
+ * @flags: desired flags for the desired GPIO lines, such as
+ * GPIOHANDLE_REQUEST_OUTPUT, GPIOHANDLE_REQUEST_ACTIVE_LOW etc, OR:ed
+ * together. Note that even if multiple lines are requested, the same flags
+ * must be applicable to all of them, if you want lines with individual
+ * flags set, request them one by one. It is possible to select
+ * a batch of input or output lines, but they must all have the same
+ * characteristics, i.e. all inputs or all outputs, all active low etc
+ * @default_values: if the GPIOHANDLE_REQUEST_OUTPUT is set for a requested
+ * line, this specifies the default output value, should be 0 (low) or
+ * 1 (high), anything else than 0 or 1 will be interpreted as 1 (high)
+ * @consumer_label: a desired consumer label for the selected GPIO line(s)
+ * such as "my-bitbanged-relay"
+ * @lines: number of lines requested in this request, i.e. the number of
+ * valid fields in the above arrays, set to 1 to request a single line
+ * @fd: if successful this field will contain a valid anonymous file handle
+ * after a GPIO_GET_LINEHANDLE_IOCTL operation, zero or negative value
+ * means error
+ */
+struct gpiohandle_request {
+	__u32 lineoffsets[GPIOHANDLES_MAX];
+	__u32 flags;
+	__u8 default_values[GPIOHANDLES_MAX];
+	char consumer_label[32];
+	__u32 lines;
+	int fd;
+};
 
-static inline int irq_to_gpio(unsigned int irq)
-{
-	return -EINVAL;
-}
+/**
+ * struct gpiohandle_config - Configuration for a GPIO handle request
+ * @flags: updated flags for the requested GPIO lines, such as
+ * GPIOHANDLE_REQUEST_OUTPUT, GPIOHANDLE_REQUEST_ACTIVE_LOW etc, OR:ed
+ * together
+ * @default_values: if the GPIOHANDLE_REQUEST_OUTPUT is set in flags,
+ * this specifies the default output value, should be 0 (low) or
+ * 1 (high), anything else than 0 or 1 will be interpreted as 1 (high)
+ * @padding: reserved for future use and should be zero filled
+ */
+struct gpiohandle_config {
+	__u32 flags;
+	__u8 default_values[GPIOHANDLES_MAX];
+	__u32 padding[4]; /* padding for future use */
+};
 
-#endif /* ! CONFIG_ARCH_HAVE_CUSTOM_GPIO_H */
+#define GPIOHANDLE_SET_CONFIG_IOCTL _IOWR(0xB4, 0x0a, struct gpiohandle_config)
 
-/* CONFIG_GPIOLIB: bindings for managed devices that want to request gpios */
+/**
+ * struct gpiohandle_data - Information of values on a GPIO handle
+ * @values: when getting the state of lines this contains the current
+ * state of a line, when setting the state of lines these should contain
+ * the desired target state
+ */
+struct gpiohandle_data {
+	__u8 values[GPIOHANDLES_MAX];
+};
 
-struct device;
+#define GPIOHANDLE_GET_LINE_VALUES_IOCTL _IOWR(0xB4, 0x08, struct gpiohandle_data)
+#define GPIOHANDLE_SET_LINE_VALUES_IOCTL _IOWR(0xB4, 0x09, struct gpiohandle_data)
 
-int devm_gpio_request(struct device *dev, unsigned gpio, const char *label);
-int devm_gpio_request_one(struct device *dev, unsigned gpio,
-			  unsigned long flags, const char *label);
-void devm_gpio_free(struct device *dev, unsigned int gpio);
+/* Eventrequest flags */
+#define GPIOEVENT_REQUEST_RISING_EDGE	(1UL << 0)
+#define GPIOEVENT_REQUEST_FALLING_EDGE	(1UL << 1)
+#define GPIOEVENT_REQUEST_BOTH_EDGES	((1UL << 0) | (1UL << 1))
 
-#else /* ! CONFIG_GPIOLIB */
+/**
+ * struct gpioevent_request - Information about a GPIO event request
+ * @lineoffset: the desired line to subscribe to events from, specified by
+ * offset index for the associated GPIO device
+ * @handleflags: desired handle flags for the desired GPIO line, such as
+ * GPIOHANDLE_REQUEST_ACTIVE_LOW or GPIOHANDLE_REQUEST_OPEN_DRAIN
+ * @eventflags: desired flags for the desired GPIO event line, such as
+ * GPIOEVENT_REQUEST_RISING_EDGE or GPIOEVENT_REQUEST_FALLING_EDGE
+ * @consumer_label: a desired consumer label for the selected GPIO line(s)
+ * such as "my-listener"
+ * @fd: if successful this field will contain a valid anonymous file handle
+ * after a GPIO_GET_LINEEVENT_IOCTL operation, zero or negative value
+ * means error
+ */
+struct gpioevent_request {
+	__u32 lineoffset;
+	__u32 handleflags;
+	__u32 eventflags;
+	char consumer_label[32];
+	int fd;
+};
 
-#include <linux/kernel.h>
-#include <linux/types.h>
-#include <linux/bug.h>
+/**
+ * GPIO event types
+ */
+#define GPIOEVENT_EVENT_RISING_EDGE 0x01
+#define GPIOEVENT_EVENT_FALLING_EDGE 0x02
 
-struct device;
-struct gpio_chip;
+/**
+ * struct gpioevent_data - The actual event being pushed to userspace
+ * @timestamp: best estimate of time of event occurrence, in nanoseconds
+ * @id: event identifier
+ */
+struct gpioevent_data {
+	__u64 timestamp;
+	__u32 id;
+};
 
-static inline bool gpio_is_valid(int number)
-{
-	return false;
-}
+#define GPIO_GET_CHIPINFO_IOCTL _IOR(0xB4, 0x01, struct gpiochip_info)
+#define GPIO_GET_LINEINFO_IOCTL _IOWR(0xB4, 0x02, struct gpioline_info)
+#define GPIO_GET_LINEINFO_WATCH_IOCTL _IOWR(0xB4, 0x0b, struct gpioline_info)
+#define GPIO_GET_LINEINFO_UNWATCH_IOCTL _IOWR(0xB4, 0x0c, __u32)
+#define GPIO_GET_LINEHANDLE_IOCTL _IOWR(0xB4, 0x03, struct gpiohandle_request)
+#define GPIO_GET_LINEEVENT_IOCTL _IOWR(0xB4, 0x04, struct gpioevent_request)
 
-static inline int gpio_request(unsigned gpio, const char *label)
-{
-	return -ENOSYS;
-}
-
-static inline int gpio_request_one(unsigned gpio,
-					unsigned long flags, const char *label)
-{
-	return -ENOSYS;
-}
-
-static inline int gpio_request_array(const struct gpio *array, size_t num)
-{
-	return -ENOSYS;
-}
-
-static inline void gpio_free(unsigned gpio)
-{
-	might_sleep();
-
-	/* GPIO can never have been requested */
-	WARN_ON(1);
-}
-
-static inline void gpio_free_array(const struct gpio *array, size_t num)
-{
-	might_sleep();
-
-	/* GPIO can never have been requested */
-	WARN_ON(1);
-}
-
-static inline int gpio_direction_input(unsigned gpio)
-{
-	return -ENOSYS;
-}
-
-static inline int gpio_direction_output(unsigned gpio, int value)
-{
-	return -ENOSYS;
-}
-
-static inline int gpio_set_debounce(unsigned gpio, unsigned debounce)
-{
-	return -ENOSYS;
-}
-
-static inline int gpio_get_value(unsigned gpio)
-{
-	/* GPIO can never have been requested or set as {in,out}put */
-	WARN_ON(1);
-	return 0;
-}
-
-static inline void gpio_set_value(unsigned gpio, int value)
-{
-	/* GPIO can never have been requested or set as output */
-	WARN_ON(1);
-}
-
-static inline int gpio_cansleep(unsigned gpio)
-{
-	/* GPIO can never have been requested or set as {in,out}put */
-	WARN_ON(1);
-	return 0;
-}
-
-static inline int gpio_get_value_cansleep(unsigned gpio)
-{
-	/* GPIO can never have been requested or set as {in,out}put */
-	WARN_ON(1);
-	return 0;
-}
-
-static inline void gpio_set_value_cansleep(unsigned gpio, int value)
-{
-	/* GPIO can never have been requested or set as output */
-	WARN_ON(1);
-}
-
-static inline int gpio_export(unsigned gpio, bool direction_may_change)
-{
-	/* GPIO can never have been requested or set as {in,out}put */
-	WARN_ON(1);
-	return -EINVAL;
-}
-
-static inline int gpio_export_link(struct device *dev, const char *name,
-				unsigned gpio)
-{
-	/* GPIO can never have been exported */
-	WARN_ON(1);
-	return -EINVAL;
-}
-
-static inline void gpio_unexport(unsigned gpio)
-{
-	/* GPIO can never have been exported */
-	WARN_ON(1);
-}
-
-static inline int gpio_to_irq(unsigned gpio)
-{
-	/* GPIO can never have been requested or set as input */
-	WARN_ON(1);
-	return -EINVAL;
-}
-
-static inline int irq_to_gpio(unsigned irq)
-{
-	/* irq can never have been returned from gpio_to_irq() */
-	WARN_ON(1);
-	return -EINVAL;
-}
-
-static inline int devm_gpio_request(struct device *dev, unsigned gpio,
-				    const char *label)
-{
-	WARN_ON(1);
-	return -EINVAL;
-}
-
-static inline int devm_gpio_request_one(struct device *dev, unsigned gpio,
-					unsigned long flags, const char *label)
-{
-	WARN_ON(1);
-	return -EINVAL;
-}
-
-static inline void devm_gpio_free(struct device *dev, unsigned int gpio)
-{
-	WARN_ON(1);
-}
-
-#endif /* ! CONFIG_GPIOLIB */
-
-#endif /* __LINUX_GPIO_H */
+#endif /* _GPIO_H_ */
