@@ -1,5 +1,15 @@
 ## activity log
 
+### 17/5/2020
+- fixed that dependency, it was an issue in my script
+- going on fixing dependencies. Now I have the zlib problem again but it's not working even compiling against kernel source
+
+### 16/5/2020
+- did some writing for the thesis
+
+### 14/5/2020
+- meeting with bpf office hour, they advised to go for fentry fexit and use modify return with that
+
 ### 13/5/2020
 - tried to fix new compilation setup
 - had to modify the test_attr__enabled macro in perf-sys
