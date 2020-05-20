@@ -1,5 +1,10 @@
 ## activity log
 
+### 20/5/2020
+- I think adding the flag -lz fixed that, now I'm back to undefined reference to read_trace_pipe
+- following the indication in the bpf compilation trace from the kernel, I basically just built including the trace_helpers
+- 
+
 ### 17/5/2020
 - fixed that dependency, it was an issue in my script
 - going on fixing dependencies. Now I have the zlib problem again but it's not working even compiling against kernel source

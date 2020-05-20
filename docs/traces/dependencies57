@@ -41,3 +41,33 @@ clang  -nostdinc -isystem
 -O2 -emit-llvm -c samples/bpf//tracex1_kern.c -o -| 
  llc -march=bpf  -filetype=obj 
 -o samples/bpf//tracex1_kern.o
+
+
+gcc -Wp,-MD,samples/bpf//.tracex1.d -Wall -O2 -Wmissing-prototypes -Wstrict-prototypes 
+-I./usr/include 
+-I./tools/testing/selftests/bpf/ 
+-I./tools/lib/ 
+-I./tools/include 
+-I./tools/perf 
+-DHAVE_ATTR_TEST=0   
+-o samples/bpf//tracex1 
+samples/bpf//bpf_load.o 
+samples/bpf//tracex1_user.o 
+samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o 
+/home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a 
+-lelf -lz 
+
+; printf '%s\n' 'cmd_samples/bpf//tracex1 := 
+gcc -Wp,-MD,samples/bpf//.tracex1.d -Wall -O2 -Wmissing-prototypes -Wstrict-prototypes 
+-I./usr/include 
+-I./tools/testing/selftests/bpf/ 
+-I./tools/lib/ 
+-I./tools/include 
+-I./tools/perf 
+-DHAVE_ATTR_TEST=0   
+-o samples/bpf//tracex1 
+samples/bpf//bpf_load.o 
+samples/bpf//tracex1_user.o 
+samples/bpf//../../tools/testing/selftests/bpf/trace_helpers.o 
+/home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -lelf -lz 
+

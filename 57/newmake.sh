@@ -26,10 +26,6 @@ clang -nostdinc -isystem `clang -print-file-name=include` \
     -include asm_goto_workaround.h \
 	-O2 -emit-llvm -c "$KERN".c -o -| llc -march=bpf -filetype=obj -o "compiled/$KERN".o
 
-
-
-
-
 }
 
 targets=( tracex1 )

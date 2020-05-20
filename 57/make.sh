@@ -27,9 +27,16 @@ clang -nostdinc -isystem `clang -print-file-name=include` \
 	-O2 -emit-llvm -c "$KERN".c -o -| llc -march=bpf -filetype=obj -o "compiled/$KERN".o
 
 
-gcc "$USER".c bpf_load.c ~/thesis/libbpf/src/libbpf.a -iquote -I/thesis/libbpf/src/ \
- -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ \
--I./tools/include -I./tools/perf -I./tools/perf/util -I./tools/perf/tests -lelf -DHAVE_ATTR_TEST=0 -o compiled/$DEFAULT
+#gcc "$USER".c bpf_load.c /home/giogge/linux/samples/bpf/../../tools/lib/bpf/libbpf.a -iquote -I/thesis/libbpf/src/ \
+# -I./usr/include -I./tools/lib/bpf/ -I./tools/testing/selftests/bpf/ -I./tools/lib/ \
+#-I./tools/include -I./tools/perf -I./tools/perf/util -I./tools/perf/tests -lelf -DHAVE_ATTR_TEST=0 -o compiled/$DEFAULT
+
+gcc "$USER".c bpf_load.c ./tools/lib/bpf/libbpf.a ./tools/testing/selftests/bpf/trace_helpers.o \
+-iquote -I/thesis/libbpf/src/ -I./usr/include -I./tools/lib/bpf/ \
+-I./tools/testing/selftests/bpf/ -I./tools/lib/ \
+-I./tools/include -I./tools/perf -DHAVE_ATTR_TEST=0 \
+-o compiled/$DEFAULT -lelf -lz
+
 
 }
 
