@@ -1,0 +1,4 @@
+feature-libbfd=0
+feature-disassembler-four-args=0
+feature-reallocarray=1
+feature-zlib=1
