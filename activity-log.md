@@ -3,7 +3,10 @@
 ### 20/5/2020
 - I think adding the flag -lz fixed that, now I'm back to undefined reference to read_trace_pipe
 - following the indication in the bpf compilation trace from the kernel, I basically just built including the trace_helpers
-- 
+- https://fosdem.org/2020/schedule/event/endless_network_programming/attachments/slides/3663/export/events/attachments/endless_network_programming/slides/3663/FOSDEM20_QMO_eBPF_update.pdf
+- do I have to convert to btf? https://lore.kernel.org/bpf/20191102220025.2475981-5-ast@kernel.org/
+- https://lore.kernel.org/bpf/20191102220025.2475981-6-ast@kernel.org/
+
 
 ### 17/5/2020
 - fixed that dependency, it was an issue in my script
