@@ -40,7 +40,7 @@ gcc "$USER".c bpf_load.c ./tools/lib/bpf/libbpf.a ./tools/testing/selftests/bpf/
 
 }
 
-targets=( tracex1 )
+targets=( tracex1 hellotrace strtol override_exec)
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"

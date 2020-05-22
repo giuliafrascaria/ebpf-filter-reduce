@@ -4,6 +4,9 @@
 - finally fixed the kernel compilation
 - compiled with LSM BPF support in general config options
 - updated the headers and not out of tree build for 5.7 compiles again
+- hellotrace compiles again but I need to see where the trace print ends
+- added strtol for tracing functions and now I'm back to the old situation with override
+- the initial iterations are more likely to succeed regardless of the size, and subsequent ones are more prone to failure
 
 ### 20/5/2020
 - I think adding the flag -lz fixed that, now I'm back to undefined reference to read_trace_pipe
