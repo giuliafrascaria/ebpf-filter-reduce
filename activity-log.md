@@ -1,5 +1,10 @@
 ## activity log
 
+### 22/5/2020
+- finally fixed the kernel compilation
+- compiled with LSM BPF support in general config options
+- updated the headers and not out of tree build for 5.7 compiles again
+
 ### 20/5/2020
 - I think adding the flag -lz fixed that, now I'm back to undefined reference to read_trace_pipe
 - following the indication in the bpf compilation trace from the kernel, I basically just built including the trace_helpers
