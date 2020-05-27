@@ -32,14 +32,17 @@ int main(int argc, char **argv)
 	snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
 	printf("eBPF file to be loaded is : %s \n", filename);
 
-	if (load_bpf_file(filename)) {
+	ret = load_bpf_file(filename);
+	printf("failed %d\n", ret);
+	if (ret) 
+    {
 		printf("%s", bpf_log_buf);
 		return 1;
 	}
 
-	printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");
+    printf("here\n");
 
-	int fd = open("f", O_RDONLY);
+    int fd = open("f", O_RDONLY);
 	if (fd == -1)
 	{
 		printf("error open file\n");

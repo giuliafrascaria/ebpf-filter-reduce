@@ -1,5 +1,12 @@
 ## activity log
 
+### 27/5/2020
+- trampoline functionality seems interesting 
+- https://www.spinics.net/lists/netdev/msg626011.html new type of bpf extensions amirite?
+- simple fentry https://elixir.bootlin.com/linux/v5.7-rc4/source/tools/testing/selftests/bpf/progs/test_trampoline_count.c
+- https://elixir.bootlin.com/linux/v5.7-rc4/source/tools/testing/selftests/bpf/progs/freplace_connect4.c
+
+
 ### 22/5/2020
 - finally fixed the kernel compilation
 - compiled with LSM BPF support in general config options
