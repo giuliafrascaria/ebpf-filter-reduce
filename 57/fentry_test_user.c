@@ -18,6 +18,7 @@
 #include <sys/wait.h>
 
 #include <bpf.h>
+#include <libbpf.h>
 #include "bpf_load.h"
 
 #include <trace_helpers.h>
@@ -32,7 +33,11 @@ int main(int argc, char **argv)
 	snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
 	printf("eBPF file to be loaded is : %s \n", filename);
 
-	ret = load_bpf_file(filename);
+	struct bpf_object *obj;
+
+	obj = bpf_object__open(filename);
+	bpf_object__load(obj);
+	//ret = load_bpf_file(filename);
 	printf("failed %d\n", ret);
 	if (ret) 
     {

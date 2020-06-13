@@ -1,5 +1,35 @@
 ## activity log
 
+### 13/6/2020
+- long time no see!
+- getting back on track with the thesis, reading documents to understandd how to compile without support in bpf_load
+- https://www.kernel.org/doc/html/latest/bpf/bpf_lsm.html
+- bpftool to generate mysterrious skeleton? or otherwise just obj open and obj load
+- https://facebookmicrosites.github.io/bpf/blog/2020/02/20/bcc-to-libbpf-howto-guide.html
+- https://github.com/iovisor/bcc/issues/2872 recompile kernel with btf support
+- CONFIG_DEBUG_INFO_BTF=y
+- failed, looks like the problem might be binutils version?
+- https://lore.kernel.org/bpf/20191127000420.GG3145429@mini-arch.hsd1.ca.comcast.net/t/
+
+```
+sudo ./fentry_test 
+
+eBPF file to be loaded is : ./fentry_test_kern.o 
+libbpf: failed to find valid kernel BTF
+libbpf: Error loading vmlinux BTF: -3
+libbpf: failed to load object './fentry_test_kern.o'
+failed -1981019360
+
+BTF: .tmp_vmlinux.btf: pahole (pahole) is not available
+Failed to generate BTF for vmlinux
+Try to disable CONFIG_DEBUG_INFO_BTF
+Makefile:1106: recipe for target 'vmlinux' failed
+
+sudo apt install dwarves
+
+```
+
+
 ### 27/5/2020
 - trampoline functionality seems interesting 
 - https://www.spinics.net/lists/netdev/msg626011.html new type of bpf extensions amirite?
