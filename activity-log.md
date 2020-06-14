@@ -2,19 +2,87 @@
 
 ### 14/6/2020 
 - going to 5.7 stable so I can hopefully finally settle, shouldn't be a problem
+- cloned https://github.com/acmel/dwarves.git
+- installed cmake and libdw-dev
+- the vmlinux was created but maybe the btf failed for this error I got during compilation
+- followed this sudo /sbin/ldconfig -v https://itsfoss.com/solve-open-shared-object-file-quick-tip/
+
+```
+pahole: error while loading shared libraries: libdwarves_reorganize.so.1: cannot open shared object file: No such file or directory
+scripts/link-vmlinux.sh: 123: [: Illegal number: 
+  LD      .tmp_vmlinux.btf
+  BTF     .btf.vmlinux.bin.o
+pahole: error while loading shared libraries: libdwarves_reorganize.so.1: cannot open shared object file: No such file or directory
+
+```
 
 ```
 BTF: .tmp_vmlinux.btf: pahole version v1.9 is too old, need at least v1.13
+
+bpf_load_program() err=22
+in-kernel BTF is malformed
+processed 0 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+in-kernel BTF is malformed
+processed 0 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+
+```
+- now the problem is with vmlinux I think, doesn't contain the information for copyout bpf whatever that might mean
+- bpftool --version is 5.4, maybe if I update to 5.7 YES IT WORKED; COULD GENERATE VMLINUX
+- https://lore.kernel.org/patchwork/patch/865992/
+- https://github.com/iovisor/bcc/issues/2872
+- https://lore.kernel.org/netdev/d8620b04-346a-11eb-000f-34d0f9f0cd51@fb.com/
+- https://facebookmicrosites.github.io/bpf/blog/2020/02/19/bpf-portability-and-co-re.html
+- https://github.com/iovisor/bcc/issues/2855
+- http://patchwork.ozlabs.org/project/netdev/patch/20191018103404.12999-1-jolsa@kernel.org/#2285034
+- https://www.kernel.org/doc/html/latest/bpf/btf.html btf guide
+- vmlinux not found https://lore.kernel.org/bpf/4BBF99E4-9554-44F7-8505-D4B8416554C4@redhat.com/t/ this is the source of the github thingy
+- https://github.com/iovisor/bcc/issues/2770
+- github example fentry from patch mail https://github.com/chaudron/bpf2bpf-tracing 
+
+
+```
+sudo ./fentry_test 
+eBPF file to be loaded is : ./fentry_test_kern.o 
+libbpf: copyout_bpf is not found in vmlinux BTF
+------
+
+bpftool btf dump file /sys/kernel/btf/vmlinux format c > vmlinux.h
+
+libbpf: failed to get EHDR from /sys/kernel/btf/vmlinux
+Error: failed to load BTF from /sys/kernel/btf/vmlinux: Unknown error -4001
+
 ```
 
-cloned https://github.com/acmel/dwarves.git
-installed cmake and libdw-dev
+```
+grep -E -i "btf|bpf" .config
+CONFIG_CGROUP_BPF=y
+CONFIG_BPF=y
+CONFIG_BPF_LSM=y
+CONFIG_BPF_SYSCALL=y
+CONFIG_ARCH_WANT_DEFAULT_BPF_JIT=y
+CONFIG_BPF_JIT_ALWAYS_ON=y
+CONFIG_BPF_JIT_DEFAULT_ON=y
+CONFIG_IPV6_SEG6_BPF=y
+# CONFIG_NETFILTER_XT_MATCH_BPF is not set
+# CONFIG_BPFILTER is not set
+# CONFIG_NET_CLS_BPF is not set
+# CONFIG_NET_ACT_BPF is not set
+CONFIG_BPF_JIT=y
+CONFIG_BPF_STREAM_PARSER=y
+CONFIG_LWTUNNEL_BPF=y
+CONFIG_HAVE_EBPF_JIT=y
+CONFIG_DEBUG_INFO_BTF=y
+CONFIG_BPF_EVENTS=y
+CONFIG_BPF_KPROBE_OVERRIDE=y
+# CONFIG_TEST_BPF is not set
+
+```
 
 
 ### 13/6/2020
 - long time no see!
 - getting back on track with the thesis, reading documents to understandd how to compile without support in bpf_load
-- https://www.kernel.org/doc/html/latest/bpf/bpf_lsm.html
+- https://www.kernel.org/doc/html/latest/bpf/bpf_lsm.html vmlinux generation
 - bpftool to generate mysterrious skeleton? or otherwise just obj open and obj load
 - https://facebookmicrosites.github.io/bpf/blog/2020/02/20/bcc-to-libbpf-howto-guide.html
 - https://github.com/iovisor/bcc/issues/2872 recompile kernel with btf support

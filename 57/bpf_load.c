@@ -633,7 +633,7 @@ static int do_load_bpf_file(const char *path, fixup_map_cb fixup_map)
 		if (get_sec(elf, i, &ehdr, &shname, &shdr, &data))
 			continue;
 
-		printf("guess who's gonna fail now?\n");
+		// printf("guess who's gonna fail now?\n");
 		
 		if (memcmp(shname, "kprobe/", 7) == 0 ||
 		    memcmp(shname, "kretprobe/", 10) == 0 ||
