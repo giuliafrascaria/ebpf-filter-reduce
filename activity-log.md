@@ -1,5 +1,16 @@
 ## activity log
 
+### 14/6/2020 
+- going to 5.7 stable so I can hopefully finally settle, shouldn't be a problem
+
+```
+BTF: .tmp_vmlinux.btf: pahole version v1.9 is too old, need at least v1.13
+```
+
+cloned https://github.com/acmel/dwarves.git
+installed cmake and libdw-dev
+
+
 ### 13/6/2020
 - long time no see!
 - getting back on track with the thesis, reading documents to understandd how to compile without support in bpf_load
