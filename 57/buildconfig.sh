@@ -11,7 +11,7 @@ rm -rf /home/giogge/thesis/ebpf-experiments/57/tools/
 cp -r /home/giogge/linux/tools/ /home/giogge/thesis/ebpf-experiments/57/
 echo "OK"
 
-echo "copying bpf fundamentals"
-cp /home/giogge/thesis/ebpf-experiments/fundamentals/* /home/giogge/thesis/ebpf-experiments/57/
-echo "OK"
+#echo "copying bpf fundamentals"
+#cp /home/giogge/thesis/ebpf-experiments/fundamentals/* /home/giogge/thesis/ebpf-experiments/57/
+#echo "OK"
 
