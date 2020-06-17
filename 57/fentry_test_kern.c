@@ -13,7 +13,7 @@
 
 
 
-SEC("fentry/copyout_bpf")
+SEC("fentry/copyout")
 int BPF_PROG(prog1)
 {
     char n[] = "fentry copyout bpf\n";
@@ -23,4 +23,6 @@ int BPF_PROG(prog1)
 }
 
 
+
 char _license[] SEC("license") = "GPL";
+__u32 _version SEC("version") = LINUX_VERSION_CODE;

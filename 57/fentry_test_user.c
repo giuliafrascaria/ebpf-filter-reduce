@@ -20,7 +20,7 @@
 #include <bpf.h>
 #include <libbpf.h>
 #include "bpf_load.h"
-#include "vmlinux.h"
+//#include "vmlinux.h"
 #include <trace_helpers.h>
 
 
@@ -36,16 +36,14 @@ int main(int argc, char **argv)
 	struct bpf_object *obj;
 
 	obj = bpf_object__open(filename);
-	bpf_object__load(obj);
+	ret = bpf_object__load(obj);
 	//ret = load_bpf_file(filename);
-	printf("failed %d\n", ret);
+	printf("bpf obj load return: %d\n", ret);
 	if (ret) 
     {
 		printf("%s", bpf_log_buf);
 		return 1;
 	}
-
-    printf("here\n");
 
     int fd = open("f", O_RDONLY);
 	if (fd == -1)

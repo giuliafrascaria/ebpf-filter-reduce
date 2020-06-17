@@ -1,5 +1,44 @@
 ## activity log
 
+### 17/6/2020
+- selftest compilation https://github.com/hlandau/acme.t/issues/1
+- https://github.com/torvalds/linux/tree/master/tools/testing/selftests/bpf
+- https://github.com/torvalds/linux/blob/master/Documentation/bpf/bpf_devel_QA.rst#q-how-to-run-bpf-selftests
+- probably also wrong clang version for some stuff
+- updated clang and llvm to version 10, also had to remove 6.0 and create the symlink from clang-10 and llc-10 to clang and llc
+
+```
+fatal error: sys/capability.h: No such file or directory
+ #include <sys/capability.h>
+          ^~~~~~~~~~~~~~~~~~
+
+teying to solve with 
+sudo apt-get install libcap-dev
+
+error: use of unknown builtin '__builtin_preserve_access_index'
+
+sudo ln -s /usr/bin/llc-10 /usr/bin/llc
+```
+- exploring fentry feature. the vmlinux that I generate with bpftool is completely broken
+- I can avoid including it and it compiles, but doesn't find the copyout and copyout_bpf in vmlinux
+- it does find ksys_read. I generated objdump for the kernel sources on iov_iter and read_write to see differences, can't see anything, however the ksym is global
+- the examples for fentry in the kernel are compiled with noinline https://elixir.bootlin.com/linux/v5.7/source/net/bpf/test_run.c#L150
+- and in line 119 of this file will be in the vmlinux btf, so it makes sense that I can onli see ksys_read which is global in kallsyms
+- need to recompile with noinline to have that
+- super useful talk on ftrace that made me look at the assembly code http://www.brendangregg.com/blog/2019-10-15/kernelrecipes-kernel-ftrace-internals.html
+
+```
+cat /proc/kallsyms | grep ksys_read
+0000000000000000 T ksys_readahead
+0000000000000000 T ksys_read
+
+cat /proc/kallsyms | grep copyout
+0000000000000000 T nanosleep_copyout
+0000000000000000 t copyout_mcsafe
+0000000000000000 t copyout
+0000000000000000 t copyout_bpf
+```
+
 ### 14/6/2020 
 - going to 5.7 stable so I can hopefully finally settle, shouldn't be a problem
 - cloned https://github.com/acmel/dwarves.git
