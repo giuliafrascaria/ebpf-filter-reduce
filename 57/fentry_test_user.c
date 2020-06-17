@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 	close(fd);
 	free(buf);
 
-	read_trace_pipe();
+	//read_trace_pipe();
 
 	return 0;
 }

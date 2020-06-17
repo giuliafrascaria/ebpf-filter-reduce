@@ -13,7 +13,7 @@
 
 
 
-SEC("fentry/copyout")
+SEC("fentry/copyout_bpf")
 int BPF_PROG(prog1)
 {
     char n[] = "fentry copyout bpf\n";
