@@ -10,7 +10,7 @@
 SEC("kprobe/copyout_bpf")
 int bpf_prog1()
 {
-	char s[] = "giulia's function yeee\n";
+	char s[] = "hemlo\n";
 	bpf_trace_printk(s, sizeof(s));
 	return 0;
 }

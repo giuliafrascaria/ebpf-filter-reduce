@@ -1,5 +1,13 @@
 ## activity log
 
+### 18/6/2020
+- fentry does not seem to trigger a call to pbf printk, which makes it very hard to debug xD
+- /tools/lib/bpf/bpf_helper_defs.h probably the place where I should be adding all new helpers
+- asof now fentry fmod fexit doesn't seem to work. am I even being called? the testbed reads from copyout
+- write a small example function to experiment and understand how it works
+- I suspect the probes are not even being triggered
+
+
 ### 17/6/2020
 - selftest compilation https://github.com/hlandau/acme.t/issues/1
 - https://github.com/torvalds/linux/tree/master/tools/testing/selftests/bpf
