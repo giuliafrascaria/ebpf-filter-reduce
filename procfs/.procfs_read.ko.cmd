@@ -1,1 +1,0 @@
-cmd_/home/giogge/thesis/ebpf-experiments/procfs/procfs_read.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000  --build-id  -T ./scripts/module-common.lds -o /home/giogge/thesis/ebpf-experiments/procfs/procfs_read.ko /home/giogge/thesis/ebpf-experiments/procfs/procfs_read.o /home/giogge/thesis/ebpf-experiments/procfs/procfs_read.mod.o;  true

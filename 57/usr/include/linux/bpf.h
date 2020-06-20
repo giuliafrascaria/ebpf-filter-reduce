@@ -3151,6 +3151,7 @@ union bpf_attr {
 	FN(xdp_output),			\
 	FN(get_netns_cookie),		\
 	FN(get_current_ancestor_cgroup_id),	\
+	FN(myprintk), \
 	FN(sk_assign),
 
 /* integer value in 'imm' field of BPF_CALL instruction selects which helper

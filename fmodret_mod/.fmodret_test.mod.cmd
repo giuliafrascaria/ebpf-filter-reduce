@@ -1,0 +1,1 @@
+cmd_/home/giogge/thesis/ebpf-experiments/fmodret_mod/fmodret_test.mod := { echo  /home/giogge/thesis/ebpf-experiments/fmodret_mod/fmodret_test.o; echo; } > /home/giogge/thesis/ebpf-experiments/fmodret_mod/fmodret_test.mod

@@ -1,0 +1,1 @@
+cmd_/home/giogge/thesis/ebpf-experiments/fmodret_mod/fmodret_test.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000  --build-id  -T ./scripts/module-common.lds -o /home/giogge/thesis/ebpf-experiments/fmodret_mod/fmodret_test.ko /home/giogge/thesis/ebpf-experiments/fmodret_mod/fmodret_test.o /home/giogge/thesis/ebpf-experiments/fmodret_mod/fmodret_test.mod.o;  true
