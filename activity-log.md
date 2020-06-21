@@ -1,9 +1,16 @@
 ## activity log
 
+### 21/6/2020
+- https://linuxplumbersconf.org/event/4/contributions/448/attachments/345/575/bpf-usability.pdf btf presentation fb
+- created the kernel module but can't instrument if I use btf cause vmlinux doesn't know the function, although it is in the kallsyms
+- reading the linux device drivers to find out how to put modules in source tree
+
+
 ### 20/6/2020
 - writing kernel module to test single operation of fmod ret
 - problem with the procfs infrastructure https://lore.kernel.org/linux-fsdevel/20191225172228.GA13378@avx2/
 - for now the read does not seem to be called so I need to investigate tomorrow
+
 
 ### 18/6/2020
 - fentry does not seem to trigger a call to pbf printk, which makes it very hard to debug xD
