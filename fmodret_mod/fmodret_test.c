@@ -35,26 +35,60 @@ static ssize_t mywrite(struct file *file, const char __user *ubuf, size_t count,
 	return -1;
 }
  
-static ssize_t myread(struct file *file, char __user *ubuf,size_t count, loff_t *ppos) 
+static ssize_t myread(struct file *file, char __user *ubuf, size_t count, loff_t *ppos) 
 {
+	
 	int a = 1;
-	int b = 1;
+	int b = 2;
 	int result = fmod_test_f(a, &b);
 
 	printk(KERN_INFO "result is %d\n", result);
 
-	return result;
+	if (b != 2)
+	{
+		//side effect happened
+		return count;
+	}
+	return (int) result;
+
+	//char buf[BUFSIZE];
+
+	/*
+	char *buf;
+	int len;
+
+	printk( KERN_DEBUG "read handler\n");
+	buf = kmalloc(BUFSIZE, GFP_KERNEL);
+	len = 0;
+	if(*ppos > 0 || count < BUFSIZE)
+		return 0;
+	//len += sprintf(buf,"irq = %d\n",irq);
+	//len += sprintf(buf + len,"mode = %d\n",mode);
+
+	len += sprintf(buf,"%0*d", BUFSIZE - 2, 0);
+	len += sprintf(buf + len, "\n");
+	
+	if(copy_to_user(ubuf,buf,len))
+		return -EFAULT;
+
+	kfree(buf);
+
+	*ppos = len;
+	return len;
+	*/
 }
-ALLOW_ERROR_INJECTION(myread, ERRNO);
-EXPORT_SYMBOL(myread);
+//ALLOW_ERROR_INJECTION(myread, ERRNO);
+//EXPORT_SYMBOL(myread);
 
  
 static struct proc_ops myops = 
 {
 	.proc_read = myread,
 	.proc_write = mywrite,
+	.proc_lseek	= noop_llseek,
 };
- 
+
+
 static int simple_init(void)
 {
 	ent=proc_create(procfs_name, 0, NULL, &myops);
@@ -69,12 +103,18 @@ static int simple_init(void)
 	printk(KERN_ALERT "hello world created\n");
 	return 0;
 }
- 
+
+
 static void simple_cleanup(void)
 {
 	proc_remove(ent);
 	printk(KERN_WARNING "so long and thanks for all the fish\n");
 }
  
+
 module_init(simple_init);
 module_exit(simple_cleanup);
+
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("giogge");

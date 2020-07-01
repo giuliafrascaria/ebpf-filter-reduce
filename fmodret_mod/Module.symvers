@@ -1,2 +1,1 @@
-0x00000000	myread	/home/giogge/thesis/ebpf-experiments/fmodret_mod/fmodret_test	EXPORT_SYMBOL	
 0x00000000	fmod_test_f	/home/giogge/thesis/ebpf-experiments/fmodret_mod/fmodret_test	EXPORT_SYMBOL	

@@ -1,5 +1,16 @@
 ## activity log
 
+### 1/7/2020
+- found out that with readahead or WILLNEED, plus fsync to hopefully free page cache, the success rate is much higher
+- set up cgroup to see if assigning more virtual memory to the process can improve this, or make sure to invalidate the page cache every time
+- this should ensure that every new read will actually go through a readahead
+- generate skeleton 
+
+```
+bpftool gen skeleton procfs_override_kern.o > procfs_override.skel.h
+```
+
+
 ### 21/6/2020
 - https://linuxplumbersconf.org/event/4/contributions/448/attachments/345/575/bpf-usability.pdf btf presentation fb
 - created the kernel module but can't instrument if I use btf cause vmlinux doesn't know the function, although it is in the kallsyms

@@ -19,13 +19,13 @@
 #include <time.h>
 #include <bpf.h>
 #include "bpf_load.h"
+#include <fcntl.h>
 
-
-#define ITERATIONS 10000
+#define ITERATIONS 20000
 #define READ_SIZE 4096
 #define MAX_READ 4096
 #define EXEC_1 0
-#define EXEC_2 2
+#define EXEC_2 1
 
 
 int main(int argc, char **argv)
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
 
                 ssize_t readbytes = read(fd, buf, readsize);
 
-                if ( strncmp(buf, "42", 2) == 0)
+                if ( strncmp(buf, expected, 2) == 0)
                 {
                     override_count = override_count + 1;
                 }
@@ -133,7 +133,8 @@ int main(int argc, char **argv)
                 {
                     exec_count = exec_count + 1;
                 }
-                
+                fsync(fd); 
+
                 close(fd);
                 memset(buf, 0, readsize + 1);
                 
@@ -186,6 +187,12 @@ int main(int argc, char **argv)
                     exit(EXIT_FAILURE);
                 }
 
+                //int posix_fadvise(int fd, off_t offset, off_t len, int advice);
+                //posix_fadvise(fd, 0, 4096, POSIX_FADV_DONTNEED);
+
+                //ssize_t readahead(int fd, off64_t offset, size_t count);
+                readahead(fd, 0, 4096);
+
                 memset(buf, 0, readsize + 1);
                 ssize_t readbytes = read(fd, buf, readsize);
 
@@ -197,6 +204,7 @@ int main(int argc, char **argv)
                     }
                     else
                     {
+                        //successful complete return override
                         override_count = override_count + 1;
                     }
                     //printf("read %s\n", buf);
@@ -204,7 +212,7 @@ int main(int argc, char **argv)
                 else
                 {
                     exec_count = exec_count + 1;
-                    //printf("read %s\n", buf);
+                    //printf("fail %d\n", i);
                 }
                 
                 close(fd);
