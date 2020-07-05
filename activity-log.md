@@ -1,5 +1,13 @@
 ## activity log
 
+### 5/7/2020
+- the readahead function kprobes don't seem to be triggered
+- the mmap shared doesn't really change things
+- recompiling to catch generic file buffered read
+- installed bcc tools in /usr/share/bcc
+- todo: put printks in file buffered read to understand if it goes to the readahead part
+
+
 ### 1/7/2020
 - found out that with readahead or WILLNEED, plus fsync to hopefully free page cache, the success rate is much higher
 - set up cgroup to see if assigning more virtual memory to the process can improve this, or make sure to invalidate the page cache every time

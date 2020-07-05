@@ -21,7 +21,7 @@
 #include "bpf_load.h"
 #include <fcntl.h>
 
-#define ITERATIONS 20000
+#define ITERATIONS 5
 #define READ_SIZE 4096
 #define MAX_READ 4096
 #define EXEC_1 0

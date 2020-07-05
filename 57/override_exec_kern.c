@@ -41,6 +41,37 @@ struct bpf_map_def SEC("maps") str_counter_map =
 };
 
 
+SEC("kprobe/page_cache_sync_readahead")
+int bpf_readahead(struct pt_regs *ctx)
+{
+
+	char s[] = "readahead call\n";
+	bpf_trace_printk(s, sizeof(s)); 
+
+	return 0;
+}
+
+SEC("kprobe/generic_file_read_iter")
+int bpf_genericfileread(struct pt_regs *ctx)
+{
+
+	char s[] = "genericfileread call\n";
+	bpf_trace_printk(s, sizeof(s)); 
+
+	return 0;
+}
+
+SEC("kprobe/generic_file_buffered_read")
+int bpf_genericfilebufferedread(struct pt_regs *ctx)
+{
+
+	char s[] = "genericfilebufferedread call\n";
+	bpf_trace_printk(s, sizeof(s)); 
+
+	return 0;
+}
+
+
 SEC("kprobe/copyout_bpf")
 int bpf_copyout(struct pt_regs *ctx)
 {
@@ -67,6 +98,10 @@ int bpf_copyout(struct pt_regs *ctx)
 
 	if (to == *val)
 	{
+
+		//char s[] = "copyout call\n";
+		//bpf_trace_printk(s, sizeof(s)); 
+
 		__u64 * counter;
 		__u64 num;
 		counter = bpf_map_lookup_elem(&counter_map, &key);
