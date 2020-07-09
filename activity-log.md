@@ -1,5 +1,22 @@
 ## activity log
 
+### 9/7/2020
+- started creating the ramdisk to experiment with that, so far it doesn't change but no clue if i'm using that correclty
+- https://people.freedesktop.org/~narmstrong/meson_drm_doc/admin-guide/initrd.html
+- https://github.com/torvalds/linux/blob/master/Documentation/admin-guide/blockdev/ramdisk.rst
+- https://www.kernel.org/doc/html/latest/admin-guide/blockdev/ramdisk.html
+- https://www.techrepublic.com/article/how-to-use-a-ramdisk-on-linux/
+
+```
+sudo mkdir -p /media/ramdisk
+sudo mount -t tmpfs -o size=2048M tmpfs /media/ramdisk
+
+sudo dd if=/dev/zero of=/dev/ram0 bs=1k count=2048
+sudo mke2fs -vm0 /dev/ram0 2048
+sudo mount -t ext2 -o loop /dev/ram0 /home/giogge/thesis/ebpf-experiments/57/compiled/ramdisk/
+
+```
+
 ### 5/7/2020
 - the readahead function kprobes don't seem to be triggered
 - the mmap shared doesn't really change things
