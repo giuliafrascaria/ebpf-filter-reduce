@@ -21,9 +21,10 @@
 #include "bpf_load.h"
 #include <fcntl.h>
 
-#define ITERATIONS 5
-#define READ_SIZE 4096
-#define MAX_READ 4096
+#define ITERATIONS 250
+#define MAX_ITER 10000
+#define READ_SIZE 1048576 //file is now 32*4kb = 131072 262144 1mb=1048576 4mb= 4194304 2mb=2097152
+#define MAX_READ 1048576
 #define EXEC_1 0
 #define EXEC_2 1
 
@@ -49,7 +50,11 @@ int main(int argc, char **argv)
     int partial_override_count = 0;
     int exec_count = 0;
 
+    int i;
+    i = atoi(argv[1]);
+
     int readsize = READ_SIZE;
+    int iter = ITERATIONS * i;
 
 
     __u32 key = 0;
@@ -158,15 +163,17 @@ int main(int argc, char **argv)
     exec_count = 0;
 
     readsize = READ_SIZE;
+    
 
     if(EXEC_2)
     {
-        while (readsize <= MAX_READ)
-        {
+        //while (readsize <= MAX_READ)
+        //while (iter <= MAX_ITER)
+        //{
             char * buf = malloc(readsize + 1);
             //char * buf = mmap(NULL, 4095, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
-            printf("buffer on user side = %lu\n", (unsigned long) buf);
+            //printf("buffer on user side = %lu\n", (unsigned long) buf);
 
             __u32 key = 0;	
             if (bpf_map_update_elem(map_fd[0], &key, &buf, BPF_ANY) != 0) 
@@ -176,10 +183,10 @@ int main(int argc, char **argv)
             }
 
 
-            for (int i = 0; i < ITERATIONS; i++)
+            for (int i = 0; i < iter; i++)
             {
 
-                int fd = open("file", O_RDONLY);
+                int fd = open("out", O_RDONLY);
 
                 if (fd == -1)
                 {
@@ -198,15 +205,14 @@ int main(int argc, char **argv)
 
                 if ( strncmp(buf, expected, 2) == 0)
                 {
-                    if(strcmp(buf + 2, "a") == 0)
+                    /*if(strcmp(buf + 2, "a") == 0)
                     {
                         partial_override_count += 1;
-                    }
-                    else
-                    {
-                        //successful complete return override
-                        override_count = override_count + 1;
-                    }
+                    }*/
+                    
+                    //successful complete return override
+                    override_count = override_count + 1;
+                    
                     //printf("read %s\n", buf);
                 }
                 else
@@ -220,16 +226,22 @@ int main(int argc, char **argv)
                 
             }
 
-            printf("---------------------------------------------------------\nknown size : %d\nsuccess: %d\npartial: %d\nfail: %d\n---------------------------------------------------------\n", readsize, override_count, partial_override_count, exec_count);
+            //printf("---------------------------------------------------------\nknown size : %d\nsuccess: %d\npartial: %d\nfail: %d\n---------------------------------------------------------\n", readsize, override_count, partial_override_count, exec_count);
+            printf("%d, %d, %d\n", iter, override_count, exec_count);
+
             override_count = 0;
             partial_override_count = 0;
             exec_count = 0;
 
-            readsize = readsize * 2;
+            //readsize = readsize * 2;
+
+            //iter = iter + 250;
+
+            //sleep(5);
 
             free(buf);
 
-        }
+        //}
     }
 
     
@@ -238,7 +250,7 @@ int main(int argc, char **argv)
     unsigned long count;
 	bpf_map_lookup_elem(map_fd[1], &key, &count);
 
-    printf("kprobe executed %lu times\n", count);
+    //printf("kprobe executed %lu times\n", count);
 
 	return 0;
 

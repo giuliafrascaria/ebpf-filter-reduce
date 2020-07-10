@@ -1,5 +1,12 @@
 ## activity log
 
+### 10/7/2020
+- benchmarked more in detail the behavior of the override exec
+- graphed based on the number of iterations, looka like it starts to fail consistently once the iterations lead dto read more than approx 100mb of data
+- doesn't seem to be influenced by vfs_pressure
+- https://manybutfinite.com/post/page-cache-the-affair-between-memory-and-files/
+
+
 ### 9/7/2020
 - started creating the ramdisk to experiment with that, so far it doesn't change but no clue if i'm using that correclty
 - https://people.freedesktop.org/~narmstrong/meson_drm_doc/admin-guide/initrd.html
