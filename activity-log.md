@@ -1,5 +1,8 @@
 ## activity log
 
+### 11/7/2020
+- experimented with single read from big file
+
 ### 10/7/2020
 - benchmarked more in detail the behavior of the override exec
 - graphed based on the number of iterations, looka like it starts to fail consistently once the iterations lead dto read more than approx 100mb of data

@@ -23,8 +23,8 @@
 
 #define ITERATIONS 250
 #define MAX_ITER 10000
-#define READ_SIZE 1048576 //file is now 32*4kb = 131072 262144 1mb=1048576 4mb= 4194304 2mb=2097152
-#define MAX_READ 1048576
+#define READ_SIZE 4096 //file is now 32*4kb = 131072 262144 1mb=1048576 4mb= 4194304 2mb=2097152
+#define MAX_READ 4096
 #define EXEC_1 0
 #define EXEC_2 1
 
@@ -182,23 +182,24 @@ int main(int argc, char **argv)
                 return 1;
             }
 
+            int fd = open("randfile", O_RDONLY);
+
+            if (fd == -1)
+            {
+                printf("error open file 2\n");
+                exit(EXIT_FAILURE);
+            }
 
             for (int i = 0; i < iter; i++)
             {
 
-                int fd = open("out", O_RDONLY);
-
-                if (fd == -1)
-                {
-                    printf("error open file 2\n");
-                    exit(EXIT_FAILURE);
-                }
+                
 
                 //int posix_fadvise(int fd, off_t offset, off_t len, int advice);
                 //posix_fadvise(fd, 0, 4096, POSIX_FADV_DONTNEED);
 
                 //ssize_t readahead(int fd, off64_t offset, size_t count);
-                readahead(fd, 0, 4096);
+                readahead(fd, 0, readsize);
 
                 memset(buf, 0, readsize + 1);
                 ssize_t readbytes = read(fd, buf, readsize);
@@ -221,11 +222,12 @@ int main(int argc, char **argv)
                     //printf("fail %d\n", i);
                 }
                 
-                close(fd);
+                //close(fd);
                 memset(buf, 0, readsize + 1);
                 
             }
 
+            close(fd);
             //printf("---------------------------------------------------------\nknown size : %d\nsuccess: %d\npartial: %d\nfail: %d\n---------------------------------------------------------\n", readsize, override_count, partial_override_count, exec_count);
             printf("%d, %d, %d\n", iter, override_count, exec_count);
 
