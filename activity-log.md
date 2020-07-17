@@ -1,5 +1,18 @@
 ## activity log
 
+### 16/7/2020
+- https://elixir.bootlin.com/linux/v5.7/source/fs/ext4/file.c#L873
+- https://elixir.bootlin.com/linux/v5.7/source/fs/iomap/direct-io.c#L401 second param is the destination
+- https://elixir.bootlin.com/linux/v5.7/source/fs/iomap/direct-io.c#L367
+- https://elixir.bootlin.com/linux/v5.7/source/fs/iomap/direct-io.c#L340 calls copy to iter that then calls copyout, hopefully I fall in this path
+
+
+### 15/7/2020
+- https://elixir.bootlin.com/linux/v5.7/source/mm/filemap.c#L1603
+- looking into the behaviors of the page cache
+- I can more reliably override if I avoid flushing the page cache, the io does not show from disk so I am serving from ram
+- vmtouch tool to know how buch of a file is in vm
+
 ### 11/7/2020
 - experimented with single read from big file
 
