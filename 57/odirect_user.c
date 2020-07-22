@@ -53,6 +53,12 @@ int main(int argc, char **argv)
     int partial_override_count = 0;
     int exec_count = 0;
 
+    if (argc != 2)
+    {
+        printf("usage: ./odirect n\nn: number of batched of iteration. every batch is 1000\n");
+        return 1;
+    }
+
     int i;
     i = atoi(argv[1]);
 

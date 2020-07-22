@@ -2,7 +2,7 @@
 
 I use a ubuntu 18.4 server virtual machine with kvm ( https://releases.ubuntu.com/18.04/ ) with 120GB HDD and 16GB of RAM
 
-I get the ip address with 
+After installation, I get the ip address with 
 ```
 virsh net-dhcp-leases default
 ```
@@ -20,7 +20,9 @@ git clone --branch stable5.7 https://github.com/giuliafrascaria/linux.git
 git clone --branch 5.7 https://github.com/giuliafrascaria/ebpf-experiments.git
 git clone https://github.com/libbpf/libbpf
 ```
-build libbpf and compile linux, use the given config file for the bpf flags
+build libbpf and copy /libbpf/src/ in /ebpf-experiments/57/libbpf/src/
+
+compile linux with the given config file for the bpf flags
 ```
 make oldconfig
 make
@@ -51,6 +53,6 @@ sudo mkdir /usr/src/linux-headers-`uname -r`/arch/x86
 sudo cp -r include/ /usr/src/linux-headers-`uname -r`/
 sudo cp -r arch/x86/include/ /usr/src/linux-headers-`uname -r`/arch/x86/
 ```
-the bpf code is in ebpf-experiments/57, if all goes as expected the script ./make-testbuild.sh should work, changing the path to /libbpf/src/ according to your path
 
+the bpf code is in ebpf-experiments/57, if all goes as expected the script ./make-testbuild.sh should work
 the compiled files are in /compiled. the bug happens in ./override_exec and is benchmarked in ./iter.sh

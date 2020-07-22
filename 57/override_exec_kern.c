@@ -71,6 +71,16 @@ int bpf_genericfilebufferedread(struct pt_regs *ctx)
 	return 0;
 }
 
+SEC("kprobe/copy_user_enhanced_fast_string")
+int bpf_fastcopy(struct pt_regs *ctx)
+{
+
+	char s[] = "faststringcopy call\n";
+	bpf_trace_printk(s, sizeof(s)); 
+
+	return 0;
+}
+
 
 SEC("kprobe/copyout_bpf")
 int bpf_copyout(struct pt_regs *ctx)
@@ -127,10 +137,7 @@ int bpf_copyout(struct pt_regs *ctx)
         char mystring[] = "42\n"; 
 		bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
 
-		//bpf_probe_write_user((void *) to, (void *) counter, sizeof(counter));
 
-		//char s2[] = "%llu, kprobe\n";
-		//bpf_trace_printk(s2, sizeof(s2), (unsigned long long) curtime);
 	}
 
 	return 0;

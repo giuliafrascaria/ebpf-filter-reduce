@@ -21,10 +21,10 @@
 #include "bpf_load.h"
 #include <fcntl.h>
 
-#define ITERATIONS 250
+#define ITERATIONS 1000
 #define MAX_ITER 10000
-#define READ_SIZE 4096 //file is now 32*4kb = 131072 262144 1mb=1048576 4mb= 4194304 2mb=2097152
-#define MAX_READ 4096
+#define READ_SIZE 2048 //file is now 32*4kb = 131072 262144 1mb=1048576 4mb= 4194304 2mb=2097152
+#define MAX_READ 2048
 #define EXEC_1 0
 #define EXEC_2 1
 
@@ -49,6 +49,12 @@ int main(int argc, char **argv)
     int override_count = 0;
     int partial_override_count = 0;
     int exec_count = 0;
+
+    if (argc != 2)
+    {
+        printf("usage: ./override_exec n\nn: number of batched of iteration. every batch is 1000\n");
+        return 1;
+    }
 
     int i;
     i = atoi(argv[1]);
@@ -199,7 +205,7 @@ int main(int argc, char **argv)
                 //posix_fadvise(fd, 0, 4096, POSIX_FADV_DONTNEED);
 
                 //ssize_t readahead(int fd, off64_t offset, size_t count);
-                readahead(fd, 0, readsize);
+                readahead(fd, 0, 524288000);
 
                 memset(buf, 0, readsize + 1);
                 ssize_t readbytes = read(fd, buf, readsize);
@@ -223,13 +229,14 @@ int main(int argc, char **argv)
                 }
                 
                 //close(fd);
+                //fsync(fd); 
                 memset(buf, 0, readsize + 1);
                 
             }
 
             close(fd);
             //printf("---------------------------------------------------------\nknown size : %d\nsuccess: %d\npartial: %d\nfail: %d\n---------------------------------------------------------\n", readsize, override_count, partial_override_count, exec_count);
-            printf("%d, %d, %d\n", iter, override_count, exec_count);
+            printf("%d, %d, %d, %d\n", iter, override_count, exec_count, iter*readsize);
 
             override_count = 0;
             partial_override_count = 0;
