@@ -22,8 +22,10 @@ git clone https://github.com/libbpf/libbpf
 ```
 build libbpf and copy /libbpf/src/ in /ebpf-experiments/57/libbpf/src/
 
-compile linux with the given config file for the bpf flags
+checkout the tag and compile linux with the given config file for the bpf flags
 ```
+git checkout tags/testsetup-kern -b test
+
 make oldconfig
 make
 sudo make modules_install
@@ -54,5 +56,11 @@ sudo cp -r include/ /usr/src/linux-headers-`uname -r`/
 sudo cp -r arch/x86/include/ /usr/src/linux-headers-`uname -r`/arch/x86/
 ```
 
-the bpf code is in ebpf-experiments/57, if all goes as expected the script ./make-testbuild.sh should work
+the bpf code is in ebpf-experiments/57. checkout at tag
+
+```
+git checkout tags/testsetup-bpf -b test
+```
+
+if all goes as expected the script ./make-testbuild.sh should work
 the compiled files are in /compiled. the bug happens in ./override_exec and is benchmarked in ./iter.sh
