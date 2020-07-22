@@ -26,14 +26,14 @@ int main(int argc, char **argv)
 	char filename[256];
 	int ret;
 
-	int fd = open("file", O_RDONLY);
+	int fd = open("randfile", O_RDONLY);
 	if (fd == -1)
 	{
 		printf("error open file\n");
 		exit(EXIT_FAILURE);
 	}
 
- 	char * buf = mmap(NULL, 4096, PROT_READ, MAP_SHARED | MAP_POPULATE, fd, 0);
+ 	char * buf = mmap(NULL, 524288000, PROT_READ, MAP_SHARED | MAP_POPULATE, fd, 0);
      if (buf == NULL)
     {
         fprintf(stderr, "mmap failed: %s\n", strerror(errno));
