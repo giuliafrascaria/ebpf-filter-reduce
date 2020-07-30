@@ -16,16 +16,20 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
-
+#include <assert.h>
 #include <bpf.h>
 #include "bpf_load.h"
 
+
+#define MIN_FUNC 3
+#define MIN_FUNC_PROG_FD (prog_fd[0])
+#define PROG_ARRAY_FD (map_fd[2])
 
 
 int main(int argc, char **argv)
 {
 	char filename[256];
-	int ret;
+	int ret, err, id, fkey = MIN_FUNC;
 
 	snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
 	printf("eBPF file to be loaded is : %s \n", filename);
@@ -34,6 +38,16 @@ int main(int argc, char **argv)
 		printf("%s", bpf_log_buf);
 		return 1;
 	}
+
+	struct bpf_prog_info info = {};
+	uint32_t info_len = sizeof(info);
+
+    /* Test fd array lookup which returns the id of the bpf_prog */
+	err = bpf_obj_get_info_by_fd(MIN_FUNC_PROG_FD, &info, &info_len);
+	assert(!err);
+	err = bpf_map_lookup_elem(PROG_ARRAY_FD, &fkey, &id);
+	assert(!err);
+	assert(id == info.id);
 
 
 	int fd = open("f", O_RDONLY);

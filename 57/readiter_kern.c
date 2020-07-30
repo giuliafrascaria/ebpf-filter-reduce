@@ -11,7 +11,7 @@
 #define _(P) ({typeof(P) val = 0; bpf_probe_read(&val, sizeof(val), &P); val;})
 #define PROG(F) SEC("kprobe/"__stringify(F)) int bpf_func_##F
 //#define	UBUFFSIZE	2048
-#define	UBUFFSIZE	4096
+#define	UBUFFSIZE	256
 
 struct bpf_map_def SEC("maps") my_read_map =
 {
@@ -29,12 +29,12 @@ struct bpf_map_def SEC("maps") result_map =
 	.max_entries = 1,	//used to pass the average back to the user
 };
 
-struct bpf_map_def SEC("maps") debug_map = {
+/*struct bpf_map_def SEC("maps") debug_map = {
 	.type = BPF_MAP_TYPE_PERF_EVENT_ARRAY,
 	.key_size = sizeof(int),
 	.value_size = sizeof(int),
 	.max_entries = 64,
-};
+};*/
 
 struct bpf_map_def SEC("maps") jmp_table = {
 	.type = BPF_MAP_TYPE_PROG_ARRAY,
@@ -179,15 +179,6 @@ int bpf_copy_to_pipe(struct pt_regs *ctx)
 	return 0;
 }
 
-/*SEC("kprobe/copy_user_enhanced_fast_string")
-int bpf_enhanced_fast_string(struct pt_regs *ctx)
-{
-
-	char s[] = "enhanced fast string\n";
-	bpf_trace_printk(s, sizeof(s));
-	return 0;
-}*/
-
 
 SEC("kprobe/copyout_bpf")
 int bpf_copyout(struct pt_regs *ctx)
@@ -273,21 +264,23 @@ int bpf_copyout(struct pt_regs *ctx)
 			sum = sum + num;
 		}
 
-		unsigned long avg = sum/elems;
+		//unsigned long avg = sum/elems;
 		
-		char s4[] = "sum of numbers is %lu, avg is %lu, read %lu elements\n";
-		bpf_trace_printk(s4, sizeof(s4), sum, avg, elems);
+		//char s4[] = "sum of numbers is %lu, avg is %lu, read %lu elements\n";
+		//bpf_trace_printk(s4, sizeof(s4), sum, avg, elems);
+		char s4[] = "sum of numbers is %lu read %lu elements\n";
+		bpf_trace_printk(s4, sizeof(s4), sum, elems);
 
-		bpf_map_update_elem(&result_map, &key, &avg, BPF_ANY);
+		bpf_map_update_elem(&result_map, &key, &sum, BPF_ANY);
 
 		//doesn't work because then copyout bpf is called and overwrites this, until I have an integrated edit of the return value
-		char mystring[] = "42\n";
-		bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
+		//char mystring[] = "42\n";
+		//bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
 
 		//now this works, but then to is overwritten by the real function copyout so it is not returned to user
 		//if only I could get return override, that highjacks execution T_T
-		char s5[] = "now the to buffer is %s\n";
-		bpf_trace_printk(s5, sizeof(s5), to);
+		//char s5[] = "now the to buffer is %s\n";
+		//bpf_trace_printk(s5, sizeof(s5), to);
 		//bpf_probe_write_user((void *) from, (char*) &avg, sizeof(avg));
 
 		//bpf_my_printk();

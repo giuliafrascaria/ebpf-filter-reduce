@@ -40,7 +40,7 @@ gcc "$USER".c bpf_load.c ./tools/lib/bpf/libbpf.a ./tools/testing/selftests/bpf/
 
 }
 
-targets=( tracex1 odirect freplace procfs_override readiter hellotrace strtol override_exec fentry_test)
+targets=( progarray tracex1 odirect freplace procfs_override readiter hellotrace strtol override_exec fentry_test)
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"

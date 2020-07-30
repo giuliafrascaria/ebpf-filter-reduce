@@ -1,5 +1,13 @@
 ## activity log
 
+### 24/7/2020
+- reading some stuff about fentry and trampoline
+- python debugger in kernel drgn tool https://www.kernel.org/doc/html/latest/bpf/drgn.html
+- https://lwn.net/Articles/789641/ 
+- https://www.spinics.net/lists/netdev/msg626011.html bpf prog type ext!!! might be the thing I need to overcome verifier
+- https://www.spinics.net/lists/xdp-newbies/msg01673.html BPF_PROG_TYPE_EXT
+
+
 ### 16/7/2020
 - https://elixir.bootlin.com/linux/v5.7/source/fs/ext4/file.c#L873
 - https://elixir.bootlin.com/linux/v5.7/source/fs/iomap/direct-io.c#L401 second param is the destination
