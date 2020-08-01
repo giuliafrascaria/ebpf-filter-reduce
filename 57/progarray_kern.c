@@ -9,6 +9,7 @@
 
 
 #define _(P) ({typeof(P) val = 0; bpf_probe_read(&val, sizeof(val), &P); val;})
+
 #define PROG(F) SEC("kprobe/"__stringify(F)) int bpf_func_##F
 //#define	UBUFFSIZE	2048
 #define	UBUFFSIZE	256
@@ -38,19 +39,19 @@ struct bpf_map_def SEC("maps") result_map =
 
 struct bpf_map_def SEC("maps") jmp_table = {
 	.type = BPF_MAP_TYPE_PROG_ARRAY,
-	.key_size = 4,
-	.value_size = 4,
+	.key_size = sizeof(u32),
+	.value_size = sizeof(u32),
 	.max_entries = 8,
 };
 
-#define AVG_FUNC 1
-#define MAX_FUNC 2
-#define MIN_FUNC 3
+#define MIN_FUNC 1
 
-
-PROG(MIN_FUNC)(struct pt_regs *ctx)
+/*
+SEC("MIN_FUNC")
+int min_func()
 {
-	void __user *to;
+	
+	void __user *to; //struct pt_regs *ctx
     int ret;
     char curr[3];
 
@@ -59,11 +60,11 @@ PROG(MIN_FUNC)(struct pt_regs *ctx)
 
     ret = bpf_probe_read_str(curr, 3, to);
 
-    char s4[] = "tail call read %s\n";
-	bpf_trace_printk(s4, sizeof(s4), curr);
+    char s4[] = "tail call read\n";
+	bpf_trace_printk(s4, sizeof(s4));
 	return 0;
 }
-
+*/
 
 SEC("kprobe/copyout_bpf")
 int bpf_copyout(struct pt_regs *ctx)

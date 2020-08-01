@@ -19,9 +19,10 @@
 #include <assert.h>
 #include <bpf.h>
 #include "bpf_load.h"
+#include <libbpf.h>
 
 
-#define MIN_FUNC 3
+#define MIN_FUNC 1
 #define MIN_FUNC_PROG_FD (prog_fd[0])
 #define PROG_ARRAY_FD (map_fd[2])
 
@@ -30,25 +31,42 @@ int main(int argc, char **argv)
 {
 	char filename[256];
 	int ret, err, id, fkey = MIN_FUNC;
+	struct rlimit r = {RLIM_INFINITY, RLIM_INFINITY};
 
 	snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
 	printf("eBPF file to be loaded is : %s \n", filename);
+	setrlimit(RLIMIT_MEMLOCK, &r);
 
 	if (load_bpf_file(filename)) {
 		printf("%s", bpf_log_buf);
 		return 1;
 	}
 
-	struct bpf_prog_info info = {};
+	char extension[256];
+	snprintf(extension, sizeof(extension), "%s_func.o", argv[1]);
+	printf("eBPF file to be loaded is : %s \n", extension);
+
+	struct bpf_object *obj;
+
+	//obj = bpf_object__open(extension);
+	int prog_fd;
+	if (bpf_prog_load(extension, BPF_PROG_TYPE_KPROBE, &obj, &prog_fd))
+	{
+		printf("error reading extension");
+		return 1;
+	}
+
+	bpf_map_update_elem(map_fd[2], &fkey, &prog_fd, BPF_ANY);
+	/*struct bpf_prog_info info = {};
 	uint32_t info_len = sizeof(info);
 
-    /* Test fd array lookup which returns the id of the bpf_prog */
+    // Test fd array lookup which returns the id of the bpf_prog 
 	err = bpf_obj_get_info_by_fd(MIN_FUNC_PROG_FD, &info, &info_len);
 	assert(!err);
 	err = bpf_map_lookup_elem(PROG_ARRAY_FD, &fkey, &id);
 	assert(!err);
 	assert(id == info.id);
-
+	printf("%d\n", id);*/
 
 	int fd = open("f", O_RDONLY);
 	if (fd == -1)

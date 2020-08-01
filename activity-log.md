@@ -1,5 +1,12 @@
 ## activity log
 
+### 1/8/2020
+- no surprise, the bpf tail call is still a pain
+- at least now i'm creating the structure to let the users pass stuff 
+- still verifier issue with tail call but I don't know why, will double check examples and book
+- https://elixir.bootlin.com/linux/v5.7/source/samples/bpf/tracex5_kern.c#L35
+- https://elixir.bootlin.com/linux/v5.7/source/tools/lib/bpf/libbpf.c#L6933
+
 ### 24/7/2020
 - reading some stuff about fentry and trampoline
 - python debugger in kernel drgn tool https://www.kernel.org/doc/html/latest/bpf/drgn.html
