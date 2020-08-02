@@ -42,6 +42,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	
 	char extension[256];
 	snprintf(extension, sizeof(extension), "%s_func.o", argv[1]);
 	printf("eBPF file to be loaded is : %s \n", extension);
@@ -56,7 +57,12 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	bpf_map_update_elem(map_fd[2], &fkey, &prog_fd, BPF_ANY);
+	err = bpf_map_update_elem(map_fd[2], &fkey, &prog_fd, BPF_ANY);
+	if(err)
+	{
+		printf("map update error for prog\n");
+		return 1;
+	}
 	/*struct bpf_prog_info info = {};
 	uint32_t info_len = sizeof(info);
 
@@ -85,7 +91,7 @@ int main(int argc, char **argv)
 		return 1;
     }
 
-	ssize_t readbytes = read(fd, buf, 256);
+	ssize_t readbytes = read(fd, buf, 128);
 	printf("retval = %d\n", (int) readbytes);
 
 

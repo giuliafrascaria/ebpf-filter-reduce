@@ -6,6 +6,7 @@
 - still verifier issue with tail call but I don't know why, will double check examples and book
 - https://elixir.bootlin.com/linux/v5.7/source/samples/bpf/tracex5_kern.c#L35
 - https://elixir.bootlin.com/linux/v5.7/source/tools/lib/bpf/libbpf.c#L6933
+- https://patchwork.ozlabs.org/project/netdev/patch/1432079946-9878-4-git-send-email-ast@plumgrid.com/
 
 ### 24/7/2020
 - reading some stuff about fentry and trampoline
@@ -480,6 +481,7 @@ failed: 1000
 - https://elixir.bootlin.com/linux/v5.4/source/arch/x86/include/asm/uaccess_64.h#L28
 - http://alumni.cs.ucr.edu/~tianc/publications/pldi10.pdf
 - https://www.kernel.org/doc/html/v4.17/userspace-api/spec_ctrl.html
+- https://github.com/gregkh/commit_tree/blob/4c08070b8b59db9e1fa4e17016e451cad8496f74/changes/5.7-rc6/ae24082331d9bbaae283aafbe930a8f0eb85605a
 
 
 ### 2/4/2020

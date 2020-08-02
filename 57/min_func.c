@@ -7,12 +7,31 @@
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_tracing.h>
 
-SEC("MIN_FUNC")
-int min_func()
+#define PROG(F) SEC("kprobe/"__stringify(F)) int bpf_func_##F
+
+struct bpf_map_def SEC("maps") result_map =
+{
+	.type = BPF_MAP_TYPE_ARRAY,
+	.key_size = sizeof(u32),
+	.value_size = sizeof(u64),
+	.max_entries = 1,	//used to pass the average back to the user
+};
+
+PROG(1)(struct pt_regs *ctx)
 {
 
-    char s4[] = "tail call read\n";
-	bpf_trace_printk(s4, sizeof(s4));
+	void __user *to; //struct pt_regs *ctx
+    int ret;
+    char curr[3];
+
+	//parse parameters from ctx
+	to = (void __user *) PT_REGS_PARM1(ctx);
+
+    ret = bpf_probe_read_str(curr, 3, to);
+
+    char snonmidire[] = "tail call read stuff %s\n";
+	bpf_trace_printk(snonmidire, sizeof(snonmidire), curr);
+	
 	return 0;
 }
 

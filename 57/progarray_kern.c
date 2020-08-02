@@ -44,7 +44,15 @@ struct bpf_map_def SEC("maps") jmp_table = {
 	.max_entries = 8,
 };
 
-#define MIN_FUNC 1
+/*
+PROG(1)(struct pt_regs *ctx)
+{
+
+    char snonmidire[] = "tail call read\n";
+	bpf_trace_printk(snonmidire, sizeof(snonmidire));
+	return 0;
+}*/
+
 
 /*
 SEC("MIN_FUNC")
@@ -101,9 +109,8 @@ int bpf_copyout(struct pt_regs *ctx)
 
 	if (to == *val)
 	{
-
-		unsigned long rc = 0;
-		bpf_override_return(ctx, rc);
+		//unsigned long rc = 0;
+		//bpf_override_return(ctx, rc);
 
 		
 		char s2[] = "copyout to 0x%p, ul %lu len %d\n";
@@ -160,10 +167,11 @@ int bpf_copyout(struct pt_regs *ctx)
 		bpf_map_update_elem(&result_map, &key, &sum, BPF_ANY);
 
 		//doesn't work because then copyout bpf is called and overwrites this, until I have an integrated edit of the return value
-		//char mystring[] = "42\n";
-		//bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
+		char mystring[] = "42\n";
+		bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
 
-        //bpf_tail_call(ctx, &jmp_table, MIN_FUNC);
+        bpf_tail_call(ctx, &jmp_table, (int) 1);
+
 
 		//now this works, but then to is overwritten by the real function copyout so it is not returned to user
 		//if only I could get return override, that highjacks execution T_T

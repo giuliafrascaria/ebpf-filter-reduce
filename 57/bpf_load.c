@@ -51,6 +51,7 @@ static int populate_prog_array(const char *event, int prog_fd)
 		printf("failed to store prog_fd in prog_array\n");
 		return -1;
 	}
+	printf("populated prog array fd %d with prog fd %d at key %d\n", prog_array_fd, prog_fd, ind);
 	return 0;
 }
 
