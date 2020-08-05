@@ -1,5 +1,14 @@
 ## activity log
 
+### 5/8/2020
+- https://gitlab.litespeedtech.com/third-party/libbpf/-/commit/7930230b4323b28b81895aa8f5ab6fda2a6250c1?w=1
+- https://github.com/torvalds/linux/blob/29d9f30d4ce6c7a38745a54a8cddface10013490/kernel/bpf/trampoline.c
+- https://github.com/ColinIanKing/linux-next-mirror/commit/4eaf0b5c5e04c21a866431bd763ab4b1f24c4d16
+- https://github.com/torvalds/linux/blob/master/tools/bpf/bpftool/Documentation/bpftool-prog.rst
+- fentry does not seem to even load, bpf2bpf is maybe a good example for the way to load? there's literally nothing else on github
+- https://github.com/ColinIanKing/linux-next-mirror/commit/4eaf0b5c5e04c21a866431bd763ab4b1f24c4d16
+- https://github.com/ColinIanKing/linux-next-mirror/blob/c9529331c7a22b8eb7eb03e1e0e221d0f58b43de/tools/testing/selftests/bpf/progs/trigger_bench.c
+
 ### 1/8/2020
 - no surprise, the bpf tail call is still a pain
 - at least now i'm creating the structure to let the users pass stuff 

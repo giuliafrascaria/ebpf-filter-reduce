@@ -34,16 +34,29 @@ int main(int argc, char **argv)
 	printf("eBPF file to be loaded is : %s \n", filename);
 
 	struct bpf_object *obj;
+	int prog_fd, err;
+	const char * prog_name[] = {
+		"fentry/copyout_fmod_test",
+		"fmod_ret/copyout_fmod_test",
+		"fexit/copyout_fmod_test",
+	};
+
+	//obj = bpf_object__open(extension);
+	/*int prog_fd;
+	if (bpf_prog_load(filename, BPF_PROG_TYPE_TRACING, &obj, &prog_fd))
+	{
+		printf("error reading bpf instrumentation");
+		return 1;
+	}*/
+
 
 	obj = bpf_object__open(filename);
-	ret = bpf_object__load(obj);
-	//ret = load_bpf_file(filename);
-	printf("bpf obj load return: %d\n", ret);
-	if (ret) 
-    {
-		printf("%s", bpf_log_buf);
-		return 1;
-	}
+	
+	printf("opened at %p\n", obj);
+
+	err = bpf_object__load(obj);
+	
+	printf("loaded with error code %d\n", err);
 
     int fd = open("f", O_RDONLY);
 	if (fd == -1)
@@ -54,7 +67,7 @@ int main(int argc, char **argv)
 
  	char * buf = malloc(50);
 
-	ssize_t readbytes = read(fd, buf, 9);
+	ssize_t readbytes = read(fd, buf, 42);	//42 read size will trigger the fentry test call
 	printf("retval = %d\n", (int) readbytes);
 	close(fd);
 	free(buf);
