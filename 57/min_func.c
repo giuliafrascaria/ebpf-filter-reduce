@@ -31,6 +31,10 @@ PROG(1)(struct pt_regs *ctx)
 
     char snonmidire[] = "tail call read stuff %s\n";
 	bpf_trace_printk(snonmidire, sizeof(snonmidire), curr);
+
+	__u32 key = 0;
+    unsigned long sum = 42;
+    bpf_map_update_elem(&result_map, &key, &sum, BPF_ANY);
 	
 	return 0;
 }

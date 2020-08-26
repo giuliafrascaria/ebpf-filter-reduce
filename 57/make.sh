@@ -72,7 +72,7 @@ for t in "${targets[@]}" ; do
 	magic_make $t
 done
 
-funcs=( min)
+funcs=( min filter)
 
 for t in "${funcs[@]}" ; do
 	echo "making function...$t"

@@ -1,5 +1,11 @@
 ## activity log
 
+### 26/8/2020
+- back from holiday, I finished the infrastructure with the tail calls
+- now the main kprobe hooks the required buffer, and then the user can choose two functions to instrument
+- filter function, operates on the from buffer and writes the filtered buffer in user buffer
+- reduce function takes the user buffer and returns the numerical value through map
+
 ### 5/8/2020
 - https://gitlab.litespeedtech.com/third-party/libbpf/-/commit/7930230b4323b28b81895aa8f5ab6fda2a6250c1?w=1
 - https://github.com/torvalds/linux/blob/29d9f30d4ce6c7a38745a54a8cddface10013490/kernel/bpf/trampoline.c

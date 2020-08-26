@@ -29,6 +29,10 @@
 
 int main(int argc, char **argv)
 {
+	if (argc != 3)
+	{
+		printf("usage: ./progarray filter-function reduce-function\n");
+	}
 	char filename[256];
 	int ret, err, id, fkey = MIN_FUNC;
 	struct rlimit r = {RLIM_INFINITY, RLIM_INFINITY};
@@ -42,14 +46,13 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	
+	// ------------------ filter ---------------------------
 	char extension[256];
 	snprintf(extension, sizeof(extension), "%s_func.o", argv[1]);
 	printf("eBPF file to be loaded is : %s \n", extension);
 
 	struct bpf_object *obj;
 
-	//obj = bpf_object__open(extension);
 	int prog_fd;
 	if (bpf_prog_load(extension, BPF_PROG_TYPE_KPROBE, &obj, &prog_fd))
 	{
@@ -57,10 +60,34 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	// ---------------- reduce -------------------------------
+	char extension2[256];
+	snprintf(extension2, sizeof(extension2), "%s_func.o", argv[2]);
+	printf("eBPF file to be loaded is : %s \n", extension);
+
+	struct bpf_object *obj2;
+
+	int prog_fd2;
+	if (bpf_prog_load(extension2, BPF_PROG_TYPE_KPROBE, &obj2, &prog_fd2))
+	{
+		printf("error reading extension");
+		return 1;
+	}
+
+	// load filter function prog fd in main kprobe intrumentation
 	err = bpf_map_update_elem(map_fd[2], &fkey, &prog_fd, BPF_ANY);
 	if(err)
 	{
 		printf("map update error for prog\n");
+		return 1;
+	}
+
+	//load reduce function progfd in filter instrumentation
+	int filter_map_fd = bpf_object__find_map_fd_by_name(obj, "jmp_table");
+	err = bpf_map_update_elem(filter_map_fd, &fkey, &prog_fd2, BPF_ANY);
+	if(err)
+	{
+		printf("map update error for filter prog\n");
 		return 1;
 	}
 	/*struct bpf_prog_info info = {};
@@ -97,8 +124,14 @@ int main(int argc, char **argv)
 
 	unsigned long avg;
 	bpf_map_lookup_elem(map_fd[1], &key, &avg);
-
 	printf("avg = %lu, on buffer %s\n", avg, buf);
+
+
+	int tail_map_fd = bpf_object__find_map_fd_by_name(obj2, "result_map");
+	unsigned long min;
+	bpf_map_lookup_elem(tail_map_fd, &key, &min);
+	printf("min = %lu\n", min);
+
 
 	printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");
 
