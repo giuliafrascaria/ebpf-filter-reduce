@@ -90,17 +90,8 @@ int main(int argc, char **argv)
 		printf("map update error for filter prog\n");
 		return 1;
 	}
-	/*struct bpf_prog_info info = {};
-	uint32_t info_len = sizeof(info);
 
-    // Test fd array lookup which returns the id of the bpf_prog 
-	err = bpf_obj_get_info_by_fd(MIN_FUNC_PROG_FD, &info, &info_len);
-	assert(!err);
-	err = bpf_map_lookup_elem(PROG_ARRAY_FD, &fkey, &id);
-	assert(!err);
-	assert(id == info.id);
-	printf("%d\n", id);*/
-
+	// open file and read to trigger the instrumentation
 	int fd = open("f", O_RDONLY);
 	if (fd == -1)
 	{
@@ -122,15 +113,16 @@ int main(int argc, char **argv)
 	printf("retval = %d\n", (int) readbytes);
 
 
-	unsigned long avg;
-	bpf_map_lookup_elem(map_fd[1], &key, &avg);
-	printf("avg = %lu, on buffer %s\n", avg, buf);
+	// retrieve results from maps
+	//unsigned long avg;
+	//bpf_map_lookup_elem(map_fd[1], &key, &avg);
+	//printf("avg = %lu, on buffer %s\n", avg, buf);
 
 
-	int tail_map_fd = bpf_object__find_map_fd_by_name(obj2, "result_map");
+	int result_map_fd = bpf_object__find_map_fd_by_name(obj2, "result_map");
 	unsigned long min;
-	bpf_map_lookup_elem(tail_map_fd, &key, &min);
-	printf("min = %lu\n", min);
+	bpf_map_lookup_elem(result_map_fd, &key, &min);
+	printf("res = %lu\n", min);
 
 
 	printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");

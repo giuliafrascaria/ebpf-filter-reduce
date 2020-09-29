@@ -43,8 +43,13 @@ int main(int argc, char **argv)
 	}
 
     char * expected = "42";
-
     char * flag = "deadbeef";
+
+    int ret1, ret2;
+    struct timespec tp1, tp2;
+    clockid_t clk_id1, clk_id2;
+    clk_id1 = CLOCK_MONOTONIC;
+    clk_id2 = CLOCK_MONOTONIC;
 
     int override_count = 0;
     int partial_override_count = 0;
@@ -206,9 +211,13 @@ int main(int argc, char **argv)
 
                 //ssize_t readahead(int fd, off64_t offset, size_t count);
                 readahead(fd, 0, 524288000);
-
                 memset(buf, 0, readsize + 1);
+
+                ret1 = clock_gettime(clk_id1, &tp1);
                 ssize_t readbytes = read(fd, buf, readsize);
+                ret2 = clock_gettime(clk_id2, &tp2);
+
+                printf("time: %ld\n", tp2.tv_nsec- tp1.tv_nsec);
 
                 if ( strncmp(buf, expected, 2) == 0)
                 {
