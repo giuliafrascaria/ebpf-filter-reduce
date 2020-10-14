@@ -65,14 +65,14 @@ clang -nostdinc -isystem `clang -print-file-name=include` \
 
 }
 
-targets=( benchoverride nooverride progarray tracex1 odirect freplace procfs_override readiter hellotrace strtol override_exec fentry_test verifier)
+targets=( endtoend benchoverride nooverride progarray tracex1 odirect freplace procfs_override readiter hellotrace strtol override_exec fentry_test verifier)
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"
 	magic_make $t
 done
 
-funcs=( sum filter)
+funcs=( sum filter 1 2 3 4 5)
 
 for t in "${funcs[@]}" ; do
 	echo "making function...$t"
