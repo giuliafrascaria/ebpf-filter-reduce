@@ -35,14 +35,9 @@ int main(int argc, char **argv)
     int ret1, ret2, ret3, ret4, ret5, ret6;
     struct timespec tp1, tp2, tp3, tp4, tp5, tp6;
     clockid_t clk_id1, clk_id2, clk_id3, clk_id4, clk_id5, clk_id6;
+retry1:
     clk_id1 = CLOCK_MONOTONIC;
     clk_id2 = CLOCK_MONOTONIC;
-
-    clk_id3 = CLOCK_MONOTONIC;
-    clk_id4 = CLOCK_MONOTONIC;
-
-    clk_id5 = CLOCK_MONOTONIC;
-    clk_id6 = CLOCK_MONOTONIC;
 
 
     // open file and read to trigger the instrumentation
@@ -60,7 +55,21 @@ int main(int argc, char **argv)
 	ssize_t readbytes1 = read(fd1, buf1, 256);
 
     ret2 = clock_gettime(clk_id2, &tp2);
-    printf("native time: %ld\n", tp2.tv_nsec- tp1.tv_nsec);
+	if (ret1 < 0)
+	{
+		printf("failed clock 1\n");
+	}
+	if (ret2 < 0)
+	{
+		printf("failed clock 2\n");
+	}
+	long diff1 = tp2.tv_nsec- tp1.tv_nsec;
+	if (diff1 < 0)
+	{
+		//printf("failed measurement1\n");
+		goto retry1;
+	}
+    printf("%s,1,%ld,%ld,%ld\n", argv[1],tp1.tv_nsec, tp2.tv_nsec, diff1);
     
     close(fd1);
 
@@ -91,7 +100,11 @@ int main(int argc, char **argv)
 	struct bpf_object *obj;
 
 	int prog_fd;
-                    
+
+retry2:
+
+    clk_id3 = CLOCK_MONOTONIC;
+    clk_id4 = CLOCK_MONOTONIC;                    
     ret3 = clock_gettime(clk_id3, &tp3);
 
 
@@ -103,7 +116,22 @@ int main(int argc, char **argv)
 
 
     ret4 = clock_gettime(clk_id4, &tp4);
-    printf("load time: %ld\n", tp4.tv_nsec- tp3.tv_nsec);
+	if (ret3 < 0)
+	{
+		printf("failed clock 1\n");
+	}
+	if (ret4 < 0)
+	{
+		printf("failed clock 1\n");
+	}
+	long diff2 = tp4.tv_nsec- tp3.tv_nsec;
+
+	if (diff2 < 0)
+	{
+		//printf("failed measurement 2\n");
+		goto retry2;
+	}
+    printf("%s,2,%ld,%ld,%ld\n", argv[1], tp3.tv_nsec, tp4.tv_nsec, diff2);
 
 
     // load filter function prog fd in main kprobe intrumentation
@@ -137,14 +165,32 @@ int main(int argc, char **argv)
 		fprintf(stderr, "map_update failed: %s\n", strerror(errno));
 		return 1;
     }
-
+retry3:
+	clk_id5 = CLOCK_MONOTONIC;
+    clk_id6 = CLOCK_MONOTONIC;
     ret5 = clock_gettime(clk_id5, &tp5);
 
 	ssize_t readbytes = read(fd, buf, 256);
 	//printf("retval = %d\n", (int) readbytes);
 
     ret6 = clock_gettime(clk_id6, &tp6);
-    printf("jit time: %ld\n", tp6.tv_nsec- tp5.tv_nsec);
+	if (ret5 < 0)
+	{
+		printf("failed clock 1\n");
+	}
+	if (ret6 < 0)
+	{
+		printf("failed clock 1\n");
+	}
+	long diff3 = tp6.tv_nsec- tp5.tv_nsec;
+
+	if (diff3 < 0)
+	{
+		//printf("failed measurement 3\n");
+		goto retry3;
+	}
+
+    printf("%s,3,%ld,%ld,%ld\n", argv[1], tp5.tv_nsec, tp6.tv_nsec, diff3);
 
 
 	//printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");

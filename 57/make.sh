@@ -65,7 +65,7 @@ clang -nostdinc -isystem `clang -print-file-name=include` \
 
 }
 
-targets=( endtoend benchoverride nooverride progarray tracex1 odirect freplace procfs_override readiter hellotrace strtol override_exec fentry_test verifier)
+targets=( tailbench notail endtoend benchoverride nooverride progarray tracex1 odirect freplace procfs_override readiter hellotrace strtol override_exec fentry_test verifier)
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"
