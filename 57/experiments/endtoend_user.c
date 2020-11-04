@@ -35,7 +35,7 @@ struct timespec diff(struct timespec start, struct timespec end)
         struct timespec temp;
         if ((end.tv_nsec-start.tv_nsec)<0) {
                 temp.tv_sec = end.tv_sec-start.tv_sec-1;
-                temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
+                temp.tv_nsec = 1000000000*temp.tv_sec+end.tv_nsec-start.tv_nsec;
         } else {
                 temp.tv_sec = end.tv_sec-start.tv_sec;
                 temp.tv_nsec = end.tv_nsec-start.tv_nsec;
@@ -46,6 +46,15 @@ struct timespec diff(struct timespec start, struct timespec end)
 
 int main(int argc, char **argv)
 {
+	if (argc != 4)
+	{
+		printf("usage: ./endtoend filter-function reduce-function iterations\n");
+	}
+
+	//number of iterations on file, max 25600
+	int iters = atoi(argv[3]);
+
+
     int ret1, ret2, ret3, ret4, ret5, ret6;
     struct timespec tp1, tp2, tp3, tp4, tp5, tp6;
     clockid_t clk_id1, clk_id2, clk_id3, clk_id4, clk_id5, clk_id6;
@@ -55,7 +64,7 @@ int main(int argc, char **argv)
 
 
     // open file and read to trigger the instrumentation
-	int fd1 = open("f", O_RDONLY);
+	int fd1 = open("rand", O_RDONLY);
 	if (fd1 == -1)
 	{
 		printf("error open file\n");
@@ -69,7 +78,16 @@ int main(int argc, char **argv)
 	*/
 
     ret1 = clock_gettime(clk_id1, &tp1);
-	ssize_t readbytes1 = read(fd1, buf1, 4096);
+	for(int i = 0; i < iters; i++)
+	{
+		ssize_t readbytes1 = read(fd1, buf1, 4096);
+		for(int j = 0; j < readbytes1; j += 3)
+		{
+			if(strncmp(buf1+j, "42\n", 3) == 0)
+				return 1;
+		}
+		memset(buf1, 0, 4096);
+	}
     ret2 = clock_gettime(clk_id2, &tp2);
 	if (ret1 < 0)
 	{
@@ -87,10 +105,7 @@ int main(int argc, char **argv)
 
 
 
-	if (argc != 2)
-	{
-		printf("usage: ./endtoend filter-function reduce-function\n");
-	}
+	
 	char filename[256];
 	int ret, err, id, fkey = MIN_FUNC;
 	struct rlimit r = {RLIM_INFINITY, RLIM_INFINITY};
@@ -112,15 +127,27 @@ int main(int argc, char **argv)
 	struct bpf_object *obj;
 
 	int prog_fd;
+	char extension2[256];
+	snprintf(extension2, sizeof(extension2), "%s_func.o", argv[2]);
 
-
+	struct bpf_object *obj2;
+	int prog_fd2;
 
     clk_id3 = CLOCK_MONOTONIC;
     clk_id4 = CLOCK_MONOTONIC;                    
     ret3 = clock_gettime(clk_id3, &tp3);
 
+	// ---------------- filter -------------------------------
 
 	if (bpf_prog_load(extension, BPF_PROG_TYPE_KPROBE, &obj, &prog_fd))
+	{
+		printf("error reading extension");
+		return 1;
+	}
+
+	// ---------------- reduce --------------------------------
+
+	if (bpf_prog_load(extension2, BPF_PROG_TYPE_KPROBE, &obj2, &prog_fd2))
 	{
 		printf("error reading extension");
 		return 1;
@@ -149,13 +176,22 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	//load reduce function progfd in filter instrumentation
+	int filter_map_fd = bpf_object__find_map_fd_by_name(obj, "jmp_table");
+	err = bpf_map_update_elem(filter_map_fd, &fkey, &prog_fd2, BPF_ANY);
+	if(err)
+	{
+		printf("map update error for filter prog\n");
+		return 1;
+	}
+
 	// ---------------- trigger call with instrumentattion and measure performace -------------------------------
 	
 
 
 
 	// open file and read to trigger the instrumentation
-	int fd = open("f", O_RDONLY);
+	int fd = open("rand", O_RDONLY);
 	if (fd == -1)
 	{
 		printf("error open file\n");
@@ -177,8 +213,14 @@ int main(int argc, char **argv)
     clk_id6 = CLOCK_MONOTONIC;
     ret5 = clock_gettime(clk_id5, &tp5);
 
-	ssize_t readbytes = read(fd, buf, 4096);
-	//printf("retval = %d\n", (int) readbytes);
+	for(int i = 0; i < iters; i++)
+	{
+		ssize_t readbytes = read(fd, buf, 4096);
+		memset(buf, 0, 4096);
+	}
+	int result_map_fd = bpf_object__find_map_fd_by_name(obj2, "result_map");
+	unsigned long min;
+	bpf_map_lookup_elem(result_map_fd, &key, &min);
 
     ret6 = clock_gettime(clk_id6, &tp6);
 	if (ret5 < 0)

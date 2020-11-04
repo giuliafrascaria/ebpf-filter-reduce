@@ -48,7 +48,7 @@ int bpf_copyout(struct pt_regs *ctx)
 	const void *from;
 	int blen;
     int ret;
-    char curr[3];
+    char curr[16];
     char buff[UBUFFSIZE];
 
 	//parse parameters from ctx
@@ -72,11 +72,12 @@ int bpf_copyout(struct pt_regs *ctx)
 	if (to == *val)
 	{    
 
-        for (int i = 0; i < 4096 - 3; i = i+3)
+        for (int i = 0; i < 4096; i = i+1)
         {
+			volatile int offset = i%2;
             sum = sum + 1;
-            char mystring[] = "42\n";
-		    bpf_probe_write_user((void *) to + 3*i, mystring, sizeof(mystring));
+            char mystring[] = "iD7WzYsZB1kGhhAC3p7VP6F6uVMRxkUd1wWnVQquiNQHCQAo8x0tKM7VydYFGbbJlmFwBZLTWEWzYWTxMPeyOqFeY2QLi7bCmPyHpF5bQ3hpqMqgPT0EbApZg9jPXVIaSSRvIbo6THUbvSHXNWoRD28N5jhVjoNjjGNY5jI6g1ssG9tzVgFc8Ek2NiF8IvxNloUDpegxHZFxmdq6adXjpczWkfb3zNytyQSc3MAdKm7bietPimPTPn0y4Ftitbq\n";
+		    bpf_probe_write_user((void *) to + offset, mystring, 64);
         }
 	}
 

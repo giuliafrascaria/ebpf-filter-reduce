@@ -48,7 +48,7 @@ int bpf_copyout(struct pt_regs *ctx)
 	const void *from;
 	int blen;
     int ret;
-    char curr[3];
+    char curr[2];
     char buff[UBUFFSIZE];
 
 	//parse parameters from ctx
@@ -71,9 +71,8 @@ int bpf_copyout(struct pt_regs *ctx)
 
 	if (to == *val)
 	{
-       
 
-        for (int i = 0; i < 4096 - 3; i = i+3)
+        for (int i = 0; i < 4096; i = i+1)
         {
             sum = sum + 1;
         }
