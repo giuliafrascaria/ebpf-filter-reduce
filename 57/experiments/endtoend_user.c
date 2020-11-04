@@ -35,7 +35,7 @@ struct timespec diff(struct timespec start, struct timespec end)
         struct timespec temp;
         if ((end.tv_nsec-start.tv_nsec)<0) {
                 temp.tv_sec = end.tv_sec-start.tv_sec-1;
-                temp.tv_nsec = 1000000000*temp.tv_sec+end.tv_nsec-start.tv_nsec;
+                temp.tv_nsec = 1000000000 + 1000000000*temp.tv_sec +end.tv_nsec-start.tv_nsec;
         } else {
                 temp.tv_sec = end.tv_sec-start.tv_sec;
                 temp.tv_nsec = end.tv_nsec-start.tv_nsec;
@@ -81,10 +81,14 @@ int main(int argc, char **argv)
 	for(int i = 0; i < iters; i++)
 	{
 		ssize_t readbytes1 = read(fd1, buf1, 4096);
-		for(int j = 0; j < readbytes1; j += 3)
+		for(int j = 0; j < readbytes1; j += 4)
 		{
-			if(strncmp(buf1+j, "42\n", 3) == 0)
+			if(strncmp(buf1+j, "4242", 4) == 0)
+			{
+				//never actually gonna happen but I need to avoid compiler optimizations
+				printf("found\n");
 				return 1;
+			}
 		}
 		memset(buf1, 0, 4096);
 	}
@@ -99,7 +103,7 @@ int main(int argc, char **argv)
 	}
 	struct timespec diff1 = diff(tp1, tp2);
 
-    printf("%s,3,%ld,%ld,%ld\n", argv[1], tp1.tv_nsec, tp2.tv_nsec, diff1.tv_nsec);
+    printf("%d,1,%ld\n", iters, diff1.tv_nsec);
     
     close(fd1);
 
@@ -165,7 +169,7 @@ int main(int argc, char **argv)
 	}
 	struct timespec diff2= diff(tp3, tp4);
 
-    printf("%s,3,%ld,%ld,%ld\n", argv[1], tp3.tv_nsec, tp4.tv_nsec, diff2.tv_nsec);
+    printf("%d,2,%ld\n", iters, diff2.tv_nsec);
 
 
     // load filter function prog fd in main kprobe intrumentation
@@ -233,7 +237,7 @@ int main(int argc, char **argv)
 	}
 	struct timespec diff3 = diff(tp5, tp6);
 
-    printf("%s,3,%ld,%ld,%ld\n", argv[1], tp5.tv_nsec, tp6.tv_nsec, diff3.tv_nsec);
+    printf("%d,3,%ld\n", iters, diff3.tv_nsec);
 
 
 	//printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");

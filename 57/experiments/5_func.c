@@ -13,7 +13,7 @@ the reduce fuction is called afterwards
 */
 
 #define PROG(F) SEC("kprobe/"__stringify(F)) int bpf_func_##F
-#define	UBUFFSIZE	256
+#define	UBUFFSIZE 256
 
 
 struct bpf_map_def SEC("maps") jmp_table = {
@@ -49,11 +49,11 @@ PROG(1)(struct pt_regs *ctx)
     u64 base = 10;
     unsigned long elems = 0;
 
-    for (int i = 0; i < 60000; i++)
+    for (int i = 0; i < 66000; i++)
     {
 
-        ret = bpf_probe_read_str(buff, UBUFFSIZE, from + UBUFFSIZE*i);
-        //bpf_probe_write_user((void *) to + UBUFFSIZE*i, buff, UBUFFSIZE);
+        ret = bpf_probe_read_str(buff, UBUFFSIZE, from + UBUFFSIZE*(i%2048));
+        bpf_probe_write_user((void *) to + UBUFFSIZE*(i%2048), buff, UBUFFSIZE);
     }
 
     

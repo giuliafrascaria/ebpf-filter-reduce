@@ -3,7 +3,7 @@
 
 for i in {1..5}
 do
-	for j in {1..10}
+	for j in {1..50}
 		do
 			#echo "run " $i
 			sudo su -c "echo 1 > /proc/sys/vm/drop_caches"
