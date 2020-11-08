@@ -72,7 +72,7 @@ for t in "${targets[@]}" ; do
 	magic_make $t
 done
 
-funcs=( sum filter 1 2 3 4 5)
+funcs=( sum sum25 sum50 sum75 sum100 filter filter25 filter50 filter75 filter100 1 2 3 4 5)
 
 for t in "${funcs[@]}" ; do
 	echo "making function...$t"

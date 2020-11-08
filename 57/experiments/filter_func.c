@@ -40,8 +40,8 @@ PROG(1)(struct pt_regs *ctx)
 	blen = PT_REGS_PARM3(ctx);
 
 
-    char snonmidire[] = "tail call read stuff filter\n";
-	bpf_trace_printk(snonmidire, sizeof(snonmidire));
+    //char snonmidire[] = "tail call read stuff filter\n";
+	//bpf_trace_printk(snonmidire, sizeof(snonmidire));
 
     
     unsigned long sum = 0;

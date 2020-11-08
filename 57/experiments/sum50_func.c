@@ -40,7 +40,7 @@ PROG(1)(struct pt_regs *ctx)
     u64 base = 10;
     unsigned long elems = 0;
 
-    for (int j = 0; j < 16; j++)
+    for (int j = 0; j < 8; j++)
     {
         for (int i = 0; i < UBUFFSIZE - 3; i = i+3)
         {

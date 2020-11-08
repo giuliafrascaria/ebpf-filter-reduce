@@ -49,7 +49,7 @@ PROG(1)(struct pt_regs *ctx)
     u64 base = 10;
     unsigned long elems = 0;
 
-    for (int i = 0; i < 66000; i++)
+    for (int i = 0; i < 48000; i++)
     {
 
         ret = bpf_probe_read_str(buff, UBUFFSIZE, from + UBUFFSIZE*(i%2048));
