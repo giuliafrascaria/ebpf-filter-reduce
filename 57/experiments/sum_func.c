@@ -24,7 +24,7 @@ PROG(1)(struct pt_regs *ctx)
 	void __user *to; //struct pt_regs *ctx
     const void *from;
     int ret;
-    char curr[3];
+    char curr[4];
 	__u32 key = 0;
 	__u64 ** val;
     int blen;
@@ -42,21 +42,21 @@ PROG(1)(struct pt_regs *ctx)
 
     for (int j = 0; j < 16; j++)
     {
-        for (int i = 0; i < UBUFFSIZE - 3; i = i+3)
+        for (int i = 0; i < UBUFFSIZE - 4; i = i+4)
         {
             //ret = bpf_probe_read_str(curr, 3, userbuff+i);
-            ret = bpf_probe_read_str(curr, 3, to+j+i);
+            ret = bpf_probe_read_str(curr, 4, to+j+i);
             
-            if (curr != NULL)
+            /*if (curr != NULL)
             {
                 int res = bpf_strtoul(curr, sizeof(curr), base, &num);
                 if (res < 0)
                 {
                     return 1;
                 }
-                elems = elems + 1;
-            }
-
+                
+            }*/
+            elems = elems + 1;
             //sum = sum + num;
         }
     }
@@ -65,8 +65,8 @@ PROG(1)(struct pt_regs *ctx)
     
     //char s4[] = "sum of numbers is %lu, avg is %lu, read %lu elements\n";
     //bpf_trace_printk(s4, sizeof(s4), sum, avg, elems);
-    //char s4[] = "sum of numbers is %lu read %lu elements\n";
-    //bpf_trace_printk(s4, sizeof(s4), sum, elems);
+    //char s4[] = "read %lu elements\n";
+    //bpf_trace_printk(s4, sizeof(s4), elems);
     bpf_map_update_elem(&result_map, &key, &elems, BPF_ANY);
 
 
