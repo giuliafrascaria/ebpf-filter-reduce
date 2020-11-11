@@ -9,7 +9,12 @@ do
 			sudo su -c "echo 1 > /proc/sys/vm/drop_caches"
 			sudo su -c "echo 2 > /proc/sys/vm/drop_caches"
 			sudo su -c "echo 3 > /proc/sys/vm/drop_caches" 
-			taskset -c 0 sudo ./endtoend filter50 sum50 $i
+			taskset -c 0 ./native $i
+			sudo su -c "echo 1 > /proc/sys/vm/drop_caches"
+			sudo su -c "echo 2 > /proc/sys/vm/drop_caches"
+			sudo su -c "echo 3 > /proc/sys/vm/drop_caches"
+			taskset -c 0 sudo ./e2e filter50 sum50 $i
+			#taskset -c 0 sudo ./endtoend filter50 sum50 $i
 		done
 	sleep 1
 done

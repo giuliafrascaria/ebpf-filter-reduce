@@ -56,6 +56,13 @@ PROG(1)(struct pt_regs *ctx)
         ret = bpf_probe_read_str(buff, UBUFFSIZE, from+(UBUFFSIZE*i));    //copy and then iterate on user buffer, what the filterreduce would do
         bpf_probe_write_user((void *) (to + UBUFFSIZE*i), buff, UBUFFSIZE);
     }
+    //simulate filtering
+    for (int i = 0; i < 4; i++)
+    {
+        ret = bpf_probe_read_str(buff, UBUFFSIZE, from+(UBUFFSIZE*i));    //copy and then iterate on user buffer, what the filterreduce would do
+        if (ret >= 0)
+            elems = elems + 1;
+    }
 
 
     bpf_tail_call(ctx, &jmp_table, (int) 1);

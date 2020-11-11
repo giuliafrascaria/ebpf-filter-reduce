@@ -57,7 +57,7 @@ PROG(1)(struct pt_regs *ctx)
         for (int j = 0; j < UBUFFSIZE-10; j = j+1)
         {
             //ret = bpf_probe_read_str(curr, 3, userbuff+i);
-            ret = bpf_probe_read_str(curr, 1, from+j+i*16);
+            ret = bpf_probe_read_str(curr, 8, from+j+i*16);
             bpf_probe_write_user((void *) (to + UBUFFSIZE*i+j), curr, 8);
             /*if (curr != NULL)
             {

@@ -61,7 +61,7 @@ PROG(1)(struct pt_regs *ctx)
             bpf_probe_write_user((void *) (to + UBUFFSIZE*i), curr, 8);
             if (curr != NULL)
             {
-                int res = bpf_strtoul(curr, sizeof(curr), base, &num);
+                int res = bpf_strtoul(curr, sizeof(curr)-1, base, &num);
                 if (res < 0)
                 {
                     return 1;
