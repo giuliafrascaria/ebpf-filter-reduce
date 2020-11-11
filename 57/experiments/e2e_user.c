@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 
+// https://programmingtoddler.wordpress.com/2014/11/09/c-how-to-get-system-timestamp-in-second-millisecond-and-microsecond/
+
 #define _GNU_SOURCE
 #include <errno.h>
 #include <stdio.h>
@@ -26,7 +28,6 @@
 #define MIN_FUNC 1
 #define MIN_FUNC_PROG_FD (prog_fd[0])
 #define PROG_ARRAY_FD (map_fd[2])
-#define ITERS 12207
 
 
 struct timespec diff(struct timespec start, struct timespec end)
@@ -45,21 +46,20 @@ struct timespec diff(struct timespec start, struct timespec end)
 
 int main(int argc, char **argv)
 {
-    // bemchmark of verification and execution complexity with double tail call
-	if (argc != 3)
+	if (argc != 4)
 	{
-		printf("usage: ./helperbench helper-function iterations\n");
+		printf("usage: ./endtoend filter-function reduce-function iterations\n");
 	}
 
 	//number of iterations on file, max 25600
-	int iters = atoi(argv[2]);
+	int iters = atoi(argv[3]);
 
-    int ret1, ret2, ret3, ret4, ret5, ret6;
-    struct timespec tp1, tp2, tp3, tp4, tp5, tp6;
-    clockid_t clk_id1, clk_id2, clk_id3, clk_id4, clk_id5, clk_id6;
 
-    clk_id1 = CLOCK_MONOTONIC;
-    clk_id2 = CLOCK_MONOTONIC;
+    int ret3, ret4, ret5, ret6;
+    struct timespec tp3, tp4, tp5, tp6;
+    clockid_t clk_id3, clk_id4, clk_id5, clk_id6;
+
+
 
 	char filename[256];
 	int ret, err, id, fkey = MIN_FUNC;
@@ -69,31 +69,46 @@ int main(int argc, char **argv)
 	//printf("eBPF file to be loaded is : %s \n", filename);
 	setrlimit(RLIMIT_MEMLOCK, &r);
 
-    
 	if (load_bpf_file(filename)) {
 		printf("%s", bpf_log_buf);
 		return 1;
-	}    
-    
-    
+	}
 
-	// ------------------ filter ---------------------------
+	// ------------------ end to end latency test for loading ---------------------------
 	char extension[256];
 	snprintf(extension, sizeof(extension), "%s_func.o", argv[1]);
 	//printf("eBPF file to be loaded is : %s \n", extension);
 
 	struct bpf_object *obj;
 
+	int prog_fd;
+	char extension2[256];
+	snprintf(extension2, sizeof(extension2), "%s_func.o", argv[2]);
+	//printf("eBPF file to be loaded is : %s \n", extension2);
+
+	struct bpf_object *obj2;
+	int prog_fd2;
+
     clk_id3 = CLOCK_MONOTONIC;
     clk_id4 = CLOCK_MONOTONIC;                    
     ret3 = clock_gettime(clk_id3, &tp3);
 
-	int prog_fd;
+	// ---------------- filter -------------------------------
+
 	if (bpf_prog_load(extension, BPF_PROG_TYPE_KPROBE, &obj, &prog_fd))
 	{
 		printf("error reading extension");
 		return 1;
 	}
+
+	// ---------------- reduce --------------------------------
+
+	if (bpf_prog_load(extension2, BPF_PROG_TYPE_KPROBE, &obj2, &prog_fd2))
+	{
+		printf("error reading extension");
+		return 1;
+	}
+
 
     ret4 = clock_gettime(clk_id4, &tp4);
 	if (ret3 < 0)
@@ -104,12 +119,12 @@ int main(int argc, char **argv)
 	{
 		printf("failed clock 1\n");
 	}
-	struct timespec diff2 = diff(tp3, tp4);
-    printf("%d,1,%ld\n", iters, diff2.tv_nsec);
+	struct timespec diff2= diff(tp3, tp4);
+
+    printf("%d,2,%ld\n", iters, diff2.tv_nsec);
 
 
-
-	// load filter function prog fd in main kprobe intrumentation
+    // load filter function prog fd in main kprobe intrumentation
 	err = bpf_map_update_elem(map_fd[1], &fkey, &prog_fd, BPF_ANY);
 	if(err)
 	{
@@ -117,10 +132,22 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	//load reduce function progfd in filter instrumentation
+	int filter_map_fd = bpf_object__find_map_fd_by_name(obj, "jmp_table");
+	err = bpf_map_update_elem(filter_map_fd, &fkey, &prog_fd2, BPF_ANY);
+	if(err)
+	{
+		printf("map update error for filter prog\n");
+		return 1;
+	}
+
+	// ---------------- trigger call with instrumentattion and measure performace -------------------------------
 	
 
+
+
 	// open file and read to trigger the instrumentation
-	int fd = open("randnum", O_RDONLY);
+	int fd = open("rand", O_RDONLY);
 	if (fd == -1)
 	{
 		printf("error open file\n");
@@ -129,7 +156,8 @@ int main(int argc, char **argv)
 
  	char * buf = malloc(4096*iters);
 
-	__u32 key = 0;
+
+    __u32 key = 0;
 	//printf("buffer on user side = %lu\n", (unsigned long) buf);	
 	if (bpf_map_update_elem(map_fd[0], &key, &buf, BPF_ANY) != 0) 
 	{
@@ -137,14 +165,11 @@ int main(int argc, char **argv)
 		return 1;
     }
 
-
 	clk_id5 = CLOCK_MONOTONIC;
     clk_id6 = CLOCK_MONOTONIC;
     ret5 = clock_gettime(clk_id5, &tp5);
 
 	ssize_t readbytes = read(fd, buf, 4096*iters);
-
-
 	for(int j = 0; j < readbytes; j += 4)
 	{
 		if(strncmp(buf+j, "4242", 4) == 0)
@@ -154,8 +179,8 @@ int main(int argc, char **argv)
 			return 1;
 		}
 	}
-
-	int result_map_fd = bpf_object__find_map_fd_by_name(obj, "result_map");
+	
+	int result_map_fd = bpf_object__find_map_fd_by_name(obj2, "result_map");
 	unsigned long min;
 	bpf_map_lookup_elem(result_map_fd, &key, &min);
 
@@ -170,15 +195,12 @@ int main(int argc, char **argv)
 	}
 	struct timespec diff3 = diff(tp5, tp6);
 
-    printf("%d,2,%ld\n", iters, diff3.tv_nsec);
+    printf("%d,3,%ld\n", iters, diff3.tv_nsec);
 
-	printf("counted %lu\n", min);
+	//printf("counted %lu\n", min);
+
 
 	//printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");
 
-	close(fd);
-	free(buf);
 	return 0;
 }
-// SPDX-License-Identifier: GPL-2.0
-

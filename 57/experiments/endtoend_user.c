@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 
 
     // open file and read to trigger the instrumentation
-	int fd1 = open("rand", O_RDONLY);
+	int fd1 = open("rand2", O_RDONLY);
 	if (fd1 == -1)
 	{
 		printf("error open file\n");
@@ -133,6 +133,7 @@ int main(int argc, char **argv)
 	int prog_fd;
 	char extension2[256];
 	snprintf(extension2, sizeof(extension2), "%s_func.o", argv[2]);
+	//printf("eBPF file to be loaded is : %s \n", extension2);
 
 	struct bpf_object *obj2;
 	int prog_fd2;
@@ -220,6 +221,15 @@ int main(int argc, char **argv)
 	for(int i = 0; i < iters; i++)
 	{
 		ssize_t readbytes = read(fd, buf, 4096);
+		for(int j = 0; j < readbytes; j += 4)
+		{
+			if(strncmp(buf+j, "4242", 4) == 0)
+			{
+				//never actually gonna happen but I need to avoid compiler optimizations
+				printf("found\n");
+				return 1;
+			}
+		}
 		memset(buf, 0, 4096);
 	}
 	int result_map_fd = bpf_object__find_map_fd_by_name(obj2, "result_map");
@@ -238,6 +248,8 @@ int main(int argc, char **argv)
 	struct timespec diff3 = diff(tp5, tp6);
 
     printf("%d,3,%ld\n", iters, diff3.tv_nsec);
+
+	printf("counted %lu\n", min);
 
 
 	//printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");

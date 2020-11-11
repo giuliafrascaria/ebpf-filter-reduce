@@ -27,13 +27,12 @@
 #define MIN_FUNC_PROG_FD (prog_fd[0])
 #define PROG_ARRAY_FD (map_fd[2])
 
-
 struct timespec diff(struct timespec start, struct timespec end)
 {
         struct timespec temp;
-        if ((end.tv_nsec-start.tv_nsec)<0) {
+        if ((end.tv_nsec-start.tv_nsec < 0 ) || ((end.tv_sec > start.tv_sec) && (end.tv_nsec-start.tv_nsec > 0)) ) {
                 temp.tv_sec = end.tv_sec-start.tv_sec-1;
-                temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
+                temp.tv_nsec = 1000000000 + 1000000000*temp.tv_sec +end.tv_nsec-start.tv_nsec;
         } else {
                 temp.tv_sec = end.tv_sec-start.tv_sec;
                 temp.tv_nsec = end.tv_nsec-start.tv_nsec;

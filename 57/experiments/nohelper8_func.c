@@ -29,7 +29,7 @@ PROG(1)(struct pt_regs *ctx)
     void __user *to; //struct pt_regs *ctx
     const void *from;
     int ret;
-    char curr[3];
+    char curr[2];
     char buff[UBUFFSIZE];
 	__u32 key = 0;
 	__u64 ** val;
@@ -54,26 +54,15 @@ PROG(1)(struct pt_regs *ctx)
 
     for (int i = 0; i < 16; i++)
     {
-        for (int j = 0; j < UBUFFSIZE-10; j = j+1)
+        for (int i = 0; i < UBUFFSIZE-8; i = i+8)
         {
             //ret = bpf_probe_read_str(curr, 3, userbuff+i);
-            ret = bpf_probe_read_str(curr, 2, from+j+i*16);
-            
-            /*if (curr != NULL)
-            {
-                int res = bpf_strtoul(curr, sizeof(curr), base, &num);
-                if (res < 0)
-                {
-                    return 1;
-                }
-                
-            }*/
+
             elems = elems + 1;
 
         }
     }
-
-    bpf_map_update_elem(&result_map, &key, &elems, BPF_ANY);
+	bpf_map_update_elem(&result_map, &key, &elems, BPF_ANY);
 	
 	return 0;
 }

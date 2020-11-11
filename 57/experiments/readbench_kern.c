@@ -48,7 +48,7 @@ int bpf_copyout(struct pt_regs *ctx)
 	const void *from;
 	int blen;
     int ret;
-    char curr[64];
+    char curr[1];
     char buff[UBUFFSIZE];
 
 	//parse parameters from ctx
@@ -75,7 +75,7 @@ int bpf_copyout(struct pt_regs *ctx)
         for (int i = 0; i < 4096; i = i+1)
         {
             sum = sum + 1;
-            ret = bpf_probe_read_str(curr, 64, from);
+            ret = bpf_probe_read_str(curr, 1, from);
         }
 	}
 
