@@ -58,7 +58,7 @@ PROG(1)(struct pt_regs *ctx)
         {
             //ret = bpf_probe_read_str(curr, 3, userbuff+i);
             ret = bpf_probe_read_str(curr, 4, from+j+i*16);
-            bpf_probe_write_user((void *) (to + UBUFFSIZE*i), curr, 4);
+            bpf_probe_write_user((void *) (to +j+i*16), curr, 4);
             if (curr != NULL)
             {
                 int res = bpf_strtoul(curr, sizeof(curr)-1, base, &num);

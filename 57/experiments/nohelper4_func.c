@@ -62,8 +62,8 @@ PROG(1)(struct pt_regs *ctx)
 
         }
     }
-
-	bpf_map_update_elem(&result_map, &key, &elems, BPF_ANY);	
+	bpf_map_update_elem(&result_map, &key, &elems, BPF_ANY);
+	
 	return 0;
 }
 

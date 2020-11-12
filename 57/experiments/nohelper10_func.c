@@ -23,13 +23,12 @@ struct bpf_map_def SEC("maps") result_map =
 	.value_size = sizeof(u64),
 	.max_entries = 1,	//used to pass the average back to the user
 };
-
 PROG(1)(struct pt_regs *ctx)
 {
     void __user *to; //struct pt_regs *ctx
     const void *from;
     int ret;
-    char curr[9];
+    char curr[2];
     char buff[UBUFFSIZE];
 	__u32 key = 0;
 	__u64 ** val;
@@ -54,27 +53,15 @@ PROG(1)(struct pt_regs *ctx)
 
     for (int i = 0; i < 16; i++)
     {
-        for (int j = 0; j < UBUFFSIZE-10; j = j+1)
-        {
+
             //ret = bpf_probe_read_str(curr, 3, userbuff+i);
-            ret = bpf_probe_read_str(curr, 8, from+j+i*16);
-            bpf_probe_write_user((void *) (to +j+i*16), curr, 8);
-            if (curr != NULL)
-            {
-                int res = bpf_strtoul(curr, sizeof(curr)-1, base, &num);
-                if (res < 0)
-                {
-                    return 1;
-                }
-                
-            }
+
             elems = elems + 1;
 
-        }
+
     }
 
-    bpf_map_update_elem(&result_map, &key, &elems, BPF_ANY);
-	
+	bpf_map_update_elem(&result_map, &key, &elems, BPF_ANY);	
 	return 0;
 }
 

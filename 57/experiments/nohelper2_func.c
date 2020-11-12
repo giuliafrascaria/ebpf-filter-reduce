@@ -54,7 +54,7 @@ PROG(1)(struct pt_regs *ctx)
 
     for (int i = 0; i < 16; i++)
     {
-        for (int i = 0; i < UBUFFSIZE-2; i = i+2)
+        for (int i = 0; i < UBUFFSIZE-1; i = i+1)
         {
             //ret = bpf_probe_read_str(curr, 3, userbuff+i);
 
@@ -62,8 +62,8 @@ PROG(1)(struct pt_regs *ctx)
 
         }
     }
+
 	bpf_map_update_elem(&result_map, &key, &elems, BPF_ANY);
-	
 	return 0;
 }
 

@@ -50,7 +50,7 @@ PROG(1)(struct pt_regs *ctx)
     u64 base = 10;
     unsigned long elems = 0;
 
-
+/*
 
     for (int i = 0; i < 16; i++)
     {
@@ -59,19 +59,32 @@ PROG(1)(struct pt_regs *ctx)
             //ret = bpf_probe_read_str(curr, 3, userbuff+i);
             ret = bpf_probe_read_str(curr, 2, from+j+i*16);
             
-            /*if (curr != NULL)
-            {
-                int res = bpf_strtoul(curr, sizeof(curr), base, &num);
-                if (res < 0)
-                {
-                    return 1;
-                }
-                
-            }*/
+            
             elems = elems + 1;
 
         }
     }
+    */
+
+    for (int i = 0; i < 16; i++)
+    {
+        for (int j = 0; j < UBUFFSIZE-1; j = j+1)
+        {
+            //ret = bpf_probe_read_str(curr, 3, userbuff+i);
+            ret = bpf_probe_read_str(curr, 1, from+j+i*16);
+            
+            
+            if(ret >= 0)
+            {
+                if(buff[0] != 'a')
+                {
+                    elems = elems + 1;
+                }
+            }
+
+        }
+    }
+
 
     bpf_map_update_elem(&result_map, &key, &elems, BPF_ANY);
 	

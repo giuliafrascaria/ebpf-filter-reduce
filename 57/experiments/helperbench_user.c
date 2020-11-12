@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 
 	for(int j = 0; j < readbytes; j += 4)
 	{
-		if(strncmp(buf+j, "4242", 4) == 0)
+		if(strncmp(buf+j, "aaaa", 4) == 0)
 		{
 			//never actually gonna happen but I need to avoid compiler optimizations
 			printf("found\n");
