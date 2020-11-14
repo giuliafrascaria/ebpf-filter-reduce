@@ -22,6 +22,14 @@ struct bpf_map_def SEC("maps") my_read_map =
 	.max_entries = 1,	//used to pass the buffer address from userland
 };
 
+struct bpf_map_def SEC("maps") result_map =
+{
+	.type = BPF_MAP_TYPE_ARRAY,
+	.key_size = sizeof(u32),
+	.value_size = sizeof(u64),
+	.max_entries = 1,	//used to pass the average back to the user
+};
+
 struct bpf_map_def SEC("maps") jmp_table = 
 {
 	.type = BPF_MAP_TYPE_PROG_ARRAY,
@@ -31,19 +39,17 @@ struct bpf_map_def SEC("maps") jmp_table =
 };
 
 
-
 SEC("kprobe/copyout_bpf")
 int bpf_copyout(struct pt_regs *ctx)
 {
-	//bpf_my_printk();
-
-	char s1[] = "entering modified copyout\n";
-	bpf_trace_printk(s1, sizeof(s1));
 
 	// instantiate parameters
 	void __user *to;
 	const void *from;
 	int blen;
+    int ret;
+    char curr[2];
+    char buff[UBUFFSIZE];
 
 	//parse parameters from ctx
 	to = (void __user *) PT_REGS_PARM1(ctx);
@@ -61,23 +67,34 @@ int bpf_copyout(struct pt_regs *ctx)
 		bpf_trace_printk(s, sizeof(s)); 
 		return 0;
 	}
-
-	//char str2[] = "buffer on params %lu, buffer on map %lu\n";
-	//bpf_trace_printk(str2, sizeof(str2), (unsigned long) to, (unsigned long) *val);
+    unsigned long sum = 0;
 
 	if (to == *val)
 	{
-		//char s2[] = "copyout to 0x%p, ul %lu len %d\n";
-    	//bpf_trace_printk(s2, sizeof(s2), to, (unsigned long) to, blen);
-        //unsigned long rc = 0;
-		//bpf_override_return(ctx, rc);
+
+        for (int i = 0; i < 4096-2; i = i+256)
+        {
+            ret = bpf_probe_read_str(curr, 1, from+i);            
+            if(ret >= 0)
+            {
+                sum = sum + 1;
+            }
+        }
+
+		unsigned long rc = 0;
+		bpf_override_return(ctx, rc);
 
 		//unsigned long long curtime;
 		//curtime = bpf_ktime_get_ns();
 			
-		bpf_tail_call(ctx, &jmp_table, (int) 1);
+		char mystring[] = "4242\n"; 
+		bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
 
+		bpf_map_update_elem(&result_map, &key, &sum, BPF_ANY);
+		
 	}
+
+
 
 	return 0;
 }
