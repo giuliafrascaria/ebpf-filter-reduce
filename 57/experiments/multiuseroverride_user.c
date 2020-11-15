@@ -53,9 +53,7 @@ int main(int argc, char **argv)
 
 	//number of iterations on file, max 25600
 	int users = atoi(argv[1]);
-
 	int iters = atoi(argv[2]);
-
 
     int ret3, ret4, ret5, ret6;
     struct timespec tp3, tp4, tp5, tp6;
@@ -124,7 +122,7 @@ int main(int argc, char **argv)
 			//child process, load buffer address on map and trigger read
 			char * buf = malloc(4096*iters);
 
-			printf("child %d\n", i);
+			//printf("child %d\n", i);
 			__u32 key = 0;
 			//printf("buffer on user side = %lu\n", (unsigned long) buf);	
 			if (bpf_map_update_elem(map_fd[0], &key, &buf, BPF_ANY) != 0) 
@@ -139,15 +137,19 @@ int main(int argc, char **argv)
 
 			ssize_t readbytes = read(fd, buf, 4096*iters);
 			
+			int override;
 			if(strncmp(buf, "4242", 4) == 0)
 			{
 				//never actually gonna happen but I need to avoid compiler optimizations
-				printf("override %d\n", i);
+				override = 1;
 				//return 1;
 			}
+            else
+            {
+                override = 0;
+            }
 			
-			
-			
+		
 			unsigned long min;
 			bpf_map_lookup_elem(map_fd[1], &key, &min);
 
@@ -162,7 +164,7 @@ int main(int argc, char **argv)
 			}
 			struct timespec diff3 = diff(tp5, tp6);
 
-			printf("user %d,%d,3,%ld\n", i,iters, diff3.tv_nsec);
+			printf("%d,%d,%d,%ld\n", i, iters, override, diff3.tv_nsec);
 			return 0;
 		}
 		
