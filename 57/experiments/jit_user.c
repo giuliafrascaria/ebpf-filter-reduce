@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 
 	if (argc != 2)
     {
-        printf("usage: ./notail niters\nn: number iterations\n");
+        printf("usage: ./jit niters\nn: number iterations\n");
         return 1;
     }
 
@@ -68,23 +68,69 @@ int main(int argc, char **argv)
     clk_id1 = CLOCK_MONOTONIC;
     clk_id2 = CLOCK_BOOTTIME;
 
-    ret1 = clock_gettime(clk_id1, &tp1);
-	if (load_bpf_file(filename)) {
-		printf("%s", bpf_log_buf);
-		return 1;
+    char * buf1 = malloc(4096);
+//------------------------------------------native-------------------------------------
+    int fd1 = open("randnum", O_RDONLY);
+	if (fd1 == -1)
+	{
+		printf("error open file\n");
+		exit(EXIT_FAILURE);
 	}
-    ret2 = clock_gettime(clk_id1, &tp2);
+    for (int iters = 0; iters < i; iters++)
+	{
+		ssize_t readbytes = read(fd1, buf1, 4096);
+		//printf("retval = %d\n", (int) readbytes);
+		//unsigned long elems;
+		//bpf_map_lookup_elem(map_fd[1], &key, &elems);
+		if(readbytes < 0)
+		{
+			printf("read error\n");
+			return 1;
+		}
+		
+		
+		//printf("counted %lu elems\n", elems);
+	}
+
+    lseek(fd1, 0, SEEK_SET);
+
+    ret1 = clock_gettime(clk_id1, &tp1);
+    for (int iters = 0; iters < i; iters++)
+	{
+		ssize_t readbytes = read(fd1, buf1, 4096);
+		//printf("retval = %d\n", (int) readbytes);
+		//unsigned long elems;
+		//bpf_map_lookup_elem(map_fd[1], &key, &elems);
+		if(readbytes < 0)
+		{
+			printf("read error\n");
+			return 1;
+		}
+		
+		
+		//printf("counted %lu elems\n", elems);
+	}
+	ret2 = clock_gettime(clk_id1, &tp2);
 	if (ret1 < 0)
 	{
 		printf("failed clock 1\n");
 	}
 	if (ret2 < 0)
 	{
-		printf("failed clock 2\n");
+		printf("failed clock 1\n");
 	}
 
-	struct timespec timediff = diff(tp1, tp2);
-    //printf("1,%lu\n", timediff.tv_nsec);
+	struct timespec timediff1 = diff(tp1, tp2);
+
+    //close(fd1);
+
+    lseek(fd1, 0, SEEK_SET);
+    
+	if (load_bpf_file(filename)) {
+		printf("%s", bpf_log_buf);
+		return 1;
+	}
+    
 
 	
 	// open file and read to trigger the instrumentation
@@ -98,6 +144,7 @@ int main(int argc, char **argv)
  	char * buf = malloc(4096);
 
 	__u32 key = 0;
+    __u32 key1 = 1;
 	//printf("buffer on user side = %lu\n", (unsigned long) buf);	
 	if (bpf_map_update_elem(map_fd[0], &key, &buf, BPF_ANY) != 0) 
 	{
@@ -108,7 +155,7 @@ int main(int argc, char **argv)
 	ret3 = clock_gettime(clk_id1, &tp3);
 	for (int iters = 0; iters < i; iters++)
 	{
-		ssize_t readbytes = read(fd, buf, 4096);
+		ssize_t readbytes = read(fd1, buf, 4096);
 		//printf("retval = %d\n", (int) readbytes);
 		//unsigned long elems;
 		//bpf_map_lookup_elem(map_fd[1], &key, &elems);
@@ -131,8 +178,16 @@ int main(int argc, char **argv)
 		printf("failed clock 4\n");
 	}
 
-	struct timespec timediff1 = diff(tp3, tp4);
-	printf("%lu,%lu\n", timediff.tv_nsec, timediff1.tv_nsec);
+    unsigned long start, end;
+	bpf_map_lookup_elem(map_fd[1], &key, &start);
+    bpf_map_lookup_elem(map_fd[1], &key1, &end);
+
+    unsigned long nativeexec = end - start;
+    
+	struct timespec timediff2 = diff(tp3, tp4);
+
+    unsigned long jit = timediff2.tv_nsec - timediff1.tv_nsec - nativeexec;
+	printf("native:%lu,instrum:%lu,bpf:%lu,jit:%lu\n", timediff1.tv_nsec, timediff2.tv_nsec, nativeexec, jit);
 
 	//printf("loaded module OK.\nCheck the trace pipe to see the output : sudo cat /sys/kernel/debug/tracing/trace_pipe \n");
 

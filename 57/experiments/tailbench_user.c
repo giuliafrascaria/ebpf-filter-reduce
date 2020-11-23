@@ -44,13 +44,16 @@ struct timespec diff(struct timespec start, struct timespec end)
 int main(int argc, char **argv)
 {
     // bemchmark of verification and execution complexity with double tail call
-	if (argc != 3)
+	if (argc != 4)
 	{
-		printf("usage: ./progarray filter-function reduce-function\n");
+		printf("usage: ./tailbench filter-function reduce-function iter\n");
 	}
 
-    int ret1, ret2, ret3, ret4, ret5, ret6;
-    struct timespec tp1, tp2, tp3, tp4, tp5, tp6;
+	int i;
+    i = atoi(argv[3]);
+
+    int ret1, ret2, ret3, ret4, ret5, ret6, ret7, ret8;
+    struct timespec tp1, tp2, tp3, tp4, tp5, tp6, tp7, tp8;
     clockid_t clk_id1, clk_id2, clk_id3, clk_id4, clk_id5, clk_id6;
 
     clk_id1 = CLOCK_MONOTONIC;
@@ -70,7 +73,7 @@ int main(int argc, char **argv)
 		return 1;
 	}    
     
-    ret2 = clock_gettime(clk_id2, &tp2);
+    ret2 = clock_gettime(clk_id1, &tp2);
 	if (ret1 < 0)
 	{
 		printf("failed clock 1\n");
@@ -79,8 +82,8 @@ int main(int argc, char **argv)
 	{
 		printf("failed clock 2\n");
 	}
-	long diff1 = tp2.tv_nsec- tp1.tv_nsec;
-    printf("load 1 %ld,%ld,%ld\n", tp1.tv_nsec, tp2.tv_nsec, diff1);
+	struct timespec timediff1 = diff(tp1, tp2);
+    //printf("1,%ld\n",  diff1);
 
 	// ------------------ filter ---------------------------
 	char extension[256];
@@ -91,7 +94,7 @@ int main(int argc, char **argv)
 
     clk_id3 = CLOCK_MONOTONIC;
     clk_id4 = CLOCK_MONOTONIC;                    
-    ret3 = clock_gettime(clk_id3, &tp3);
+    ret3 = clock_gettime(clk_id1, &tp3);
 
 	int prog_fd;
 	if (bpf_prog_load(extension, BPF_PROG_TYPE_KPROBE, &obj, &prog_fd))
@@ -100,17 +103,17 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-    ret4 = clock_gettime(clk_id4, &tp4);
+    ret4 = clock_gettime(clk_id1, &tp4);
 	if (ret3 < 0)
 	{
-		printf("failed clock 1\n");
+		printf("failed clock 3\n");
 	}
 	if (ret4 < 0)
 	{
-		printf("failed clock 1\n");
+		printf("failed clock 4\n");
 	}
-	long diff2 = tp4.tv_nsec- tp3.tv_nsec;
-    printf("load 2 %ld,%ld,%ld\n", tp3.tv_nsec, tp4.tv_nsec, diff2);
+	struct timespec timediff2 = diff(tp3, tp4);
+    //printf("load 2 %ld,%ld,%ld\n", tp3.tv_nsec, tp4.tv_nsec, diff2);
 
 	// ---------------- reduce -------------------------------
 	char extension2[256];
@@ -123,7 +126,7 @@ int main(int argc, char **argv)
 
     clk_id5 = CLOCK_MONOTONIC;
     clk_id6 = CLOCK_MONOTONIC;
-    ret5 = clock_gettime(clk_id5, &tp5);
+    ret5 = clock_gettime(clk_id1, &tp5);
 
 	if (bpf_prog_load(extension2, BPF_PROG_TYPE_KPROBE, &obj2, &prog_fd2))
 	{
@@ -131,17 +134,16 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-    ret6 = clock_gettime(clk_id6, &tp6);
+    ret6 = clock_gettime(clk_id1, &tp6);
 	if (ret5 < 0)
 	{
-		printf("failed clock 1\n");
+		printf("failed clock 5\n");
 	}
 	if (ret6 < 0)
 	{
-		printf("failed clock 1\n");
+		printf("failed clock 6\n");
 	}
-	long diff3 = tp6.tv_nsec- tp5.tv_nsec;
-    printf("load 3 %ld,%ld,%ld\n", tp5.tv_nsec, tp6.tv_nsec, diff3);
+	struct timespec timediff3 = diff(tp5, tp6);
 
 	// load filter function prog fd in main kprobe intrumentation
 	err = bpf_map_update_elem(map_fd[2], &fkey, &prog_fd, BPF_ANY);
@@ -161,14 +163,14 @@ int main(int argc, char **argv)
 	}
 
 	// open file and read to trigger the instrumentation
-	int fd = open("f", O_RDONLY);
+	int fd = open("randnum", O_RDONLY);
 	if (fd == -1)
 	{
 		printf("error open file\n");
 		exit(EXIT_FAILURE);
 	}
 
- 	char * buf = malloc(4096);
+ 	char * buf = malloc(4096*i);
 
 	__u32 key = 0;
 	//printf("buffer on user side = %lu\n", (unsigned long) buf);	
@@ -178,8 +180,40 @@ int main(int argc, char **argv)
 		return 1;
     }
 
-	ssize_t readbytes = read(fd, buf, 4096);
-	//printf("retval = %d\n", (int) readbytes);
+	ret7 = clock_gettime(clk_id1, &tp7);
+	for (int iters = 0; iters < i; iters++)
+	{
+		ssize_t readbytes = read(fd, buf, 4096);
+		//printf("retval = %d\n", (int) readbytes);
+		//unsigned long elems;
+		//bpf_map_lookup_elem(map_fd[1], &key, &elems);
+		if(readbytes < 0)
+		{
+			printf("read error\n");
+			return 1;
+		}
+		
+		
+		//printf("counted %lu elems\n", elems);
+	}
+
+	//int result_map_fd = bpf_object__find_map_fd_by_name(obj2, "result_map");
+	//unsigned long elems;
+	//bpf_map_lookup_elem(result_map_fd, &key, &elems);
+	//printf("counted %lu\n", elems);
+	
+	ret8 = clock_gettime(clk_id1, &tp8);
+	if (ret7 < 0)
+	{
+		printf("failed clock 7\n");
+	}
+	if (ret8 < 0)
+	{
+		printf("failed clock 8\n");
+	}
+
+	struct timespec timediff4 = diff(tp7, tp8);
+    printf("%lu,%lu,%lu,%lu\n", timediff1.tv_nsec, timediff2.tv_nsec, timediff3.tv_nsec, timediff4.tv_nsec);
 
 
 
