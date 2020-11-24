@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 		else if(pid == 0)
 		{
 			//child process, load buffer address on map and trigger read
-			char * buf = malloc(4096*iters);
+			char * buf = malloc(4096);
 
 			//printf("child %d\n", i);
 			__u32 key = 0;
@@ -133,27 +133,37 @@ int main(int argc, char **argv)
 
 			clk_id5 = CLOCK_MONOTONIC;
 			clk_id6 = CLOCK_MONOTONIC;
+
+			int override = 0;
+			int nooverride = 0;
+
 			ret5 = clock_gettime(clk_id5, &tp5);
 
-			ssize_t readbytes = read(fd, buf, 4096*iters);
+			//ssize_t readbytes = read(fd, buf, 4096*iters);
 			
-			int override;
-			if(strncmp(buf, "4242", 4) == 0)
+			for (int i = 0; i < iters; i++)
 			{
-				//never actually gonna happen but I need to avoid compiler optimizations
-				override = 1;
-				//return 1;
+				ssize_t readbytes = read(fd, buf, 4096);
+				if(strncmp(buf, "aaaa", 4) == 0)
+				{
+					//never actually gonna happen but I need to avoid compiler optimizations
+					override = override + 1;
+					//return 1;
+				}
+				else
+				{
+					nooverride = nooverride + 1;
+				}
+
 			}
-            else
-            {
-                override = 0;
-            }
+
 			
+			ret6 = clock_gettime(clk_id6, &tp6);
 		
 			unsigned long min;
 			bpf_map_lookup_elem(map_fd[1], &key, &min);
 
-			ret6 = clock_gettime(clk_id6, &tp6);
+			
 			if (ret5 < 0)
 			{
 				printf("failed clock 1\n");
@@ -164,7 +174,8 @@ int main(int argc, char **argv)
 			}
 			struct timespec diff3 = diff(tp5, tp6);
 
-			printf("%d,%d,%d,%ld\n", i, iters, override, diff3.tv_nsec);
+			//procnum, iters, success, fail, time
+			printf("%d,%d,%d,%d,%ld\n", i, iters, override, nooverride, diff3.tv_nsec);
 			return 0;
 		}
 		

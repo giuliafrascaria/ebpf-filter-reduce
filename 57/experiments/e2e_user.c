@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 {
 	if (argc != 4)
 	{
-		printf("usage: ./endtoend filter-function reduce-function iterations\n");
+		printf("usage: ./e2e filter-function reduce-function iterations\n");
 	}
 
 	//number of iterations on file, max 25600
@@ -121,7 +121,7 @@ int main(int argc, char **argv)
 	}
 	struct timespec diff2= diff(tp3, tp4);
 
-    printf("%d,2,%ld\n", iters, diff2.tv_nsec);
+    printf("%d,2,%ld,0\n", iters, diff2.tv_nsec);
 
 
     // load filter function prog fd in main kprobe intrumentation
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 
 
 	// open file and read to trigger the instrumentation
-	int fd = open("rand", O_RDONLY);
+	int fd = open("randnum", O_RDONLY);
 	if (fd == -1)
 	{
 		printf("error open file\n");
@@ -169,7 +169,10 @@ int main(int argc, char **argv)
     clk_id6 = CLOCK_MONOTONIC;
     ret5 = clock_gettime(clk_id5, &tp5);
 
+
+	/*
 	ssize_t readbytes = read(fd, buf, 4096*iters);
+	
 	for(int j = 0; j < readbytes; j += 4)
 	{
 		if(strncmp(buf+j, "4242", 4) == 0)
@@ -178,7 +181,18 @@ int main(int argc, char **argv)
 			printf("found\n");
 			return 1;
 		}
-	}
+	}*/
+	for (int i = 0; i < iters; i++)
+    {
+        ssize_t readbytes = read(fd, buf+4096*i, 4096);
+        if (readbytes != 4096)
+        {
+            printf("failed read\n");
+            return 1;
+        }
+
+    }
+	
 	
 	int result_map_fd = bpf_object__find_map_fd_by_name(obj2, "result_map");
 	unsigned long min;
@@ -195,7 +209,7 @@ int main(int argc, char **argv)
 	}
 	struct timespec diff3 = diff(tp5, tp6);
 
-    printf("%d,3,%ld\n", iters, diff3.tv_nsec);
+    printf("%d,3,%ld,%lu\n", iters, diff3.tv_nsec, min);
 
 	//printf("counted %lu\n", min);
 

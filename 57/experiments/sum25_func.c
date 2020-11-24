@@ -46,7 +46,8 @@ PROG(1)(struct pt_regs *ctx)
         {
             //ret = bpf_probe_read_str(curr, 3, userbuff+i);
             ret = bpf_probe_read_str(curr, 4, to+j+i);
-            
+            if (ret >= 0)
+                elems = elems + 1;
             /*if (curr != NULL)
             {
                 int res = bpf_strtoul(curr, sizeof(curr), base, &num);
@@ -56,7 +57,7 @@ PROG(1)(struct pt_regs *ctx)
                 }
                 
             }*/
-            elems = elems + 1;
+            
             //sum = sum + num;
         }
     }

@@ -65,14 +65,14 @@ clang -nostdinc -isystem `clang -print-file-name=include` \
 
 }
 
-targets=( multiuseroverride multiusernooverride e2e nohelper helperbench writebench readbench tailbench notail endtoend benchoverride nooverride verifier)
+targets=( jit multiuseroverride multiusernooverride e2e nohelper helperbench writebench readbench tailbench notail endtoend benchoverride nooverride verifier)
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"
 	magic_make $t
 done
 
-funcs=( sum sum25 sum50 sum75 sum100 filter filter25 filter50 filter75 filter100 read2 read4 read6 read8 read10 write2 write4 write6 write8 write10 strtol2 strtol4 strtol6 strtol8 strtol10 nohelper2 nohelper4 nohelper6 nohelper8 nohelper10 1 2 3 4 5)
+funcs=( count sum sum25 sum50 sum75 sum100 filter filter25 filter50 filter75 filter100 read2 read4 read6 read8 read10 write2 write4 write6 write8 write10 strtol2 strtol4 strtol6 strtol8 strtol10 nohelper2 nohelper4 nohelper6 nohelper8 nohelper10 1 2 3 4 5)
 
 for t in "${funcs[@]}" ; do
 	echo "making function...$t"

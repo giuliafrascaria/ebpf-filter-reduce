@@ -47,8 +47,8 @@ int main(int argc, char **argv)
 	int iters = atoi(argv[1]);
 
 
-    int ret1, ret2;
-    struct timespec tp1, tp2;
+    int ret1, ret2, ret3, ret4;
+    struct timespec tp1, tp2, tp3, tp4;
     clockid_t clk_id1, clk_id2;
 
     clk_id1 = CLOCK_MONOTONIC;
@@ -56,34 +56,38 @@ int main(int argc, char **argv)
 
 
     // open file and read to trigger the instrumentation
-	int fd1 = open("rand2", O_RDONLY);
+	int fd1 = open("randnum", O_RDONLY);
 	if (fd1 == -1)
 	{
 		printf("error open file\n");
 		exit(EXIT_FAILURE);
 	}
 
- 	char * buf1 = malloc(4096*iters);
-
+ 	//char * buf1 = malloc(4096*iters);
+    char * buf1 = malloc(4096*iters);
 	/*
 	timing for the native execution without the ebpf extension
 	*/
 
+
+    // ------------------------------------------measure read time--------------------------------------
+    int count = 0;
     ret1 = clock_gettime(clk_id1, &tp1);
 
-    ssize_t readbytes1 = read(fd1, buf1, 4096*iters);
-    for(int j = 0; j < readbytes1; j += 4)
+    for (int i = 0; i < iters; i++)
     {
-        if(strncmp(buf1+j, "4242", 4) == 0)
+        ssize_t readbytes1 = read(fd1, buf1+4096*i, 4096);
+        if (readbytes1 != 4096)
         {
-            //never actually gonna happen but I need to avoid compiler optimizations
-            printf("found\n");
+            printf("failed read\n");
             return 1;
         }
+
     }
+    
 
 	
-    ret2 = clock_gettime(clk_id2, &tp2);
+    ret2 = clock_gettime(clk_id1, &tp2);
 	if (ret1 < 0)
 	{
 		printf("failed clock 1\n");
@@ -94,7 +98,31 @@ int main(int argc, char **argv)
 	}
 	struct timespec diff1 = diff(tp1, tp2);
 
-    printf("%d,1,%ld\n", iters, diff1.tv_nsec);
+    // ------------------------------------------measure filter time--------------------------------------
+
+    ret3 = clock_gettime(clk_id1, &tp3);
+    for(int j = 0; j < iters*4096; j += 4)
+    {
+        if(strncmp(buf1+j, "aaaa", 4) == 0)
+        {
+            //never actually gonna happen but I need to avoid compiler optimizations
+            printf("found\n");
+            return 1;
+        }
+        count = count + 1;
+    }
+    ret4 = clock_gettime(clk_id1, &tp4);
+	if (ret3 < 0)
+	{
+		printf("failed clock 3\n");
+	}
+	if (ret4 < 0)
+	{
+		printf("failed clock 4\n");
+	}
+	struct timespec diff2 = diff(tp3, tp4);
+
+    printf("%d,1,%ld,%ld\n", iters, diff1.tv_nsec, diff2.tv_nsec);
     
     close(fd1);
 

@@ -37,11 +37,11 @@ PROG(1)(struct pt_regs *ctx)
 	//parse parameters from ctx
 	to = (void __user *) PT_REGS_PARM1(ctx);
     from = (const void *) PT_REGS_PARM2(ctx);
-	blen = PT_REGS_PARM3(ctx);
+	blen = (int) PT_REGS_PARM3(ctx);
 
 
-    //char snonmidire[] = "tail call read stuff filter\n";
-	//bpf_trace_printk(snonmidire, sizeof(snonmidire));
+    //char snonmidire[] = "tail call read stuff filter len %d\n";
+	//bpf_trace_printk(snonmidire, sizeof(snonmidire), blen);
 
     
     unsigned long sum = 0;
@@ -53,8 +53,12 @@ PROG(1)(struct pt_regs *ctx)
 
     for (int i = 0; i < 16; i++)
     {
-        ret = bpf_probe_read_str(buff, UBUFFSIZE, from+(UBUFFSIZE*i));    //copy and then iterate on user buffer, what the filterreduce would do
-        bpf_probe_write_user((void *) (to + UBUFFSIZE*i), buff, UBUFFSIZE);
+        ret = bpf_probe_read(buff, UBUFFSIZE, from+(UBUFFSIZE*i));    //copy and then iterate on user buffer, what the filterreduce would do
+        if (ret >= 0)
+        {
+            elems = elems + 1;
+            bpf_probe_write_user((void *) (to + UBUFFSIZE*i), buff, UBUFFSIZE);
+        }
     }
 
 

@@ -87,7 +87,7 @@ int bpf_copyout(struct pt_regs *ctx)
 		//unsigned long long curtime;
 		//curtime = bpf_ktime_get_ns();
 			
-		char mystring[] = "4242\n"; 
+		char mystring[] = "aaaa\n"; 
 		bpf_probe_write_user((void *) to, mystring, sizeof(mystring));
 
 		bpf_map_update_elem(&result_map, &key, &sum, BPF_ANY);
