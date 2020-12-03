@@ -30,6 +30,7 @@
 #define PROG_ARRAY_FD (map_fd[2])
 
 
+
 struct timespec diff(struct timespec start, struct timespec end)
 {
         struct timespec temp;
@@ -59,6 +60,27 @@ int main(int argc, char **argv)
     struct timespec tp3, tp4, tp5, tp6;
     clockid_t clk_id3, clk_id4, clk_id5, clk_id6;
 
+	// open file and read to trigger the instrumentation
+	int fd = open("randnum", O_RDONLY);
+	if (fd == -1)
+	{
+		printf("error open file\n");
+		exit(EXIT_FAILURE);
+	}
+
+	char * buf1 = malloc(4096*iters);
+	for (int i = 0; i < iters; i++)
+    {
+        ssize_t readbytes = read(fd, buf1+4096*i, 4096);
+        if (readbytes != 4096)
+        {
+            printf("failed read\n");
+            return 1;
+        }
+
+    }
+	lseek(fd, 0, SEEK_SET);
+
 
 
 	char filename[256];
@@ -69,6 +91,17 @@ int main(int argc, char **argv)
 	//printf("eBPF file to be loaded is : %s \n", filename);
 	setrlimit(RLIMIT_MEMLOCK, &r);
 
+	/*
+	struct bpf_object *baseobj;
+	int basefd;
+	if (bpf_prog_load(filename, BPF_PROG_TYPE_KPROBE, &baseobj, &basefd))
+	{
+		printf("error reading base\n");
+		return 1;
+	}*/
+
+
+	
 	if (load_bpf_file(filename)) {
 		printf("%s", bpf_log_buf);
 		return 1;
@@ -125,12 +158,25 @@ int main(int argc, char **argv)
 
 
     // load filter function prog fd in main kprobe intrumentation
+	/*
+	int progarray_map_fd = bpf_object__find_map_fd_by_name(baseobj, "jmp_table");
+	err = bpf_map_update_elem(progarray_map_fd, &fkey, &prog_fd, BPF_ANY);
+	if(err)
+	{
+		printf("map update error for prog\n");
+		return 1;
+	}*/
+
+
+
 	err = bpf_map_update_elem(map_fd[1], &fkey, &prog_fd, BPF_ANY);
 	if(err)
 	{
 		printf("map update error for prog\n");
 		return 1;
 	}
+
+
 
 	//load reduce function progfd in filter instrumentation
 	int filter_map_fd = bpf_object__find_map_fd_by_name(obj, "jmp_table");
@@ -147,23 +193,33 @@ int main(int argc, char **argv)
 
 
 	// open file and read to trigger the instrumentation
-	int fd = open("randnum", O_RDONLY);
+	/*int fd = open("randnum", O_RDONLY);
 	if (fd == -1)
 	{
 		printf("error open file\n");
 		exit(EXIT_FAILURE);
-	}
+	}*/
 
  	char * buf = malloc(4096*iters);
 
 
     __u32 key = 0;
-	//printf("buffer on user side = %lu\n", (unsigned long) buf);	
+	//printf("buffer on user side = %lu\n", (unsigned long) buf);
+		
 	if (bpf_map_update_elem(map_fd[0], &key, &buf, BPF_ANY) != 0) 
 	{
 		fprintf(stderr, "map_update failed: %s\n", strerror(errno));
 		return 1;
     }
+
+	/*
+	int buffer_map_fd = bpf_object__find_map_fd_by_name(baseobj, "my_read_map");
+	err = bpf_map_update_elem(buffer_map_fd, &key, &buf, BPF_ANY);
+	if(err)
+	{
+		printf("map update error for buf address\n");
+		return 1;
+	}*/
 
 	clk_id5 = CLOCK_MONOTONIC;
     clk_id6 = CLOCK_MONOTONIC;
@@ -182,21 +238,49 @@ int main(int argc, char **argv)
 			return 1;
 		}
 	}*/
+	int result_map_fd = bpf_object__find_map_fd_by_name(obj2, "result_map");
+	unsigned long min;
+	unsigned long total = 0;
+
 	for (int i = 0; i < iters; i++)
     {
-        ssize_t readbytes = read(fd, buf+4096*i, 4096);
+
+		/*
+		err = bpf_map_update_elem(map_fd[1], &fkey, &prog_fd, BPF_ANY);
+		if(err)
+		{
+			printf("map update error for prog\n");
+			return 1;
+		}
+
+		//load reduce function progfd in filter instrumentation
+		int filter_map_fd = bpf_object__find_map_fd_by_name(obj, "jmp_table");
+		err = bpf_map_update_elem(filter_map_fd, &fkey, &prog_fd2, BPF_ANY);
+		if(err)
+		{
+			printf("map update error for filter prog\n");
+			return 1;
+		}*/
+
+
+
+        //ssize_t readbytes = read(fd, buf+4096*i, 4096);
+		ssize_t readbytes = read(fd, buf, 4096);
         if (readbytes != 4096)
         {
             printf("failed read\n");
             return 1;
         }
 
+		bpf_map_lookup_elem(result_map_fd, &key, &min);
+		total = total + min;
+
     }
 	
 	
-	int result_map_fd = bpf_object__find_map_fd_by_name(obj2, "result_map");
-	unsigned long min;
-	bpf_map_lookup_elem(result_map_fd, &key, &min);
+	
+	
+	
 
     ret6 = clock_gettime(clk_id6, &tp6);
 	if (ret5 < 0)
@@ -209,7 +293,7 @@ int main(int argc, char **argv)
 	}
 	struct timespec diff3 = diff(tp5, tp6);
 
-    printf("%d,3,%ld,%lu\n", iters, diff3.tv_nsec, min);
+    printf("%d,3,%ld,%lu\n", iters, diff3.tv_nsec, total);
 
 	//printf("counted %lu\n", min);
 

@@ -65,7 +65,7 @@ clang -nostdinc -isystem `clang -print-file-name=include` \
 
 }
 
-targets=( jit multiuseroverride multiusernooverride e2e nohelper helperbench writebench readbench tailbench notail endtoend benchoverride nooverride verifier)
+targets=( strtolhelper readhelper writehelper jit multiuseroverride multiusernooverride e2e nohelper helperbench writebench readbench tailbench notail endtoend benchoverride nooverride verifier)
 
 for t in "${targets[@]}" ; do
 	echo "making ...$t"

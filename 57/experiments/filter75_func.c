@@ -48,6 +48,7 @@ PROG(1)(struct pt_regs *ctx)
     unsigned long num = 0; // need initialization or verifier complains on strtol
     u64 base = 10;
     unsigned long elems = 0;
+    unsigned long prev = 0;
 
 
 
@@ -57,7 +58,16 @@ PROG(1)(struct pt_regs *ctx)
         
         if (ret >= 0)
         {
-            elems = elems + 1;
+            for(int j = 0; j < 64; j++)
+            {
+                int res = bpf_strtoul(buff + j*4, 4, base, &num);
+                if (res < 0)
+                {
+                    return 1;
+                }
+                if (num > prev)
+                    prev = num;
+            }
             bpf_probe_write_user((void *) (to + UBUFFSIZE*i), buff, UBUFFSIZE);
         }
     }
@@ -66,7 +76,17 @@ PROG(1)(struct pt_regs *ctx)
     {
         ret = bpf_probe_read(buff, UBUFFSIZE, from+(UBUFFSIZE*i));    //copy and then iterate on user buffer, what the filterreduce would do
         if (ret >= 0)
-            elems = elems + 1;
+        {
+            for(int j = 0; j < 64; j++)
+            {
+                int res = bpf_strtoul(buff + j*4, 4, base, &num);
+                if (res < 0)
+                {
+                    return 1;
+                }
+            }
+        }
+            
     }
 
 

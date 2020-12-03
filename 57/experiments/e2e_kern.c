@@ -67,8 +67,8 @@ int bpf_copyout(struct pt_regs *ctx)
 
 	if (to == *val)
 	{
-		//char s2[] = "copyout to 0x%p, ul %lu len %d\n";
-    	//bpf_trace_printk(s2, sizeof(s2), to, (unsigned long) to, blen);
+		//char s2[] = "about to tail call\n";
+    	//bpf_trace_printk(s2, sizeof(s2));
         //unsigned long rc = 0;
 		//bpf_override_return(ctx, rc);
 

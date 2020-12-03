@@ -24,7 +24,8 @@ PROG(1)(struct pt_regs *ctx)
 	void __user *to; //struct pt_regs *ctx
     const void *from;
     int ret;
-    char curr[4];
+    char curr[5];
+
 	__u32 key = 0;
 	__u64 ** val;
     int blen;
@@ -42,21 +43,15 @@ PROG(1)(struct pt_regs *ctx)
 
     for (int j = 0; j < 4; j++)
     {
+        
+        
         for (int i = 0; i < UBUFFSIZE - 4; i = i+4)
         {
             //ret = bpf_probe_read_str(curr, 3, userbuff+i);
             ret = bpf_probe_read_str(curr, 4, to+j+i);
             if (ret >= 0)
                 elems = elems + 1;
-            /*if (curr != NULL)
-            {
-                int res = bpf_strtoul(curr, sizeof(curr), base, &num);
-                if (res < 0)
-                {
-                    return 1;
-                }
-                
-            }*/
+
             
             //sum = sum + num;
         }

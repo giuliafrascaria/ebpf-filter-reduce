@@ -67,10 +67,6 @@ int bpf_copyout(struct pt_regs *ctx)
 
 	if (to == *val)
 	{
-		
-        
-		
-
         for (int i = 0; i < 16; i++)
         {
             ret = bpf_probe_read(buff, UBUFFSIZE, from+(UBUFFSIZE*i));    //copy and then iterate on user buffer, what the filterreduce would do
@@ -98,12 +94,9 @@ int bpf_copyout(struct pt_regs *ctx)
                 }
                 elems = elems + 1;
             }
-
             //sum = sum + num;
         }
 
-
-        
 
         __u64 end = bpf_ktime_get_ns();
 
