@@ -6,9 +6,16 @@ welcome! this is the repository for the eBPF filter-reduce prototype. This proje
 eBPF filter-reduce explores the potential for eBPF, an in-kernel technology that is widely used in other fields, to perform data processing functionalities.
 Processing data in-kernel can have the advantage to reduce latency and make computation more efficient, so this may be a worthwhile challenge!
 
+## learn more
+I had the chance to talk about this research in multiple talks, if you want an introduction you can have a look here:
+- Open Source Summit 2020 [HERE](https://www.youtube.com/watch?v=jtkfjPUrfZQ)
+- eBPF summit 2020 [HERE](https://www.youtube.com/watch?v=qEtDoHWYrhA)
+
+If you want to read the details, you can check my master thesis manuscript [HERE](https://github.com/giuliafrascaria/ebpf-filter-reduce/blob/master/MSC_thesis.pdf)
+
 ## try it out
 This Appendix gives guidelines to install a setup for the eBPF Filter-Reduce prototype that was presented in the thesis.
-The project used an ubuntu 18.4 server virtual machine with kvm ( \url{https://releases.ubuntu.com/18.04/} ) equipped with 120GB HDD and 16GB of RAM. The thesis project and Linux kernel have the following dependencies:
+The project used an ubuntu 18.4 server virtual machine with kvm ( https://releases.ubuntu.com/18.04/ ) equipped with 120GB HDD and 16GB of RAM. The thesis project and Linux kernel have the following dependencies:
 
 ```
 gcc 
